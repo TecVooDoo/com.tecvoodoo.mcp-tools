@@ -1,0 +1,28 @@
+{
+    "name": "MCPTools.BehaviorDesigner.Editor",
+    "rootNamespace": "",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime",
+        "Opsive.GraphDesigner.Runtime.Wrappers",
+        "Opsive.Shared.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll",
+        "Opsive.BehaviorDesigner.Runtime.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HAS_BEHAVIOR_DESIGNER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
