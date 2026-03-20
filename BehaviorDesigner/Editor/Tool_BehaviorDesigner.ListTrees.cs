@@ -4,53 +4,36 @@ using System;
 using System.ComponentModel;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
+using com.IvanMurzak.ReflectorNet.Utils;
 using Opsive.BehaviorDesigner.Runtime;
-using Opsive.GraphDesigner.Runtime.Variables;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace MCPTools.BehaviorDesigner.Editor
 {
     public partial class Tool_BehaviorDesigner
     {
-        [McpPluginTool("bd-list-trees", Title = "Behavior Designer / List Trees")]
-        [Description("Lists all BehaviorTree components in the current scene with their name, group, enabled state, and variable count.")]
+        [McpPluginTool("bd-list-trees", Title = "Behavior Designer / List All Trees")]
+        [Description("Lists all BehaviorTree components in the current scene with their name and status.")]
         public string ListTrees()
         {
             return MainThread.Instance.Run(() =>
             {
-                BehaviorTree[] trees = UnityEngine.Object.FindObjectsByType<BehaviorTree>(FindObjectsSortMode.None);
-                if (trees.Length == 0)
+                BehaviorTree[] allTrees = UnityEngine.Object.FindObjectsByType<BehaviorTree>(FindObjectsSortMode.None);
+                if (allTrees.Length == 0)
                     return "No BehaviorTree components found in the scene.";
 
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"Found {trees.Length} BehaviorTree(s):");
+                sb.AppendLine($"=== Behavior Trees in Scene ({allTrees.Length}) ===");
 
-                for (int i = 0; i < trees.Length; i++)
+                for (int i = 0; i < allTrees.Length; i++)
                 {
-                    BehaviorTree tree = trees[i];
+                    BehaviorTree tree = allTrees[i];
+                    string treeName = tree.Name ?? "(unnamed)";
                     string goName = tree.gameObject.name;
-                    int instanceId = tree.gameObject.GetInstanceID();
-
-                    string treeName = "(unnamed)";
-                    try { treeName = tree.BehaviorName ?? "(unnamed)"; } catch { /* DLL API safety */ }
-
-                    string groupName = "(none)";
-                    try { groupName = tree.Group ?? "(none)"; } catch { /* DLL API safety */ }
-
                     bool enabled = tree.enabled;
+                    int varCount = tree.SharedVariables != null ? tree.SharedVariables.Length : 0;
 
-                    int varCount = 0;
-                    try
-                    {
-                        List<SharedVariable> variables = tree.GetAllVariables();
-                        if (variables != null)
-                            varCount = variables.Count;
-                    }
-                    catch { /* DLL API safety */ }
-
-                    sb.AppendLine($"  [{instanceId}] {goName} | Tree: {treeName} | Group: {groupName} | Enabled: {enabled} | Vars: {varCount}");
+                    sb.AppendLine($"  [{i}] GO: {goName} | Tree: {treeName} | Enabled: {enabled} | Variables: {varCount}");
                 }
 
                 return sb.ToString();

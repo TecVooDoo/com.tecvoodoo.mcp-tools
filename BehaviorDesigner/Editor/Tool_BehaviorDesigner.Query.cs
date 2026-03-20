@@ -5,9 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
+using com.IvanMurzak.ReflectorNet.Utils;
 using Opsive.BehaviorDesigner.Runtime;
-using Opsive.BehaviorDesigner.Runtime.Tasks;
 using Opsive.GraphDesigner.Runtime.Variables;
 using UnityEngine;
 
@@ -16,10 +15,12 @@ namespace MCPTools.BehaviorDesigner.Editor
     public partial class Tool_BehaviorDesigner
     {
         [McpPluginTool("bd-query", Title = "Behavior Designer / Query Tree")]
-        [Description("Query behavior tree state on a GameObject. Shows tree info, shared variables, and active task.")]
+        [Description("Query behavior tree state on a GameObject: tree name, enabled status, shared variables, and node info.")]
         public string Query(
             [Description("Name of the GameObject with BehaviorTree component(s).")]
-            string gameObjectName
+            string gameObjectName,
+            [Description("Index of the tree if multiple BehaviorTree components exist. Default 0.")]
+            int? treeIndex = 0
         )
         {
             return MainThread.Instance.Run(() =>
@@ -29,106 +30,50 @@ namespace MCPTools.BehaviorDesigner.Editor
                 if (trees.Length == 0)
                     throw new Exception($"'{gameObjectName}' has no BehaviorTree component.");
 
+                int idx = treeIndex ?? 0;
+                if (idx < 0 || idx >= trees.Length)
+                    throw new Exception($"Tree index {idx} out of range. '{gameObjectName}' has {trees.Length} tree(s).");
+
+                BehaviorTree tree = trees[idx];
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine($"GameObject: {go.name} ({trees.Length} tree(s))");
 
-                for (int i = 0; i < trees.Length; i++)
+                string treeName = tree.Name ?? "(unnamed)";
+                sb.AppendLine($"=== BehaviorTree on '{go.name}' [{idx}/{trees.Length}] ===");
+                sb.AppendLine($"  Name: {treeName}");
+                sb.AppendLine($"  Enabled: {tree.enabled}");
+                sb.AppendLine($"  StartWhenEnabled: {tree.StartWhenEnabled}");
+                sb.AppendLine($"  PauseWhenDisabled: {tree.PauseWhenDisabled}");
+
+                // Shared Variables
+                SharedVariable[]? vars = tree.SharedVariables;
+                if (vars != null && vars.Length > 0)
                 {
-                    BehaviorTree tree = trees[i];
-                    sb.AppendLine($"\n--- Tree [{i}] ---");
-
-                    try
+                    sb.AppendLine($"\n  --- Shared Variables ({vars.Length}) ---");
+                    for (int i = 0; i < vars.Length; i++)
                     {
-                        string treeName = tree.BehaviorName ?? "(unnamed)";
-                        sb.AppendLine($"  Name: {treeName}");
-                    }
-                    catch
-                    {
-                        sb.AppendLine("  Name: (unable to read)");
-                    }
-
-                    try
-                    {
-                        string groupName = tree.Group ?? "(none)";
-                        sb.AppendLine($"  Group: {groupName}");
-                    }
-                    catch
-                    {
-                        sb.AppendLine("  Group: (unable to read)");
-                    }
-
-                    sb.AppendLine($"  Enabled: {tree.enabled}");
-
-                    // Shared variables
-                    try
-                    {
-                        List<SharedVariable> variables = tree.GetAllVariables();
-                        if (variables != null)
+                        SharedVariable sv = vars[i];
+                        try
                         {
-                            sb.AppendLine($"  Variables ({variables.Count}):");
-                            foreach (SharedVariable v in variables)
+                            string varName = sv.Name.ToString();
+                            string typeName = sv.GetType().Name;
+                            string valStr = "(unknown)";
+                            try
                             {
-                                try
-                                {
-                                    string typeName = v.GetType().Name;
-                                    object value = v.GetValue();
-                                    string valueStr = value != null ? value.ToString()! : "null";
-                                    sb.AppendLine($"    [{typeName}] {v.Name} = {valueStr}");
-                                }
-                                catch
-                                {
-                                    sb.AppendLine($"    [?] {v.Name} = (unable to read)");
-                                }
+                                object? val = sv.GetType().GetProperty("Value")?.GetValue(sv);
+                                valStr = val?.ToString() ?? "null";
                             }
+                            catch { }
+                            sb.AppendLine($"    [{i}] {varName} ({typeName}) = {valStr}");
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            sb.AppendLine("  Variables: none");
+                            sb.AppendLine($"    [{i}] (error reading variable: {ex.Message})");
                         }
                     }
-                    catch
-                    {
-                        sb.AppendLine("  Variables: (unable to enumerate)");
-                    }
-
-                    // Active task (play mode only)
-                    try
-                    {
-                        if (Application.isPlaying)
-                        {
-                            // Try to get currently running tasks
-                            List<Task> activeTasks = tree.FindTasks<Task>();
-                            if (activeTasks != null)
-                            {
-                                StringBuilder activeNames = new StringBuilder();
-                                foreach (Task task in activeTasks)
-                                {
-                                    try
-                                    {
-                                        TaskStatus status = task.NodeData.NodeStatus;
-                                        if (status == TaskStatus.Running)
-                                        {
-                                            if (activeNames.Length > 0) activeNames.Append(", ");
-                                            activeNames.Append(task.FriendlyName);
-                                        }
-                                    }
-                                    catch { /* skip tasks we can't read */ }
-                                }
-                                if (activeNames.Length > 0)
-                                    sb.AppendLine($"  Active tasks: {activeNames}");
-                                else
-                                    sb.AppendLine("  Active tasks: none running");
-                            }
-                        }
-                        else
-                        {
-                            sb.AppendLine("  Active tasks: (not in play mode)");
-                        }
-                    }
-                    catch
-                    {
-                        sb.AppendLine("  Active tasks: (unable to query)");
-                    }
+                }
+                else
+                {
+                    sb.AppendLine("\n  No shared variables.");
                 }
 
                 return sb.ToString();

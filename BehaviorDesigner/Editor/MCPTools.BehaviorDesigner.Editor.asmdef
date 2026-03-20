@@ -4,6 +4,7 @@
     "references": [
         "com.IvanMurzak.Unity.MCP.Editor",
         "com.IvanMurzak.Unity.MCP.Runtime",
+        "Opsive.BehaviorDesigner.Runtime",
         "Opsive.GraphDesigner.Runtime.Wrappers",
         "Opsive.Shared.Runtime"
     ],
@@ -17,7 +18,7 @@
         "McpPlugin.dll",
         "McpPlugin.Common.dll",
         "ReflectorNet.dll",
-        "Opsive.BehaviorDesigner.Runtime.dll"
+        "Opsive.GraphDesigner.Runtime.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [
