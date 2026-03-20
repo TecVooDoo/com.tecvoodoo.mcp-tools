@@ -1,8 +1,8 @@
 {
   "name": "com.tecvoodoo.mcp-tools",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "displayName": "TecVooDoo MCP Tool Extensions",
-  "description": "Custom MCP tool extensions for Claude AI Game Developer. Covers Flexalon, PrefabWorldBuilder, RayFire, MagicaCloth2, FinalIK, AssetInventory, MalbersAC, QuestForge, RetargetPro, RopeToolkit, HeathenPhysics, HeathenBallistics, Feel, and DamageNumbersPro. Tools auto-activate via MCPToolsDefineManager when target assets are detected.",
+  "description": "Custom MCP tool extensions for Claude AI Game Developer. Covers Flexalon, PrefabWorldBuilder, RayFire, MagicaCloth2, FinalIK, AssetInventory, MalbersAC, QuestForge, RetargetPro, RopeToolkit, HeathenPhysics, HeathenBallistics, Feel, DamageNumbersPro, Cinemachine, AnimationRigging, and ALINE. Tools auto-activate via MCPToolsDefineManager when target assets are detected.",
   "unity": "6000.0",
   "author": {
     "name": "TecVooDoo LLC"

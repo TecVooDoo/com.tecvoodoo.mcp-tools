@@ -32,6 +32,10 @@ namespace MCPTools.Editor
             ("HAS_HEATHEN_BALLISTICS", "Heathen.UnityPhysics.BallisticAim, Heathen.Ballistics"),
             ("HAS_FEEL",               "MoreMountains.Feedbacks.MMF_Player, MoreMountains.Tools"),
             ("HAS_DAMAGE_NUMBERS_PRO", "DamageNumbersPro.DamageNumberMesh, DamageNumbersPro"),
+            // Session 3 additions
+            ("HAS_CINEMACHINE",        "Unity.Cinemachine.CinemachineCamera, Unity.Cinemachine"),
+            ("HAS_ANIMATION_RIGGING",  "UnityEngine.Animations.Rigging.TwoBoneIKConstraint, Unity.Animation.Rigging"),
+            ("HAS_ALINE",              "Drawing.MonoBehaviourGizmos, ALINE"),
         };
 
         static MCPToolsDefineManager()

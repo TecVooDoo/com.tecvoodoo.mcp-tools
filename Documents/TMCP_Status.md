@@ -1,10 +1,10 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.1.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.2.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** March 20, 2026
+**Last Updated:** March 20, 2026 (Session 3)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -13,7 +13,7 @@
 
 ## Current State
 
-**75 tools** across 14 asset groups. All stable.
+**90 tools** across 17 asset groups. All stable.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -26,11 +26,14 @@
 | Malbers AC | 8 | `HAS_MALBERS_AC` | `MCPTools.MalbersAC.Editor` | Stable |
 | Quest Forge | 5 | `HAS_MALBERS_QUESTFORGE` | None (`#if` only) | Stable |
 | Retarget Pro | 4 | `HAS_RETARGETPRO` | `MCPTools.RetargetPro.Editor` | Stable |
-| **Rope Toolkit** | **5** | `HAS_ROPE_TOOLKIT` | None (`#if` only) | **New** |
-| **Heathen Physics** | **5** | `HAS_HEATHEN_PHYSICS` | `MCPTools.HeathenPhysics.Editor` | **New** |
-| **Heathen Ballistics** | **5** | `HAS_HEATHEN_BALLISTICS` | `MCPTools.HeathenBallistics.Editor` | **New** |
-| **Feel** | **4** | `HAS_FEEL` | None (`#if` only) | **New** |
-| **Damage Numbers Pro** | **4** | `HAS_DAMAGE_NUMBERS_PRO` | `MCPTools.DamageNumbersPro.Editor` | **New** |
+| Rope Toolkit | 5 | `HAS_ROPE_TOOLKIT` | None (`#if` only) | Stable |
+| Heathen Physics | 5 | `HAS_HEATHEN_PHYSICS` | `MCPTools.HeathenPhysics.Editor` | Stable |
+| Heathen Ballistics | 5 | `HAS_HEATHEN_BALLISTICS` | `MCPTools.HeathenBallistics.Editor` | Stable |
+| Feel | 4 | `HAS_FEEL` | None (`#if` only) | Stable |
+| Damage Numbers Pro | 4 | `HAS_DAMAGE_NUMBERS_PRO` | `MCPTools.DamageNumbersPro.Editor` | Stable |
+| **Cinemachine** | **5** | `HAS_CINEMACHINE` | `MCPTools.Cinemachine.Editor` | **New** |
+| **Animation Rigging** | **5** | `HAS_ANIMATION_RIGGING` | `MCPTools.AnimationRigging.Editor` | **New** |
+| **ALINE** | **4** | `HAS_ALINE` | `MCPTools.ALINE.Editor` | **New** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed.
 
@@ -38,7 +41,7 @@
 
 ## Package vs Source Sync
 
-All 14 groups built directly in the package folder. No separate source location.
+All 17 groups built directly in the package folder. No separate source location.
 
 **Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. FinalIK, PWB, Quest Forge, Rope Toolkit, and Feel have no asmdef -- they use `#if HAS_*` guards and compile to nothing when the target asset isn't installed. SyntyAssets project was deleted Mar 12, 2026.
 
@@ -70,6 +73,31 @@ All 14 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### Session 3 (Mar 20, 2026) -- Cinemachine + Animation Rigging + ALINE + Compile fix
+
+Added 3 new tool groups (14 tools) + fixed Session 2 compile errors:
+
+**Compile fix:** All Session 2 asmdef-based tools (HeathenPhysics, HeathenBallistics, DamageNumbersPro) were missing `using com.IvanMurzak.ReflectorNet.Utils;` -- MainThread is in ReflectorNet.dll, not MCP.Editor.Utils. Fixed in 7 files.
+
+**Cinemachine (5 tools):** `HAS_CINEMACHINE`, `MCPTools.Cinemachine.Editor`
+- `cm-query` -- Read full CinemachineCamera setup (priority, lens, targets, pipeline components) or CinemachineBrain
+- `cm-configure-camera` -- Set priority, FOV, clip planes, Dutch, tracking/lookAt targets
+- `cm-configure-follow` -- Configure CinemachineFollow (offset, damping, bindingMode) or CinemachineThirdPersonFollow (shoulder offset, side, distance)
+- `cm-configure-noise` -- Set AmplitudeGain, FrequencyGain, NoiseProfile on CinemachineBasicMultiChannelPerlin
+- `cm-configure-brain` -- Configure CinemachineBrain (defaultBlend style+time, updateMethod, ignoreTimeScale)
+
+**Animation Rigging (5 tools):** `HAS_ANIMATION_RIGGING`, `MCPTools.AnimationRigging.Editor`
+- `rig-query` -- List all RigBuilder layers, Rig, TwoBoneIKConstraint, MultiAimConstraint, MultiParentConstraint, ChainIKConstraint
+- `rig-configure-twoboneik` -- Assign root/mid/tip/target/hint transforms, set position/rotation/hint weights
+- `rig-configure-aim` -- Configure MultiAimConstraint (constrainedObject, source objects with weights)
+- `rig-configure-weights` -- Set Rig weight, constraint weight, enable/disable RigBuilder layers
+
+**ALINE (4 tools):** `HAS_ALINE`, `MCPTools.ALINE.Editor`
+- `aline-draw-line` -- Draw a persistent line in Scene View (between coords or named GameObjects, with duration+color)
+- `aline-draw-sphere` -- Draw a wire sphere at a world position or named GameObject
+- `aline-draw-box` -- Draw a wire box at a world position or named GameObject (uses GO's scale as default size)
+- `aline-label` -- Draw a 2D text label at a world position or named GameObject
 
 ### Session 2 (Mar 20, 2026) -- Rope Toolkit + Heathen + Feel + DNP
 
