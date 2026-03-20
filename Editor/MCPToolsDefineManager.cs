@@ -25,7 +25,7 @@ namespace MCPTools.Editor
             ("HAS_ASSETINVENTORY", "AssetInventory.AssetSearch, AssetInventory.Editor"),
             ("HAS_MALBERS_AC",     "MalbersAnimations.Controller.MAnimal, MalbersAnimations"),
             ("HAS_MALBERS_QUESTFORGE", "MalbersAnimations.QuestForge.QuestManager, Assembly-CSharp"),
-            ("HAS_RETARGETPRO",    "KINEMATION.RetargetProComponent, RetargetPro.Runtime"),
+            ("HAS_RETARGETPRO",    "KINEMATION.RetargetPro.Runtime.RetargetProComponent, RetargetPro.Runtime"),
             // Session 2 additions
             ("HAS_ROPE_TOOLKIT",       "RopeToolkit.Rope, Assembly-CSharp"),
             ("HAS_HEATHEN_PHYSICS",    "Heathen.UnityPhysics.PhysicsData, Heathen.UnityPhysics"),
@@ -38,14 +38,14 @@ namespace MCPTools.Editor
             ("HAS_ALINE",              "Drawing.MonoBehaviourGizmos, ALINE"),
             // Session 4 additions
             ("HAS_MASTERAUDIO",        "DarkTonic.MasterAudio.MasterAudio, Assembly-CSharp"),
-            ("HAS_ASTAR",              "Pathfinding.AstarPath, AstarPathfindingProject"),
+            ("HAS_ASTAR",              "AstarPath, AstarPathfindingProject"),
             ("HAS_DIALOGUE_SYSTEM",    "PixelCrushers.DialogueSystem.DialogueManager, Assembly-CSharp"),
             ("HAS_SENSORTOOLKIT",      "Micosmo.SensorToolkit.RangeSensor, Micosmo.SensorToolkit"),
-            ("HAS_UCC",                "Opsive.UltimateCharacterController.Character.UltimateCharacterLocomotion, Opsive.UltimateCharacterController.Runtime"),
+            ("HAS_UCC",                "Opsive.UltimateCharacterController.Character.UltimateCharacterLocomotion, Opsive.UltimateCharacterController"),
             ("HAS_BEHAVIOR_DESIGNER",  "Opsive.BehaviorDesigner.Runtime.BehaviorTree, Opsive.BehaviorDesigner.Runtime"),
             ("HAS_DOTWEEN",            "DG.Tweening.DOTweenAnimation, DOTweenPro"),
-            ("HAS_UNITY_ENTITIES",     "Unity.Entities.World, Unity.Entities"),
-            ("HAS_UNITY_PHYSICS",      "Unity.Physics.PhysicsStep, Unity.Physics"),
+            ("HAS_UNITY_ENTITIES",     "Unity.Entities.SceneSectionComponent, Unity.Entities.Hybrid"),
+            ("HAS_UNITY_PHYSICS",      "Unity.Physics.Authoring.PhysicsStepAuthoring, Unity.Physics.Hybrid"),
         };
 
         static MCPToolsDefineManager()
