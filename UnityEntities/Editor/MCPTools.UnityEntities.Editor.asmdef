@@ -1,0 +1,26 @@
+{
+    "name": "MCPTools.UnityEntities.Editor",
+    "rootNamespace": "MCPTools.UnityEntities.Editor",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime",
+        "Unity.Entities"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "HAS_UNITY_ENTITIES"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

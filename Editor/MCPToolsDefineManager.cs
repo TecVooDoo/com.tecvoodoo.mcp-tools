@@ -44,6 +44,8 @@ namespace MCPTools.Editor
             ("HAS_UCC",                "Opsive.UltimateCharacterController.Character.UltimateCharacterLocomotion, Opsive.UltimateCharacterController.Runtime"),
             ("HAS_BEHAVIOR_DESIGNER",  "Opsive.BehaviorDesigner.Runtime.BehaviorTree, Opsive.BehaviorDesigner.Runtime"),
             ("HAS_DOTWEEN",            "DG.Tweening.DOTweenAnimation, DOTweenPro"),
+            ("HAS_UNITY_ENTITIES",     "Unity.Entities.World, Unity.Entities"),
+            ("HAS_UNITY_PHYSICS",      "Unity.Physics.PhysicsStep, Unity.Physics"),
         };
 
         static MCPToolsDefineManager()

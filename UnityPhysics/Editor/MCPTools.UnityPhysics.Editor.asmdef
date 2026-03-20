@@ -1,0 +1,29 @@
+{
+    "name": "MCPTools.UnityPhysics.Editor",
+    "rootNamespace": "MCPTools.UnityPhysics.Editor",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime",
+        "Unity.Entities",
+        "Unity.Physics",
+        "Unity.Physics.Hybrid",
+        "Unity.Mathematics"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "HAS_UNITY_PHYSICS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
