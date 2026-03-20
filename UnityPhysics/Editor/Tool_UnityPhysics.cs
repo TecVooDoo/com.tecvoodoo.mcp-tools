@@ -1,5 +1,6 @@
 #nullable enable
 using com.IvanMurzak.McpPlugin;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace MCPTools.UnityPhysics.Editor
@@ -9,7 +10,7 @@ namespace MCPTools.UnityPhysics.Editor
     {
         static string FormatV3(Vector3 v) => $"({v.x:F3}, {v.y:F3}, {v.z:F3})";
 
-        static string FormatFloat3(Unity.Mathematics.float3 v) => $"({v.x:F3}, {v.y:F3}, {v.z:F3})";
+        static string FormatFloat3(float3 v) => $"({v.x:F3}, {v.y:F3}, {v.z:F3})";
 
         static T GetOrAdd<T>(GameObject go) where T : Component
         {
