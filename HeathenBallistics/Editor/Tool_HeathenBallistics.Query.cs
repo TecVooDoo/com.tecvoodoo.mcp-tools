@@ -35,8 +35,11 @@ Use before configuring to understand the current ballistic setup.")]
                     sb.AppendLine($"  acceleration:  {FormatVector3(aim.constantAcceleration)}");
                     sb.AppendLine($"  yLimit:        ({aim.yLimit.x:F1} to {aim.yLimit.y:F1})");
                     sb.AppendLine($"  xLimit:        ({aim.xLimit.x:F1} to {aim.xLimit.y:F1})");
-                    sb.AppendLine($"  yPivot:        {(aim.yPivot != null ? aim.yPivot.name : "none")}");
-                    sb.AppendLine($"  xPivot:        {(aim.xPivot != null ? aim.xPivot.name : "none")}");
+                    // yPivot/xPivot are private SerializeField -- read via reflection
+                    var yPivot = (Transform)typeof(BallisticAim).GetField("yPivot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(aim);
+                    var xPivot = (Transform)typeof(BallisticAim).GetField("xPivot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(aim);
+                    sb.AppendLine($"  yPivot:        {(yPivot != null ? yPivot.name : "none")}");
+                    sb.AppendLine($"  xPivot:        {(xPivot != null ? xPivot.name : "none")}");
                 }
 
                 var targeting = go.GetComponent<BallisticTargeting>();

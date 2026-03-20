@@ -102,7 +102,7 @@ This tool sets up the visualization component -- it does not trigger a simulatio
 
                 if (gravityMode != null)
                 {
-                    if (!System.Enum.TryParse<GravityMode>(gravityMode, true, out var gmode))
+                    if (!System.Enum.TryParse<BallisticPathLineRender.GravityMode>(gravityMode, true, out BallisticPathLineRender.GravityMode gmode))
                         throw new System.Exception($"Invalid gravityMode '{gravityMode}'. Valid: None, Physics, Custom");
                     viz.gravityMode = gmode;
                 }

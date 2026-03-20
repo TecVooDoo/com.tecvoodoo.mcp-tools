@@ -41,17 +41,23 @@ gravityY: vertical gravity acceleration (default -9.81).")]
 
                 if (initialSpeed.HasValue) aim.initialSpeed = Mathf.Max(0.1f, initialSpeed.Value);
 
-                if (yPivotName != null)
+                // yPivot/xPivot are private SerializeField -- set via SerializedObject
+                if (yPivotName != null || xPivotName != null)
                 {
-                    var t = go.transform.Find(yPivotName);
-                    if (t == null) throw new System.Exception($"Child '{yPivotName}' not found under '{gameObjectName}'.");
-                    aim.yPivot = t;
-                }
-                if (xPivotName != null)
-                {
-                    var t = go.transform.Find(xPivotName);
-                    if (t == null) throw new System.Exception($"Child '{xPivotName}' not found under '{gameObjectName}'.");
-                    aim.xPivot = t;
+                    var so = new UnityEditor.SerializedObject(aim);
+                    if (yPivotName != null)
+                    {
+                        var t = go.transform.Find(yPivotName);
+                        if (t == null) throw new System.Exception($"Child '{yPivotName}' not found under '{gameObjectName}'.");
+                        so.FindProperty("yPivot").objectReferenceValue = t;
+                    }
+                    if (xPivotName != null)
+                    {
+                        var t = go.transform.Find(xPivotName);
+                        if (t == null) throw new System.Exception($"Child '{xPivotName}' not found under '{gameObjectName}'.");
+                        so.FindProperty("xPivot").objectReferenceValue = t;
+                    }
+                    so.ApplyModifiedProperties();
                 }
 
                 if (yLimitMin.HasValue || yLimitMax.HasValue)
@@ -64,7 +70,9 @@ gravityY: vertical gravity acceleration (default -9.81).")]
 
                 EditorUtility.SetDirty(aim);
 
-                return $"OK: BallisticAim on '{gameObjectName}' configured. speed={aim.initialSpeed:F2} yPivot={aim.yPivot?.name ?? "none"} xPivot={aim.xPivot?.name ?? "none"} yLimit={FormatVector2(aim.yLimit)} xLimit={FormatVector2(aim.xLimit)}";
+                var yPivotRef = (Transform)typeof(BallisticAim).GetField("yPivot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(aim);
+                var xPivotRef = (Transform)typeof(BallisticAim).GetField("xPivot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(aim);
+                return $"OK: BallisticAim on '{gameObjectName}' configured. speed={aim.initialSpeed:F2} yPivot={yPivotRef?.name ?? "none"} xPivot={xPivotRef?.name ?? "none"} yLimit={FormatVector2(aim.yLimit)} xLimit={FormatVector2(aim.xLimit)}";
             });
         }
 
