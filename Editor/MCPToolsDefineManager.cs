@@ -53,6 +53,33 @@ namespace MCPTools.Editor
             UpdateDefines();
         }
 
+        static Type? FindType(string assemblyQualifiedName)
+        {
+            // Type.GetType() only searches the calling assembly + mscorlib.
+            // We need to search ALL loaded assemblies for types in Assembly-CSharp,
+            // third-party DLLs, and UPM packages.
+            Type? t = Type.GetType(assemblyQualifiedName);
+            if (t != null) return t;
+
+            // Parse "TypeName, AssemblyName" and search all loaded assemblies
+            string[] parts = assemblyQualifiedName.Split(',');
+            if (parts.Length < 2) return null;
+
+            string typeName = parts[0].Trim();
+            string assemblyName = parts[1].Trim();
+
+            foreach (System.Reflection.Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                string asmSimpleName = asm.GetName().Name ?? "";
+                if (string.Equals(asmSimpleName, assemblyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    t = asm.GetType(typeName);
+                    if (t != null) return t;
+                }
+            }
+            return null;
+        }
+
         static void UpdateDefines()
         {
             var target = EditorUserBuildSettings.selectedBuildTargetGroup;
@@ -66,7 +93,7 @@ namespace MCPTools.Editor
 
             foreach (var (symbol, detectType) in Entries)
             {
-                bool assetPresent = Type.GetType(detectType) != null;
+                bool assetPresent = FindType(detectType) != null;
                 if (assetPresent && defines.Add(symbol))
                     changed = true;
                 else if (!assetPresent && defines.Remove(symbol))
