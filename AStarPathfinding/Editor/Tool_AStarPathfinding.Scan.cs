@@ -85,7 +85,7 @@ penalty, and tags within the update bounds. Useful for dynamic obstacle changes.
                         if (setTag.Value < 0 || setTag.Value > 31)
                             throw new System.Exception($"Tag must be 0-31, got {setTag.Value}.");
                         guo.modifyTag = true;
-                        guo.setTag = (Pathfinding.PathfindingTag)setTag.Value;
+                        guo.setTag = new Pathfinding.PathfindingTag((uint)setTag.Value);
                     }
 
                     AstarPath.active.UpdateGraphs(guo);
