@@ -6,7 +6,7 @@
         "com.IvanMurzak.Unity.MCP.Runtime",
         "AstarPathfindingProject",
         "PackageTools",
-        "ALINE"
+        "Drawing"
     ],
     "includePlatforms": [
         "Editor"
