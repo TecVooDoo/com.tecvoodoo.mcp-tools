@@ -37,8 +37,9 @@ omitted parameters keep their current values.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                GameObject go = FindGO(gameObjectName);
-                PhysicsStepAuthoring step = GetOrAdd<PhysicsStepAuthoring>(go);
+                GameObject go = GameObject.Find(gameObjectName) ?? throw new System.Exception($"GameObject '{gameObjectName}' not found.");
+                PhysicsStepAuthoring step = go.GetComponent<PhysicsStepAuthoring>();
+                if (step == null) step = go.AddComponent<PhysicsStepAuthoring>();
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"=== PhysicsStepAuthoring configured: {go.name} ===");
 
@@ -53,7 +54,8 @@ omitted parameters keep their current values.")]
                 if (gravityChanged)
                 {
                     step.Gravity = currentGravity;
-                    sb.AppendLine($"  Gravity -> {FormatFloat3(step.Gravity)}");
+                    Unity.Mathematics.float3 g = step.Gravity;
+                    sb.AppendLine($"  Gravity -> ({g.x:F3}, {g.y:F3}, {g.z:F3})");
                 }
 
                 if (solverIterationCount >= 1)

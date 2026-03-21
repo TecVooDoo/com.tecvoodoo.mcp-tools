@@ -42,7 +42,7 @@ Only provided parameters are applied; omitted parameters keep their current valu
         {
             return MainThread.Instance.Run(() =>
             {
-                GameObject go = FindGO(gameObjectName);
+                GameObject go = GameObject.Find(gameObjectName) ?? throw new System.Exception($"GameObject '{gameObjectName}' not found.");
                 StringBuilder sb = new StringBuilder();
                 Collider col;
 
@@ -149,7 +149,7 @@ Only provided parameters are applied; omitted parameters keep their current valu
                     if (!float.IsNaN(centerX) || !float.IsNaN(centerY) || !float.IsNaN(centerZ))
                     {
                         box.center = center;
-                        sb.AppendLine($"  Center -> {FormatV3(box.center)}");
+                        sb.AppendLine($"  Center -> {box.center}");
                     }
 
                     Vector3 size = box.size;
@@ -159,7 +159,7 @@ Only provided parameters are applied; omitted parameters keep their current valu
                     if (!float.IsNaN(sizeX) || !float.IsNaN(sizeY) || !float.IsNaN(sizeZ))
                     {
                         box.size = size;
-                        sb.AppendLine($"  Size -> {FormatV3(box.size)}");
+                        sb.AppendLine($"  Size -> {box.size}");
                     }
                 }
 
@@ -173,7 +173,7 @@ Only provided parameters are applied; omitted parameters keep their current valu
                     if (!float.IsNaN(centerX) || !float.IsNaN(centerY) || !float.IsNaN(centerZ))
                     {
                         sphere.center = center;
-                        sb.AppendLine($"  Center -> {FormatV3(sphere.center)}");
+                        sb.AppendLine($"  Center -> {sphere.center}");
                     }
                     if (!float.IsNaN(radius))
                     {
@@ -192,7 +192,7 @@ Only provided parameters are applied; omitted parameters keep their current valu
                     if (!float.IsNaN(centerX) || !float.IsNaN(centerY) || !float.IsNaN(centerZ))
                     {
                         capsule.center = center;
-                        sb.AppendLine($"  Center -> {FormatV3(capsule.center)}");
+                        sb.AppendLine($"  Center -> {capsule.center}");
                     }
                     if (!float.IsNaN(radius))
                     {

@@ -23,7 +23,7 @@ workflow that bakes from built-in Rigidbody and Collider components.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                GameObject go = FindGO(gameObjectName);
+                GameObject go = GameObject.Find(gameObjectName) ?? throw new System.Exception($"GameObject '{gameObjectName}' not found.");
                 StringBuilder sb = new StringBuilder();
                 bool found = false;
 
@@ -42,9 +42,9 @@ workflow that bakes from built-in Rigidbody and Collider components.")]
                     sb.AppendLine($"  CollisionDetect:  {rb.collisionDetectionMode}");
                     sb.AppendLine($"  Constraints:      {rb.constraints}");
                     sb.AppendLine($"  AutoCenterOfMass: {rb.automaticCenterOfMass}");
-                    sb.AppendLine($"  CenterOfMass:     {FormatV3(rb.centerOfMass)}");
+                    sb.AppendLine($"  CenterOfMass:     {rb.centerOfMass}");
                     sb.AppendLine($"  AutoInertiaTensor:{rb.automaticInertiaTensor}");
-                    sb.AppendLine($"  InertiaTensor:    {FormatV3(rb.inertiaTensor)}");
+                    sb.AppendLine($"  InertiaTensor:    {rb.inertiaTensor}");
                     sb.AppendLine($"  MaxLinearVelocity:{rb.maxLinearVelocity:F3}");
                     sb.AppendLine($"  MaxAngularVelocity:{rb.maxAngularVelocity:F3}");
                 }
@@ -61,7 +61,7 @@ workflow that bakes from built-in Rigidbody and Collider components.")]
                         sb.AppendLine($"\n  -- Collider [{i}]: {col.GetType().Name} --");
                         sb.AppendLine($"    Enabled:    {col.enabled}");
                         sb.AppendLine($"    IsTrigger:  {col.isTrigger}");
-                        sb.AppendLine($"    Bounds:     center={FormatV3(col.bounds.center)}, size={FormatV3(col.bounds.size)}");
+                        sb.AppendLine($"    Bounds:     center={col.bounds.center}, size={col.bounds.size}");
 
                         PhysicsMaterial mat = col.sharedMaterial;
                         if (mat != null)
@@ -81,21 +81,21 @@ workflow that bakes from built-in Rigidbody and Collider components.")]
                         BoxCollider box = col as BoxCollider;
                         if (box != null)
                         {
-                            sb.AppendLine($"    Center: {FormatV3(box.center)}");
-                            sb.AppendLine($"    Size:   {FormatV3(box.size)}");
+                            sb.AppendLine($"    Center: {box.center}");
+                            sb.AppendLine($"    Size:   {box.size}");
                         }
 
                         SphereCollider sphere = col as SphereCollider;
                         if (sphere != null)
                         {
-                            sb.AppendLine($"    Center: {FormatV3(sphere.center)}");
+                            sb.AppendLine($"    Center: {sphere.center}");
                             sb.AppendLine($"    Radius: {sphere.radius:F3}");
                         }
 
                         CapsuleCollider capsule = col as CapsuleCollider;
                         if (capsule != null)
                         {
-                            sb.AppendLine($"    Center:    {FormatV3(capsule.center)}");
+                            sb.AppendLine($"    Center:    {capsule.center}");
                             sb.AppendLine($"    Radius:    {capsule.radius:F3}");
                             sb.AppendLine($"    Height:    {capsule.height:F3}");
                             sb.AppendLine($"    Direction: {capsule.direction}");
@@ -118,7 +118,7 @@ workflow that bakes from built-in Rigidbody and Collider components.")]
                     found = true;
                     sb.AppendLine($"\n=== PhysicsStepAuthoring: {go.name} ===");
                     sb.AppendLine($"  SimulationType:   {step.SimulationType}");
-                    sb.AppendLine($"  Gravity:          {FormatFloat3(step.Gravity)}");
+                    sb.AppendLine($"  Gravity:          {step.Gravity}");
                     sb.AppendLine($"  SubstepCount:     {step.SubstepCount}");
                     sb.AppendLine($"  SolverIterations: {step.SolverIterationCount}");
                     sb.AppendLine($"  MultiThreaded:    {step.MultiThreaded}");

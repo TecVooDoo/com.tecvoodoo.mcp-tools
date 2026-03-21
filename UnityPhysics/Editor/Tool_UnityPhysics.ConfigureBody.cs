@@ -34,8 +34,9 @@ parameters are applied; omitted parameters keep their current values.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                GameObject go = FindGO(gameObjectName);
-                Rigidbody rb = GetOrAdd<Rigidbody>(go);
+                GameObject go = GameObject.Find(gameObjectName) ?? throw new System.Exception($"GameObject '{gameObjectName}' not found.");
+                Rigidbody rb = go.GetComponent<Rigidbody>();
+                if (rb == null) rb = go.AddComponent<Rigidbody>();
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"=== Rigidbody configured: {go.name} ===");
 
