@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
+using Component = UnityEngine.Component;
 using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;

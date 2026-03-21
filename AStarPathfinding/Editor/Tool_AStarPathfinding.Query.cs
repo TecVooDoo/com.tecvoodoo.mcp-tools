@@ -137,7 +137,7 @@ reachedDestination, remainingDistance, hasPath) and Seeker settings (traversable
                     {
                         sb.AppendLine($"\n  -- Seeker --");
                         sb.AppendLine($"  traversableTags: {seeker.traversableTags} (0x{seeker.traversableTags:X8})");
-                        int[] penalties = seeker.tagPenalties;
+                        uint[] penalties = seeker.tagPenalties;
                         if (penalties != null && penalties.Length > 0)
                         {
                             StringBuilder tagSb = new StringBuilder("  tagPenalties: ");

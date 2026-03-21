@@ -1,10 +1,10 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.2.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.4.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** March 20, 2026 (Session 3)
+**Last Updated:** March 20, 2026 (Session 4b)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -13,7 +13,7 @@
 
 ## Current State
 
-**90 tools** across 17 asset groups. All stable.
+**~135 tools** across 26 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -31,19 +31,28 @@
 | Heathen Ballistics | 5 | `HAS_HEATHEN_BALLISTICS` | `MCPTools.HeathenBallistics.Editor` | Stable |
 | Feel | 4 | `HAS_FEEL` | None (`#if` only) | Stable |
 | Damage Numbers Pro | 4 | `HAS_DAMAGE_NUMBERS_PRO` | `MCPTools.DamageNumbersPro.Editor` | Stable |
-| **Cinemachine** | **5** | `HAS_CINEMACHINE` | `MCPTools.Cinemachine.Editor` | **New** |
-| **Animation Rigging** | **5** | `HAS_ANIMATION_RIGGING` | `MCPTools.AnimationRigging.Editor` | **New** |
-| **ALINE** | **4** | `HAS_ALINE` | `MCPTools.ALINE.Editor` | **New** |
+| Cinemachine | 5 | `HAS_CINEMACHINE` | `MCPTools.Cinemachine.Editor` | Stable |
+| Animation Rigging | 5 | `HAS_ANIMATION_RIGGING` | `MCPTools.AnimationRigging.Editor` | Stable |
+| ALINE | 4 | `HAS_ALINE` | `MCPTools.ALINE.Editor` | Stable |
+| **Master Audio** | **6** | `HAS_MASTERAUDIO` | None (`#if` only) | **New S4** |
+| **A* Pathfinding** | **6** | `HAS_ASTAR` | `MCPTools.AStarPathfinding.Editor` | **New S4** |
+| **Dialogue System** | **6** | `HAS_DIALOGUE_SYSTEM` | None (`#if` only) | **New S4** |
+| **SensorToolkit 2** | **5** | `HAS_SENSORTOOLKIT` | `MCPTools.SensorToolkit.Editor` | **New S4** |
+| **UCC (Opsive)** | **5** | `HAS_UCC` | `MCPTools.UCC.Editor` | **New S4** |
+| **Behavior Designer** | **4** | `HAS_BEHAVIOR_DESIGNER` | `MCPTools.BehaviorDesigner.Editor` | **New S4** |
+| **DOTween Pro** | **4** | `HAS_DOTWEEN` | None (`#if` only) | **New S4** |
+| **Unity Entities** | **5** | `HAS_UNITY_ENTITIES` | `MCPTools.UnityEntities.Editor` | **New S4b** |
+| **Unity Physics** | **4** | `HAS_UNITY_PHYSICS` | `MCPTools.UnityPhysics.Editor` | **New S4b** |
 
-**Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed.
+**Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
 ---
 
 ## Package vs Source Sync
 
-All 17 groups built directly in the package folder. No separate source location.
+All 24 groups built directly in the package folder. No separate source location.
 
-**Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. FinalIK, PWB, Quest Forge, Rope Toolkit, and Feel have no asmdef -- they use `#if HAS_*` guards and compile to nothing when the target asset isn't installed. SyntyAssets project was deleted Mar 12, 2026.
+**Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. Assets without asmdef use `#if HAS_*` guards (FinalIK, PWB, Quest Forge, Rope Toolkit, Feel, Master Audio, Dialogue System, DOTween). Assets with asmdef use `defineConstraints` for the same effect.
 
 ---
 
@@ -54,117 +63,118 @@ All 17 groups built directly in the package folder. No separate source location.
 | RayFire crash | `DemolishForced()` and `ApplyDamage()` crash Unity when called from MCP context. Tools exist but should only be used for setup, not runtime testing. |
 | Flexalon RequireComponent | `FlexalonLayoutBase` auto-adds `FlexalonObject` via `[RequireComponent]`. Use `GetComponent<FlexalonObject>()`, never `AddComponent<FlexalonObject>()` (returns null duplicate). |
 | MagicaCloth MeshCloth | MeshCloth locks all verts. Must use `SkinnedMeshRenderer`, not `MeshRenderer`. |
-| Asmdef pattern | Tools with asmdefs use `overrideReferences: true` + `ReflectorNet.dll`. Tools without asmdefs (PWB, FinalIK) live in Assembly-CSharp-Editor and use `#if` guards. |
+| Asmdef pattern | Tools with asmdefs use `overrideReferences: true` + `ReflectorNet.dll`. Tools without asmdefs live in Assembly-CSharp-Editor and use `#if` guards. |
 | Domain reload | MCP disconnects during domain reload after adding defines. Wait for auto-reconnect. |
+| BD Pro v2.x API | Behavior Designer Pro v2 uses `StartBehavior`/`StopBehavior`/`RestartBehavior` (not `EnableBehavior`/`DisableBehavior` from v1). `SharedVariables` is an array, not `GetAllVariables()`. `GetVariable` takes `PropertyName`, not string. |
+| UCC reflection | UCC tools use 100% reflection-based API access for resilience across versions. |
+| DOTween detect type | DefineManager detects `DOTweenAnimation, DOTweenPro` (Pro DLL), not core `DOTween.dll`. |
+| Agent API verification | Build agents must verify actual API signatures from source before writing code. Never assume from documentation knowledge or eval summaries. |
 
 ---
 
 ## Adding New Tool Groups
 
-1. Create folder: `MCPTools/{AssetName}/Editor/`
+1. Create folder: `{AssetName}/Editor/`
 2. Create partial class: `Tool_{AssetName}.cs` with `[McpPluginToolType]`
 3. Create tool files: `Tool_{AssetName}.{Feature}.cs` with `[McpPluginTool]` methods
 4. Add `HAS_{ASSETNAME}` detection to `MCPToolsDefineManager.cs`
 5. Create asmdef if the asset has its own assembly (use `MCPTools.Flexalon.Editor.asmdef` as template). If asset lives in Assembly-CSharp, use `#if HAS_*` guards instead.
-6. Test in Sandbox or target project (SyntyAssets deleted Mar 12, 2026)
-7. Update `TMCP_Reference.md` and this status doc
-8. Update `Sandbox_AssetLog.md` MCP Candidates section
+6. **CRITICAL:** Read actual source files to verify every method/property name before writing code. Never assume APIs.
+7. Test in Sandbox or target project
+8. Update `TMCP_Reference.md` and this status doc
+9. Update `Sandbox_AssetLog.md` MCP Candidates section
 
 ---
 
 ## Session Log
 
+### Session 4 (Mar 20, 2026) -- 7 new tool groups (36 tools) + MCP evals
+
+**MCP controllability evals completed (10 assets):**
+- DOTween Pro (Medium-High, 4 tools), Behavior Designer Pro (Medium-High, 4 tools), SensorToolkit 2 (High, 5 tools), UCC (High, 5 tools), A* Pathfinding Pro (High, 6 tools), Master Audio 2024 (High, 6 tools), Dialogue System for Unity (High, 6 tools)
+- Not candidates: BD Senses Pack (Low), Procedural Dialogue Addon (Low), Follow & Protect Agent (Low)
+- Deferred: GOAP v3 (Medium), Breeze (Medium-High)
+
+**Master Audio (6 tools):** `#if HAS_MASTERAUDIO`, Assembly-CSharp
+- `ma-query` -- List groups, buses, playlists, master volume, mute state, playing variations
+- `ma-play` -- Play sound by group name (2D or 3D with position)
+- `ma-group-control` -- Mute/unmute/solo/pause/stop/fade sound groups
+- `ma-bus-control` -- Mute/unmute/solo/pause/stop/fade/pitch buses
+- `ma-playlist` -- Play/stop/next/prev/random/pause/mute/fade/change playlists
+- `ma-configure-ducking` -- Add/remove groups from music duck list
+
+**A* Pathfinding (6 tools):** `HAS_ASTAR`, `MCPTools.AStarPathfinding.Editor`
+- `astar-query` -- Graph list (type, nodes, dimensions) + AI agent state
+- `astar-configure-grid` -- GridGraph dimensions, nodeSize, center, slope, step, erosion
+- `astar-configure-recast` -- RecastGraph characterRadius, walkableHeight, cellSize, tiling
+- `astar-configure-agent` -- AIPath/AILerp/RichAI speed, rotation, reach, slowdown
+- `astar-scan` -- Trigger Scan() or runtime UpdateGraphs with bounds/penalty/walkability
+- `astar-configure-seeker` -- Seeker tag masks, graph masks, cost multipliers
+
+**Dialogue System (6 tools):** `#if HAS_DIALOGUE_SYSTEM`, Assembly-CSharp
+- `ds-query` -- List conversations, actors, variables, quests from database + active state
+- `ds-conversation` -- Start/stop/stopall/check conversations by title
+- `ds-quest` -- Get/set quest states and entry states
+- `ds-variable` -- Get/set Lua dialogue variables
+- `ds-bark` -- Trigger barks from conversation or raw text
+- `ds-lua` -- Execute arbitrary Lua code
+
+**SensorToolkit 2 (5 tools):** `HAS_SENSORTOOLKIT`, `MCPTools.SensorToolkit.Editor`
+- `sensor-query` -- List all sensors on GO with config (shape, layers, pulse, detections)
+- `sensor-add-range` -- Add/configure RangeSensor or RaySensor
+- `sensor-add-los` -- Add/configure LOSSensor with view angle/distance limits
+- `sensor-configure-steering` -- Configure SteeringSensor seek/interest/danger
+- `sensor-query-detections` -- Runtime: query detections sorted by distance/strength
+
+**UCC (5 tools):** `HAS_UCC`, `MCPTools.UCC.Editor` (100% reflection-based)
+- `uc-query` -- Full character state (locomotion, abilities, items, attributes)
+- `uc-configure-locomotion` -- Mass, gravity, skin width
+- `uc-ability-control` -- List/enable/disable/start/stop abilities by type name
+- `uc-configure-attribute` -- Set health/stamina/mana values
+- `uc-item-control` -- List inventory, equip/unequip item sets
+
+**Behavior Designer (4 tools):** `HAS_BEHAVIOR_DESIGNER`, `MCPTools.BehaviorDesigner.Editor`
+- `bd-query` -- Tree name, enabled, shared variables with values
+- `bd-set-variable` -- Get/set SharedVariable by name (bool/float/int/string/vector3)
+- `bd-control` -- Start/stop/restart behavior tree
+- `bd-list-trees` -- List all BehaviorTree components in scene
+
+**DOTween Pro (4 tools):** `#if HAS_DOTWEEN`, Assembly-CSharp
+- `dotween-query` -- List DOTweenAnimation components with full config
+- `dotween-add-animation` -- Add/configure DOTweenAnimation (type, ease, duration, endValue)
+- `dotween-play` -- Runtime: play/pause/rewind/restart/complete/kill by id
+- `dotween-global` -- Global DOTween control (killall/pauseall/playall/completeall)
+
+**Unity Entities (5 tools):** `HAS_UNITY_ENTITIES`, `MCPTools.UnityEntities.Editor`
+- `ecs-query-worlds` -- List all active Worlds (name, entity count, system count, default flag)
+- `ecs-query-entities` -- Query entities by component types, list up to 50 with component lists
+- `ecs-inspect-entity` -- Inspect entity by index+version, read all component field values via reflection
+- `ecs-modify-entity` -- Modify IComponentData field on entity via reflection (supports float3, quaternion, enums)
+- `ecs-create-destroy` -- Create entity with component types or destroy by index+version
+
+**Unity Physics (4 tools):** `HAS_UNITY_PHYSICS`, `MCPTools.UnityPhysics.Editor`
+- `uphys-query` -- Read Rigidbody, Colliders, PhysicsStepAuthoring on a GO with full config
+- `uphys-configure-body` -- Add/configure Rigidbody (mass, damping, gravity, kinematic, constraints, Unity 6 API)
+- `uphys-configure-step` -- Add/configure PhysicsStepAuthoring (gravity, solver, substeps, broadphase, threading)
+- `uphys-configure-shape` -- Add/configure Collider (Box/Sphere/Capsule/Mesh + PhysicsMaterial + trigger)
+
+**Compile fixes:** BD Pro tools rewritten against actual v2.x API (StartBehavior/StopBehavior, SharedVariables array, PropertyName-based variable access). Missing `using com.IvanMurzak.ReflectorNet.Utils;` added to all BD files. Asmdef fixed: moved BD Runtime from precompiledReferences to references, added GraphDesigner.Runtime.dll to precompiledReferences.
+
 ### Session 3 (Mar 20, 2026) -- Cinemachine + Animation Rigging + ALINE + Compile fix
 
-Added 3 new tool groups (14 tools) + fixed Session 2 compile errors:
-
-**Compile fix:** All Session 2 asmdef-based tools (HeathenPhysics, HeathenBallistics, DamageNumbersPro) were missing `using com.IvanMurzak.ReflectorNet.Utils;` -- MainThread is in ReflectorNet.dll, not MCP.Editor.Utils. Fixed in 7 files.
-
-**Cinemachine (5 tools):** `HAS_CINEMACHINE`, `MCPTools.Cinemachine.Editor`
-- `cm-query` -- Read full CinemachineCamera setup (priority, lens, targets, pipeline components) or CinemachineBrain
-- `cm-configure-camera` -- Set priority, FOV, clip planes, Dutch, tracking/lookAt targets
-- `cm-configure-follow` -- Configure CinemachineFollow (offset, damping, bindingMode) or CinemachineThirdPersonFollow (shoulder offset, side, distance)
-- `cm-configure-noise` -- Set AmplitudeGain, FrequencyGain, NoiseProfile on CinemachineBasicMultiChannelPerlin
-- `cm-configure-brain` -- Configure CinemachineBrain (defaultBlend style+time, updateMethod, ignoreTimeScale)
-
-**Animation Rigging (5 tools):** `HAS_ANIMATION_RIGGING`, `MCPTools.AnimationRigging.Editor`
-- `rig-query` -- List all RigBuilder layers, Rig, TwoBoneIKConstraint, MultiAimConstraint, MultiParentConstraint, ChainIKConstraint
-- `rig-configure-twoboneik` -- Assign root/mid/tip/target/hint transforms, set position/rotation/hint weights
-- `rig-configure-aim` -- Configure MultiAimConstraint (constrainedObject, source objects with weights)
-- `rig-configure-weights` -- Set Rig weight, constraint weight, enable/disable RigBuilder layers
-
-**ALINE (4 tools):** `HAS_ALINE`, `MCPTools.ALINE.Editor`
-- `aline-draw-line` -- Draw a persistent line in Scene View (between coords or named GameObjects, with duration+color)
-- `aline-draw-sphere` -- Draw a wire sphere at a world position or named GameObject
-- `aline-draw-box` -- Draw a wire box at a world position or named GameObject (uses GO's scale as default size)
-- `aline-label` -- Draw a 2D text label at a world position or named GameObject
+Added 3 new tool groups (14 tools) + fixed Session 2 compile errors.
 
 ### Session 2 (Mar 20, 2026) -- Rope Toolkit + Heathen + Feel + DNP
 
-Added 5 new tool groups (23 tools):
+Added 5 new tool groups (23 tools).
 
-**Rope Toolkit (5 tools):** `#if HAS_ROPE_TOOLKIT`, Assembly-CSharp (no asmdef)
-- `rope-query` -- Read full rope config (simulation, collision, appearance, measurements, connections)
-- `rope-configure-simulation` -- Set stiffness, energyLoss, gravityMultiplier, substeps, solverIterations
-- `rope-configure-collision` -- Set collision enabled, influenceRigidbodies, friction, stride, margin
-- `rope-configure-appearance` -- Set radius, radialVertices, isLoop
-- `rope-add-connection` -- Add/configure RopeConnection (type, ropeLocation, rigidbody stiffness/damping)
+### Session 1 (Mar 14, 2026) -- Malbers AC + Quest Forge + Retarget Pro
 
-**Heathen Unity Physics (5 tools):** `HAS_HEATHEN_PHYSICS`, `MCPTools.HeathenPhysics.Editor`
-- `hphys-query` -- List all Heathen physics components (PhysicsData, BuoyantBody, ForceEffectField, ForceEffectReceiver)
-- `hphys-configure-physics-data` -- Add/configure PhysicsData (volume, area, cross-sections, debug)
-- `hphys-configure-buoyancy` -- Add/configure BuoyantBody (magnitude, calculationMode, activeSurface)
-- `hphys-configure-force-field` -- Add/configure ForceEffectField (strength, radius, isGlobal)
-- `hphys-configure-force-receiver` -- Add/configure ForceEffectReceiver (useLinear, useAngular, sensitivity)
-
-**Heathen Ballistics (5 tools):** `HAS_HEATHEN_BALLISTICS`, `MCPTools.HeathenBallistics.Editor`
-- `ballistic-query` -- List ballistic components (BallisticAim, TrickShot, BallisticPathLineRender, BallisticTargeting)
-- `ballistic-configure-aim` -- Add/configure BallisticAim (speed, pivots, yaw/pitch limits, gravity)
-- `ballistic-configure-trickshot` -- Add/configure TrickShot (speed, bounces, damping, distance, resolution, template)
-- `ballistic-calculate-solution` -- Static aim solution: given from/to/speed, returns low+high arc Euler angles
-- `ballistic-visualize` -- Add/configure BallisticPathLineRender (resolution, maxLength, bounces, gravityMode)
-
-**Feel (4 tools):** `#if HAS_FEEL`, MoreMountains.Tools assembly
-- `feel-query` -- Read MMF_Player settings and feedback list (type, label, active, duration, chance per feedback)
-- `feel-configure-player` -- Add/configure MMF_Player (intensity, direction, cooldown, delay, durationMultiplier, channel)
-- `feel-add-feedback` -- Add feedback type to FeedbacksList (CameraShake, Position, Scale, Rotation, Light, Particles, etc.)
-- `feel-play` -- Runtime control: Play, Stop, Pause, Resume, Reset, Reverse
-
-**Damage Numbers Pro (4 tools):** `HAS_DAMAGE_NUMBERS_PRO`, `MCPTools.DamageNumbersPro.Editor`
-- `dnp-query` -- Read DamageNumber full config (display, fade, movement, spam control, performance)
-- `dnp-configure-display` -- Set lifetime, permanent, number format, prefix/suffix texts, color, 3D/camera settings
-- `dnp-configure-animation` -- Set fade in/out timing+offsets, movement mode (lerp/velocity/shaking), rotation
-- `dnp-configure-performance` -- Set pooling (enable, poolSize), updateDelay, spamGroup, combination/push/destruction
-
-### Session 1 (Mar 14, 2026) -- Malbers AC + Quest Forge
-
-Added 2 new tool groups (13 tools total):
-
-**Malbers AC (8 tools):**
-- `ac-query-animal` -- Read full animal setup (states, modes, stances, speed sets)
-- `ac-query-stats` -- Read all stats on a Stats component
-- `ac-configure-state` -- Configure state properties (active, priority, input, strafe)
-- `ac-configure-mode` -- Configure mode properties (active, cooldown, movement, rotation)
-- `ac-configure-speed` -- Configure speed set entries (position, rotation, animator speeds)
-- `ac-configure-stat` -- Configure individual stat values (value, max, regen, degen, immunity)
-- `ac-configure-damageable` -- Configure MDamageable (multiplier, alignment)
-- `ac-add-lock-axis` -- Add/configure LockAxis for 2.5D gameplay
-
-**Quest Forge (5 tools):**
-- `qf-create-quest` -- Create Quest ScriptableObject with ID, name, type
-- `qf-query-quests` -- List all Quest SOs with objectives
-- `qf-add-objective` -- Add objectives (Kill, Collect, TalkTo, GoToLocation, Interact)
-- `qf-create-poi` -- Create PointOfInterest SO for minimap/compass
-- `qf-query-pois` -- List all POI SOs with positions and settings
-
-**Retarget Pro (4 tools):**
-- `retarget-batch-bake` -- Batch-retarget folder of AnimationClips using a RetargetProfile
-- `retarget-create-profile` -- Create RetargetProfile SO with source/target characters and rigs
-- `retarget-query-profiles` -- List all RetargetProfile SOs with configuration details
+Added 3 new tool groups (13 tools).
 
 ### Session 0 (Pre-docs) -- Stable
 
-All 35 tools built across Sandbox Sessions 52-55 in SyntyAssets project. Evaluated in Session 55. Documented in Sandbox ENTRY-267. Package created at `com.tecvoodoo.mcp-tools` v1.0.0. Installed in Sandbox and HOK.
+All 35 tools built across Sandbox Sessions 52-55. Package created at v1.0.0.
 
 ---
 

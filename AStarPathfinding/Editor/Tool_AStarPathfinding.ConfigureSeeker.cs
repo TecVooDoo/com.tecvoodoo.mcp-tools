@@ -35,11 +35,11 @@ tagCosts: comma-separated penalty values for tags 0-31 (e.g. '0,0,0,1000,0,5000'
                 if (tagCosts != null)
                 {
                     string[] parts = tagCosts.Split(',');
-                    int[] penalties = new int[32];
+                    uint[] penalties = new uint[32];
                     for (int i = 0; i < parts.Length && i < 32; i++)
                     {
                         string trimmed = parts[i].Trim();
-                        if (!int.TryParse(trimmed, out int penalty))
+                        if (!uint.TryParse(trimmed, out uint penalty))
                             throw new System.Exception($"Invalid tag cost at index {i}: '{trimmed}'. Must be an integer.");
                         penalties[i] = penalty;
                     }
@@ -54,7 +54,7 @@ tagCosts: comma-separated penalty values for tags 0-31 (e.g. '0,0,0,1000,0,5000'
                 if (tagCosts != null)
                 {
                     sb.Append(" tagPenalties set:");
-                    int[] p = seeker.tagPenalties;
+                    uint[] p = seeker.tagPenalties;
                     for (int i = 0; i < p.Length; i++)
                     {
                         if (p[i] != 0) sb.Append($" [{i}]={p[i]}");
