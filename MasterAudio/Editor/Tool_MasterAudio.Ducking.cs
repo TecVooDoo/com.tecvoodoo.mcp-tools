@@ -49,15 +49,7 @@ riseVolStart: normalized position (0-1) of remaining sound when volume restore b
                         float unduck = unduckTime ?? 1f;
                         float rise = riseVolStart ?? 0.5f;
 
-                        DuckGroupInfo duckInfo = new DuckGroupInfo
-                        {
-                            soundType = groupName,
-                            duckedVolumeCut = volCut,
-                            unduckTime = unduck,
-                            riseVolStart = rise
-                        };
-
-                        MasterAudio.AddSoundGroupToDuckList(duckInfo);
+                        MasterAudio.AddSoundGroupToDuckList(groupName, rise, volCut, unduck);
                         return $"OK: Group '{groupName}' added to duck list. VolCut={volCut:F1}dB UnduckTime={unduck:F2}s RiseStart={rise:F2}";
 
                     case "remove":

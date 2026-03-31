@@ -1,0 +1,26 @@
+{
+    "name": "MCPTools.BroAudio.Editor",
+    "rootNamespace": "",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime",
+        "BroAudio"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HAS_BROAUDIO"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

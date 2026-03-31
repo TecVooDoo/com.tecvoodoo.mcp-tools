@@ -1,12 +1,9 @@
 {
-    "name": "MCPTools.BehaviorDesigner.Editor",
+    "name": "MCPTools.DryWetMIDI.Editor",
     "rootNamespace": "",
     "references": [
         "com.IvanMurzak.Unity.MCP.Editor",
-        "com.IvanMurzak.Unity.MCP.Runtime",
-        "Opsive.BehaviorDesigner.Runtime",
-        "Opsive.GraphDesigner.Runtime.Wrappers",
-        "Opsive.Shared.Runtime"
+        "com.IvanMurzak.Unity.MCP.Runtime"
     ],
     "includePlatforms": [
         "Editor"
@@ -18,11 +15,11 @@
         "McpPlugin.dll",
         "McpPlugin.Common.dll",
         "ReflectorNet.dll",
-        "Opsive.GraphDesigner.Runtime.dll"
+        "Melanchall.DryWetMidi.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_BEHAVIOR_DESIGNER"
+        "HAS_DRYWETMIDI"
     ],
     "versionDefines": [],
     "noEngineReferences": false

@@ -1,0 +1,26 @@
+{
+    "name": "MCPTools.Koreographer.Editor",
+    "rootNamespace": "",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll",
+        "SonicBloom.Koreo.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HAS_KOREOGRAPHER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -7,6 +7,7 @@ using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using Opsive.BehaviorDesigner.Runtime;
+using Opsive.BehaviorDesigner.Runtime.Components;
 using Opsive.GraphDesigner.Runtime.Variables;
 using UnityEngine;
 
@@ -43,6 +44,20 @@ namespace MCPTools.BehaviorDesigner.Editor
                 sb.AppendLine($"  Enabled: {tree.enabled}");
                 sb.AppendLine($"  StartWhenEnabled: {tree.StartWhenEnabled}");
                 sb.AppendLine($"  PauseWhenDisabled: {tree.PauseWhenDisabled}");
+                sb.AppendLine($"  UpdateMode: {tree.UpdateMode}");
+                sb.AppendLine($"  EvaluationType: {tree.EvaluationType}");
+                if (tree.EvaluationType == EvaluationType.Count)
+                    sb.AppendLine($"  MaxEvaluationCount: {tree.MaxEvaluationCount}");
+
+                // Runtime state (play mode only)
+                if (Application.isPlaying)
+                {
+                    sb.AppendLine($"\n  --- Runtime State ---");
+                    sb.AppendLine($"  Status: {tree.Status}");
+                    sb.AppendLine($"  IsActive: {tree.IsActive()}");
+                    sb.AppendLine($"  IsRunning: {tree.IsRunning()}");
+                    sb.AppendLine($"  IsPaused: {tree.IsPaused()}");
+                }
 
                 // Shared Variables
                 SharedVariable[]? vars = tree.SharedVariables;

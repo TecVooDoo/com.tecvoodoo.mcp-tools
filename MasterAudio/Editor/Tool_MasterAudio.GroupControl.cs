@@ -56,11 +56,11 @@ For fade action, provide volume and optional fadeTime.")]
                         return $"OK: Group '{groupName}' unsoloed.";
 
                     case "pause":
-                        MasterAudio.PauseGroup(groupName);
+                        MasterAudio.PauseSoundGroup(groupName);
                         return $"OK: Group '{groupName}' paused.";
 
                     case "unpause":
-                        MasterAudio.UnpauseGroup(groupName);
+                        MasterAudio.UnpauseSoundGroup(groupName);
                         return $"OK: Group '{groupName}' unpaused.";
 
                     case "stop":

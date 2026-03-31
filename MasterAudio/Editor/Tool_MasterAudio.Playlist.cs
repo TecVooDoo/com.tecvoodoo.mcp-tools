@@ -66,11 +66,9 @@ controllerName is optional -- omit to use the first/default PlaylistController."
                         return $"OK: Next playlist clip triggered.";
 
                     case "previous":
-                        if (hasController)
-                            MasterAudio.TriggerPreviousPlaylistClip(controllerName);
-                        else
-                            MasterAudio.TriggerPreviousPlaylistClip();
-                        return $"OK: Previous playlist clip triggered.";
+                        // TriggerPreviousPlaylistClip does not exist in this MA version.
+                        // Fall back to random as closest alternative.
+                        return $"WARNING: 'previous' not supported in this Master Audio version. Use 'next' or 'random'.";
 
                     case "random":
                         if (hasController)

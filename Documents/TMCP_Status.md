@@ -1,10 +1,10 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.4.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.5.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** March 20, 2026 (Session 4b)
+**Last Updated:** March 30, 2026 (SpaceSucks Session 1)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -13,7 +13,7 @@
 
 ## Current State
 
-**~135 tools** across 26 asset groups. All compiling.
+**~177 tools** across 37 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -39,10 +39,21 @@
 | **Dialogue System** | **6** | `HAS_DIALOGUE_SYSTEM` | None (`#if` only) | **New S4** |
 | **SensorToolkit 2** | **5** | `HAS_SENSORTOOLKIT` | `MCPTools.SensorToolkit.Editor` | **New S4** |
 | **UCC (Opsive)** | **5** | `HAS_UCC` | `MCPTools.UCC.Editor` | **New S4** |
-| **Behavior Designer** | **4** | `HAS_BEHAVIOR_DESIGNER` | `MCPTools.BehaviorDesigner.Editor` | **New S4** |
+| **Behavior Designer** | **5** | `HAS_BEHAVIOR_DESIGNER` | None (`#if` only) | **Updated SS1** |
 | **DOTween Pro** | **4** | `HAS_DOTWEEN` | None (`#if` only) | **New S4** |
 | **Unity Entities** | **5** | `HAS_UNITY_ENTITIES` | `MCPTools.UnityEntities.Editor` | **New S4b** |
 | **Unity Physics** | **4** | `HAS_UNITY_PHYSICS` | `MCPTools.UnityPhysics.Editor` | **New S4b** |
+| **Bro Audio** | **4** | `HAS_BROAUDIO` | `MCPTools.BroAudio.Editor` | **New S5** |
+| **Koreographer** | **2** | `HAS_KOREOGRAPHER` | `MCPTools.Koreographer.Editor` | **New S5** |
+| **PMG** | **4** | `HAS_PMG` | None (`#if` only) | **New S5** |
+| **Maestro MIDI** | **4** | `HAS_MAESTRO` | `MCPTools.Maestro.Editor` | **New S5** |
+| **DryWetMIDI** | **1** | `HAS_DRYWETMIDI` | `MCPTools.DryWetMIDI.Editor` | **New S5** |
+| **FMOD Studio** | **5** | `HAS_FMOD` | `MCPTools.FMOD.Editor` | **New S5** |
+| **Chunity** | **4** | `HAS_CHUNITY` | None (`#if` only) | **New S5** |
+| **Naninovel** | **5** | `HAS_NANINOVEL` | `MCPTools.Naninovel.Editor` | **New VNPC** |
+| **Adventure Creator** | **5** | `HAS_ADVENTURE_CREATOR` | `MCPTools.AdventureCreator.Editor` | **New VNPC** |
+| **Text Animator** | **4** | `HAS_TEXT_ANIMATOR` | `MCPTools.TextAnimator.Editor` | **New VNPC** |
+| **Ink Integration** | **3** | `HAS_INK` | `MCPTools.InkIntegration.Editor` | **New VNPC** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -50,9 +61,9 @@
 
 ## Package vs Source Sync
 
-All 24 groups built directly in the package folder. No separate source location.
+All 33 groups built directly in the package folder. No separate source location.
 
-**Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. Assets without asmdef use `#if HAS_*` guards (FinalIK, PWB, Quest Forge, Rope Toolkit, Feel, Master Audio, Dialogue System, DOTween). Assets with asmdef use `defineConstraints` for the same effect.
+**Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. Assets without asmdef use `#if HAS_*` guards (FinalIK, PWB, Quest Forge, Rope Toolkit, Feel, Master Audio, Dialogue System, DOTween, PMG, Chunity, Behavior Designer). Assets with asmdef use `defineConstraints` for the same effect.
 
 ---
 
@@ -65,10 +76,14 @@ All 24 groups built directly in the package folder. No separate source location.
 | MagicaCloth MeshCloth | MeshCloth locks all verts. Must use `SkinnedMeshRenderer`, not `MeshRenderer`. |
 | Asmdef pattern | Tools with asmdefs use `overrideReferences: true` + `ReflectorNet.dll`. Tools without asmdefs live in Assembly-CSharp-Editor and use `#if` guards. |
 | Domain reload | MCP disconnects during domain reload after adding defines. Wait for auto-reconnect. |
-| BD Pro v2.x API | Behavior Designer Pro v2 uses `StartBehavior`/`StopBehavior`/`RestartBehavior` (not `EnableBehavior`/`DisableBehavior` from v1). `SharedVariables` is an array, not `GetAllVariables()`. `GetVariable` takes `PropertyName`, not string. |
+| BD Pro v3.x API | BD Pro 3 uses `StartBehavior`/`StopBehavior(bool pause)`/`RestartBehavior` (same as Pro 2). `SharedVariables` is an array. `GetVariable` takes `PropertyName`. New: `StopBehavior` takes optional `pause` param, `RestartBehavior` returns `bool`, `Status`/`IsActive()`/`IsRunning()`/`IsPaused()` state queries, `Tick()` for manual update, `UpdateMode`/`EvaluationType` enums. |
+| BD asmdef crash on uninstall | **FIXED (SS1).** Was: hard assembly refs in asmdef caused compile errors when BD removed. Fix: deleted asmdef, converted to `#if HAS_BEHAVIOR_DESIGNER` pattern like FinalIK/Feel/DOTween. |
+| BD Pro 3 upgrade | BD Pro 3 (DOTS-powered, v3.0.0+) keeps same assembly names as Pro 2. MonoBehaviour API is backward compatible. Tools updated SS1 with BD3 enhancements: pause/unpause, Status/IsActive/IsRunning/IsPaused, UpdateMode, manual Tick. ECS overloads (`World, Entity`) exist but not yet exposed as separate tools. |
 | UCC reflection | UCC tools use 100% reflection-based API access for resilience across versions. |
 | DOTween detect type | DefineManager detects `DOTweenAnimation, DOTweenPro` (Pro DLL), not core `DOTween.dll`. |
 | Agent API verification | Build agents must verify actual API signatures from source before writing code. Never assume from documentation knowledge or eval summaries. |
+| Assets/Plugins/ assembly | Assets installed under `Assets/Plugins/` compile to `Assembly-CSharp-firstpass`, not `Assembly-CSharp`. `FindType` now has a fallback that searches ALL assemblies if the specified one misses. Fixed HOK Session 22 -- DS was in firstpass, define manager couldn't find it. |
+| Cross-version API drift | Shared package compiles in every project. Asset version differences between projects cause compile errors. MA v1.0.4 renamed `PauseGroup`->`PauseSoundGroup`, changed `PlaySoundAndForget` return from `PlaySoundResult`->`bool`. DS v2.2.68 changed `GetQuestDescription` second param from `string`->`QuestState` enum. Fixed HOK Session 22. |
 
 ---
 
@@ -87,6 +102,116 @@ All 24 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### SpaceSucks Session 1 (Mar 30, 2026) -- BD Pro 3 upgrade + asmdef crash fix
+
+**Asmdef crash fix (CLOSED BUG):** Deleted `MCPTools.BehaviorDesigner.Editor.asmdef`. BD tools now use `#if HAS_BEHAVIOR_DESIGNER` pattern (Assembly-CSharp-Editor) like FinalIK/Feel/DOTween. Removing BD from a project no longer causes compile errors.
+
+**BD Pro 3 API update:** All 4 existing tools updated for BD Pro 3.0.0 (DOTS-powered). MonoBehaviour API is backward compatible with BD Pro 2.
+
+**BD tool changes:**
+- `bd-control` -- Added `pause` and `unpause`/`resume` actions (BD3 `StopBehavior(pause: true)` + `IsPaused()`)
+- `bd-query` -- Added `UpdateMode`, `EvaluationType`, `MaxEvaluationCount` properties. Added runtime state section (play mode only): `Status` (TaskStatus enum), `IsActive`, `IsRunning`, `IsPaused`
+- `bd-list-trees` -- Added `Status` to play mode listing
+- `bd-set-variable` -- No API changes needed (PropertyName + SetVariableValue<T> unchanged)
+
+**New tool:**
+- `bd-tick` -- Manual tick for trees with `UpdateMode.Manual`. Takes optional `count` param. Play mode only.
+
+**Tool count:** 4 -> 5 tools.
+
+---
+
+### HOK Session 22 (Mar 29, 2026) -- FindType fix + MA/DS API fixes
+
+**No new tools built.** Infrastructure fix that unblocked existing tools in HOK.
+
+**FindType assembly fallback:** `MCPToolsDefineManager.FindType()` now has a second pass that searches ALL loaded assemblies if the specified assembly doesn't contain the type. Root cause: Dialogue System installs to `Assets/Plugins/Pixel Crushers/` which compiles to `Assembly-CSharp-firstpass`, but the detection entry specified `Assembly-CSharp`. This is a permanent fix -- any asset that lands in an unexpected assembly (e.g. `firstpass` due to Plugins/ folder) will now be detected correctly.
+
+**Master Audio API fixes (v1.0.4 compatibility):**
+- `PauseGroup` -> `PauseSoundGroup`, `UnpauseGroup` -> `UnpauseSoundGroup`
+- `PlaySoundAndForget` / `PlaySound3DAtVector3AndForget` return `bool` (not `PlaySoundResult`)
+- `AddSoundGroupToDuckList` takes individual params (not `DuckGroupInfo` struct)
+- `GetBusByName` removed -- simplified bus query to name-only listing
+- `TriggerPreviousPlaylistClip` does not exist -- returns warning message
+
+**Dialogue System API fix (v2.2.68 compatibility):**
+- `QuestLog.GetQuestDescription(questName, "success")` -> `GetQuestDescription(questName, QuestState.Success)` (second param is `QuestState` enum, not string)
+
+**Defines activated in HOK:** `HAS_DIALOGUE_SYSTEM`, `HAS_MASTERAUDIO`, `HAS_DOTWEEN` (all newly detected thanks to FindType fix). DS, MA, and DOTween tools now compile and surface as MCP skills in HOK.
+
+---
+
+### VNPC Session 6 (Mar 23, 2026) -- 4 narrative/VN tool groups (17 tools)
+
+Narrative and visual novel assets from the VNPC project. All use asmdef with `defineConstraints`.
+
+**Naninovel (5 tools):** `HAS_NANINOVEL`, `MCPTools.Naninovel.Editor`
+- `nani-list-characters` -- List registered characters (ID, display name, colors, poses) via `Configuration.GetOrDefault<CharactersConfiguration>()`
+- `nani-list-backgrounds` -- List registered backgrounds via `Configuration.GetOrDefault<BackgroundsConfiguration>()`
+- `nani-list-scripts` -- Find all .nani files in project via AssetDatabase
+- `nani-read-script` -- Read .nani script content by name (partial match, line-numbered output)
+- `nani-list-commands` -- Discover all Command subclasses via reflection, show alias (`@char`, `@back`, etc.)
+
+**Adventure Creator (5 tools):** `HAS_ADVENTURE_CREATOR`, `MCPTools.AdventureCreator.Editor`
+- `ac-query-managers` -- Status of all 8 managers (assigned?, item/variable/action counts)
+- `ac-list-inventory` -- Items, categories, recipes, documents from InventoryManager
+- `ac-list-variables` -- Global variables (ID, label, type) from VariablesManager
+- `ac-list-actions` -- Available Action types (title, filename) from ActionsManager, with filter
+- `ac-find-scene-objects` -- Find Hotspots, NPCs, Players, Markers, ActionLists in current scene
+
+**Text Animator (4 tools):** `HAS_TEXT_ANIMATOR`, `MCPTools.TextAnimator.Editor`
+- `ta-list-effects` -- Discover all effects via `[EffectInfoAttribute]` reflection (behaviors/appearances, tag IDs)
+- `ta-find-components` -- Find TextAnimatorComponentBase instances in scene (type, loop mode, text)
+- `ta-list-databases` -- Find AnimationsDatabase assets via AssetDatabase
+- `ta-get-settings` -- Find AnimatorSettingsScriptable assets via AssetDatabase
+
+**Ink Integration (3 tools):** `HAS_INK`, `MCPTools.InkIntegration.Editor`
+- `ink-list-files` -- List .ink files via InkLibrary (master/include, auto-compile, compiled status)
+- `ink-compile` -- Compile specific file or all master files via InkCompiler
+- `ink-get-story-info` -- Load compiled JSON, report variables, content lines, choice points, global tags
+
+### Session 5 (Mar 22, 2026) -- 7 audio tool groups (24 tools)
+
+Audio packages rated High in Sandbox AssetLog. All are optional -- tools auto-activate only when the target asset is installed.
+
+**Bro Audio (4 tools):** `HAS_BROAUDIO`, `MCPTools.BroAudio.Editor`
+- `bro-query` -- List all AudioEntity assets via `Resources.FindObjectsOfTypeAll<AudioEntity>()`; reports name, playing state
+- `bro-play` -- `BroAudio.Play(new SoundID(entity), fadeIn)` with optional 3D position; lookup by entity name
+- `bro-stop` -- `BroAudio.Stop(soundId, fadeOut)` or stop all entities by `BroAudioType` enum name; lookup by entity name
+- `bro-volume` -- `BroAudio.SetVolume(soundId/type, volume, fadeTime)`; lookup by entity name
+
+**Koreographer (2 tools):** `HAS_KOREOGRAPHER`, `MCPTools.Koreographer.Editor` (compiled DLL)
+- `koreo-query` -- `Koreographer.Instance.GetAllLoadedKoreography()`, clip names, event track IDs, current beat time
+- `koreo-beattime` -- `Koreographer.GetBeatTime(trackName, subdivision)` + `GetBeatTimeDelta()`
+
+**PMG (4 tools):** `#if HAS_PMG`, Assembly-CSharp (MonoBehaviour, no static singleton)
+- `pmg-query` -- `FindFirstObjectByType<MusicGenerator>()`, `GeneratorState`, `Tempo/KeySteps/Scale/Mode`, `AutoPlay`
+- `pmg-play` -- `gen.SetState(GeneratorState.Playing)`
+- `pmg-stop` -- `gen.SetState(GeneratorState.Stopped)`
+- `pmg-configure` -- Sets `cfg.Tempo`, `cfg.KeySteps`, `cfg.Scale`, `cfg.Mode` (enum parse)
+
+**Maestro MIDI (4 tools):** `HAS_MAESTRO`, `MCPTools.Maestro.Editor`
+- `maestro-query` -- `FindObjectsByType<MidiFilePlayer/MidiStreamPlayer>()`, name, MPTK_MidiName, IsPlaying, Tempo, Speed, Loop
+- `maestro-play` -- Finds by GO name, sets MPTK_MidiName/Loop/Speed, calls `MPTK_Play()`
+- `maestro-stop` -- `MPTK_Stop()` on named player
+- `maestro-send-note` -- `MPTKEvent { Command=NoteOn, Value, Channel, Velocity, Duration, Patch }` via `MPTK_PlayEvent()`
+
+**DryWetMIDI (1 tool):** `HAS_DRYWETMIDI`, `MCPTools.DryWetMIDI.Editor` (compiled DLL)
+- `midi-query-devices` -- `OutputDevice.GetAll()` + `InputDevice.GetAll()`, disposes each, wrapped in try/catch
+
+**FMOD Studio (5 tools):** `HAS_FMOD`, `MCPTools.FMOD.Editor`
+- `fmod-query` -- IsInitialized, HaveAllBanksLoaded, HaveMasterBanksLoaded, IsMuted, AnyBankLoading()
+- `fmod-play` -- `RuntimeManager.PlayOneShot(eventPath, pos)` with optional 3D position parse
+- `fmod-parameter` -- `RuntimeManager.StudioSystem.setParameterByName(name, value, ignoreSeekSpeed)`
+- `fmod-vca` -- `RuntimeManager.GetVCA(path).setVolume(volume)` with before/after logging
+- `fmod-bus` -- `RuntimeManager.GetBus(path).setVolume(volume)` with before/after logging
+
+**Chunity (4 tools):** `#if HAS_CHUNITY`, Assembly-CSharp
+- `chuck-query` -- `FindObjectsByType<ChuckMainInstance>()`, lists GO names and active state
+- `chuck-run` -- `inst.RunCode(code)` on named ChuckMainInstance
+- `chuck-set-float` -- `Chuck.Manager.SetFloat(instanceName, variableName, value)`
+- `chuck-set-int` -- `Chuck.Manager.SetInt(instanceName, variableName, value)`
 
 ### Session 4 (Mar 20, 2026) -- 7 new tool groups (36 tools) + MCP evals
 
@@ -133,11 +258,12 @@ All 24 groups built directly in the package folder. No separate source location.
 - `uc-configure-attribute` -- Set health/stamina/mana values
 - `uc-item-control` -- List inventory, equip/unequip item sets
 
-**Behavior Designer (4 tools):** `HAS_BEHAVIOR_DESIGNER`, `MCPTools.BehaviorDesigner.Editor`
+**Behavior Designer (4 tools, updated SS1 to 5):** `HAS_BEHAVIOR_DESIGNER`, `#if` only (asmdef removed SS1)
 - `bd-query` -- Tree name, enabled, shared variables with values
 - `bd-set-variable` -- Get/set SharedVariable by name (bool/float/int/string/vector3)
-- `bd-control` -- Start/stop/restart behavior tree
+- `bd-control` -- Start/stop/pause/unpause/restart behavior tree
 - `bd-list-trees` -- List all BehaviorTree components in scene
+- `bd-tick` -- Manual tick for Manual update mode trees (added SS1)
 
 **DOTween Pro (4 tools):** `#if HAS_DOTWEEN`, Assembly-CSharp
 - `dotween-query` -- List DOTweenAnimation components with full config

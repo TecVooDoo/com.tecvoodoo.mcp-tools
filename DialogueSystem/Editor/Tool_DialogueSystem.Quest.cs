@@ -42,8 +42,8 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                     {
                         QuestState currentState = QuestLog.GetQuestState(questName);
                         string description = QuestLog.GetQuestDescription(questName);
-                        string successDesc = QuestLog.GetQuestDescription(questName, "success");
-                        string failureDesc = QuestLog.GetQuestDescription(questName, "failure");
+                        string successDesc = QuestLog.GetQuestDescription(questName, QuestState.Success);
+                        string failureDesc = QuestLog.GetQuestDescription(questName, QuestState.Failure);
                         int entryCount = QuestLog.GetQuestEntryCount(questName);
 
                         StringBuilder sb = new StringBuilder();

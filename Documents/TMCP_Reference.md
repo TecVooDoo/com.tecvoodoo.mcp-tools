@@ -1,8 +1,8 @@
 # TecVooDoo MCP Tools -- API Reference
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.0.0
-**Source:** `E:\Unity\SyntyAssets\Assets\MCPTools\`
-**Last Updated:** March 14, 2026
+**Package:** `com.tecvoodoo.mcp-tools` v1.5.0
+**Source:** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
+**Last Updated:** March 23, 2026
 
 ---
 
@@ -32,6 +32,17 @@ All tools follow the same pattern:
 | `HAS_MALBERS_AC` | `MalbersAnimations.Controller.MAnimal` | `MalbersAnimations` |
 | `HAS_MALBERS_QUESTFORGE` | `MalbersAnimations.QuestForge.QuestManager` | `Assembly-CSharp` |
 | `HAS_RETARGETPRO` | `KINEMATION.RetargetProComponent` | `RetargetPro.Runtime` |
+| `HAS_BROAUDIO` | `Ami.BroAudio.BroAudio` | `BroAudio` |
+| `HAS_KOREOGRAPHER` | `SonicBloom.Koreo.Koreographer` | `SonicBloom.Koreo` |
+| `HAS_PMG` | `ProcGenMusic.MusicGenerator` | `Assembly-CSharp` |
+| `HAS_MAESTRO` | `MidiPlayerTK.MidiFilePlayer` | `MidiPlayer.Run` |
+| `HAS_DRYWETMIDI` | `Melanchall.DryWetMidi.Core.MidiFile` | `Melanchall.DryWetMidi` |
+| `HAS_FMOD` | `FMODUnity.RuntimeManager` | `FMODUnity` |
+| `HAS_CHUNITY` | `ChuckMainInstance` | `Assembly-CSharp` |
+| `HAS_NANINOVEL` | `Naninovel.Engine` | `Elringus.Naninovel.Runtime` |
+| `HAS_ADVENTURE_CREATOR` | `AC.KickStarter` | `AC` |
+| `HAS_TEXT_ANIMATOR` | `Febucci.TextAnimatorForUnity.TextAnimatorComponentBase` | `Febucci.TextAnimatorForUnity.Runtime` |
+| `HAS_INK` | `Ink.Runtime.Story` | `Ink-Libraries` |
 
 ---
 
@@ -903,6 +914,654 @@ QueryProfilesResponse QueryProfiles(
 ```
 
 **Returns:** profileCount, details (name, source/target chars, rigs, feature count, poses per profile)
+
+---
+
+---
+
+## 27. Bro Audio (4 Tools)
+
+**Files:** `BroAudio/Editor/Tool_BroAudio.*.cs`
+**Asmdef:** `MCPTools.BroAudio.Editor` | **Define:** `HAS_BROAUDIO`
+
+**Note:** BroAudio v2 replaced integer IDs with direct `AudioEntity` ScriptableObject references. Tools now use entity names (strings) instead of int IDs. Entities found via `Resources.FindObjectsOfTypeAll<AudioEntity>()`.
+
+### bro-query
+
+Lists all AudioEntity assets, their names, and playing state.
+
+```csharp
+string Query()
+```
+
+**Returns:** Entity count, per entity: Name, IsPlaying.
+
+### bro-play
+
+Plays a sound entity by name with optional fade-in and 3D position.
+
+```csharp
+string Play(
+    string entityName,
+    float fadeIn = 0f,
+    string? position = null    // "x,y,z" for 3D spatialized playback
+)
+```
+
+**Returns:** OK with entity name, or ERROR if entity not found.
+
+### bro-stop
+
+Stops a sound by entity name (with fade) or stops all sounds of a named BroAudioType.
+
+```csharp
+string Stop(
+    string? entityName = null,
+    string? audioType = null,    // BroAudioType enum name: "All", "BGM", "SFX", "Ambience", "Generic", "UI"
+    float fadeOut = 0f
+)
+```
+
+**Returns:** OK with stopped target.
+
+### bro-volume
+
+Sets volume for a named entity or all sounds of a BroAudioType.
+
+```csharp
+string SetVolume(
+    float volume,
+    float fadeTime = 0f,
+    string? entityName = null,
+    string? audioType = null
+)
+```
+
+**Returns:** OK with target and new volume.
+
+---
+
+## 28. Koreographer (2 Tools)
+
+**Files:** `Koreographer/Editor/Tool_Koreographer.cs`
+**Asmdef:** `MCPTools.Koreographer.Editor` | **Define:** `HAS_KOREOGRAPHER`
+**Assembly:** Compiled DLL (`SonicBloom.Koreo.dll`)
+
+### koreo-query
+
+Lists all loaded Koreography assets and their beat track event IDs. Reports current beat time.
+
+```csharp
+string Query()
+```
+
+**Returns:** Koreographer initialized state, koreography count, per koreography: SourceClipName, event track IDs via `GetEventIDs()`, plus current beat time.
+
+### koreo-beattime
+
+Gets current beat time and beat time delta for a named track.
+
+```csharp
+string GetBeatTime(
+    string trackName,
+    int subdivision = 1    // Beats per measure subdivision
+)
+```
+
+**Returns:** trackName, subdivision, beatTime, beatTimeDelta, or ERROR if Koreographer not initialized.
+
+---
+
+## 29. PMG -- Procedural Music Generator (4 Tools)
+
+**Files:** `PMG/Editor/Tool_PMG.cs`
+**No asmdef** -- uses `#if HAS_PMG` guard | **Define:** `HAS_PMG`
+**Note:** PMG is a MonoBehaviour. No static singleton -- uses `FindFirstObjectByType<MusicGenerator>()`.
+
+### pmg-query
+
+Reads current PMG state: generator state, tempo, key, scale, mode, and auto-play setting.
+
+```csharp
+string Query()
+```
+
+**Returns:** GeneratorState, Tempo, KeySteps, Scale (enum name), Mode (enum name), AutoPlay.
+
+### pmg-play
+
+Starts the PMG music generator.
+
+```csharp
+string Play()
+```
+
+**Returns:** OK, or ERROR if no MusicGenerator found.
+
+### pmg-stop
+
+Stops the PMG music generator.
+
+```csharp
+string Stop()
+```
+
+**Returns:** OK, or ERROR if no MusicGenerator found.
+
+### pmg-configure
+
+Sets PMG configuration parameters. All params are optional -- only provided ones are changed.
+
+```csharp
+string Configure(
+    float? tempo = null,
+    int? keySteps = null,           // Semitones from C (0-11)
+    string? scale = null,           // e.g. "Major", "Minor", "Dorian"
+    string? mode = null             // e.g. "Ionian", "Dorian", "Phrygian"
+)
+```
+
+**Returns:** Updated values for each changed param, or ERROR if MusicGenerator not found / enum parse fails.
+
+---
+
+## 30. Maestro MIDI (4 Tools)
+
+**Files:** `Maestro/Editor/Tool_Maestro.cs`
+**Asmdef:** `MCPTools.Maestro.Editor` | **Define:** `HAS_MAESTRO`
+
+### maestro-query
+
+Lists all MidiFilePlayer and MidiStreamPlayer components in the scene with their current state.
+
+```csharp
+string Query()
+```
+
+**Returns:** Per player: GO name, type (FilePlayer/StreamPlayer), MPTK_MidiName, IsPlaying, IsPaused, MPTK_Tempo, MPTK_Speed, MPTK_Loop.
+
+### maestro-play
+
+Starts playback on a named MidiFilePlayer.
+
+```csharp
+string Play(
+    string playerName,         // GameObject name of the MidiFilePlayer
+    string? midiName = null,   // MIDI file name (from MPTK library)
+    bool loop = false,
+    float speed = 1f
+)
+```
+
+**Returns:** OK with player name and MIDI name, or ERROR if not found.
+
+### maestro-stop
+
+Stops a named MIDI player.
+
+```csharp
+string Stop(
+    string playerName          // GameObject name of MidiFilePlayer or MidiStreamPlayer
+)
+```
+
+**Returns:** OK with player name, or ERROR if not found.
+
+### maestro-send-note
+
+Sends an immediate MIDI note event to a named MidiStreamPlayer.
+
+```csharp
+string SendNote(
+    string playerName,         // GameObject name of the MidiStreamPlayer
+    int note,                  // MIDI note 0-127 (60 = middle C)
+    int channel = 0,           // MIDI channel 0-15
+    int velocity = 100,        // Note velocity 0-127
+    int durationMs = 500,      // Duration in milliseconds
+    int patch = 0              // GM instrument preset 0-127
+)
+```
+
+**Returns:** OK with note, channel, velocity, duration, patch, or ERROR if player not found.
+
+---
+
+## 31. DryWetMIDI (1 Tool)
+
+**Files:** `DryWetMIDI/Editor/Tool_DryWetMIDI.cs`
+**Asmdef:** `MCPTools.DryWetMIDI.Editor` | **Define:** `HAS_DRYWETMIDI`
+**Assembly:** Compiled DLL (`Melanchall.DryWetMidi.dll`)
+
+### midi-query-devices
+
+Lists all available MIDI input and output devices on the machine.
+
+```csharp
+string QueryDevices()
+```
+
+**Returns:** Output device count + names, input device count + names. Each device is disposed after listing. Errors per-device-type are caught and reported inline.
+
+---
+
+## 32. FMOD Studio (5 Tools)
+
+**Files:** `FMOD/Editor/Tool_FMOD.cs`
+**Asmdef:** `MCPTools.FMOD.Editor` | **Define:** `HAS_FMOD`
+
+### fmod-query
+
+Returns FMOD Studio runtime state: initialization, bank load status, mute state.
+
+```csharp
+string Query()
+```
+
+**Returns:** IsInitialized, HaveAllBanksLoaded, HaveMasterBanksLoaded, IsMuted, AnyBankLoading.
+
+### fmod-play
+
+Plays an FMOD Studio event as a one-shot (fire and forget).
+
+```csharp
+string PlayOneShot(
+    string eventPath,           // e.g. "event:/Music/MainTheme"
+    string? position = null     // "x,y,z" for 3D spatialized playback
+)
+```
+
+**Returns:** OK with event path and position, or ERROR if not initialized.
+
+### fmod-parameter
+
+Sets a global FMOD Studio parameter by name.
+
+```csharp
+string SetGlobalParameter(
+    string parameterName,
+    float value,
+    bool ignoreSeekSpeed = true
+)
+```
+
+**Returns:** OK with name and value, or FMOD RESULT error code. Parameter must be declared as a global parameter in FMOD Studio (not local to an event).
+
+### fmod-vca
+
+Sets the volume of an FMOD Studio VCA.
+
+```csharp
+string SetVCAVolume(
+    string vcaPath,             // e.g. "vca:/Master" or "vca:/Music"
+    float volume                // 0.0 to 1.0 (clamped)
+)
+```
+
+**Returns:** OK with path, old volume, and new volume, or FMOD RESULT error code.
+
+### fmod-bus
+
+Sets the fader level of an FMOD Studio Bus.
+
+```csharp
+string SetBusVolume(
+    string busPath,             // e.g. "bus:/" or "bus:/Music"
+    float volume                // 0.0 to 1.0 (clamped)
+)
+```
+
+**Returns:** OK with path, old volume, and new volume, or FMOD RESULT error code.
+
+---
+
+## 33. Chunity (4 Tools)
+
+**Files:** `Chunity/Editor/Tool_Chunity.cs`
+**No asmdef** -- uses `#if HAS_CHUNITY` guard | **Define:** `HAS_CHUNITY`
+
+### chuck-query
+
+Lists all ChuckMainInstance components in the scene.
+
+```csharp
+string Query()
+```
+
+**Returns:** Instance count, per instance: index, GO name, activeInHierarchy. Use the GO name as `instanceName` in other chuck-* tools.
+
+### chuck-run
+
+Runs a ChucK code string on a named ChuckMainInstance.
+
+```csharp
+string RunCode(
+    string instanceName,        // GameObject name of the ChuckMainInstance
+    string code                 // Valid ChucK DSP code
+)
+```
+
+**Example code:** `"SinOsc s => dac; 440 => s.freq; 1 => s.gain; 2::second => now;"`
+
+**Returns:** OK if code submitted, ERROR if instance not found or RunCode returned false.
+
+### chuck-set-float
+
+Sets a global float variable in a ChuckMainInstance's VM.
+
+```csharp
+string SetFloat(
+    string instanceName,
+    string variableName,        // Must be declared as "global float myVar;" in ChucK code
+    double value
+)
+```
+
+**Returns:** OK with instance, variable, and value, or ERROR with hint to check global declaration.
+
+### chuck-set-int
+
+Sets a global int variable in a ChuckMainInstance's VM.
+
+```csharp
+string SetInt(
+    string instanceName,
+    string variableName,        // Must be declared as "global int myVar;" in ChucK code
+    long value
+)
+```
+
+**Returns:** OK with instance, variable, and value, or ERROR with hint to check global declaration.
+
+---
+
+## 34. Naninovel (5 Tools)
+
+**Files:** `Naninovel/Editor/Tool_Naninovel.*.cs`
+**Asmdef:** `MCPTools.Naninovel.Editor` | **Define:** `HAS_NANINOVEL`
+
+### nani-list-characters
+
+Lists all characters registered in Naninovel project configuration. Shows IDs, display names, colors, poses.
+
+```csharp
+string ListCharacters()
+```
+
+**Returns:** Character list with metadata from `CharactersConfiguration`.
+
+### nani-list-backgrounds
+
+Lists all backgrounds registered in Naninovel project configuration.
+
+```csharp
+string ListBackgrounds()
+```
+
+**Returns:** Background list with IDs and implementation types from `BackgroundsConfiguration`.
+
+### nani-list-scripts
+
+Lists all .nani scenario script files in the project.
+
+```csharp
+string ListScripts()
+```
+
+**Returns:** File names, paths, and sizes grouped by folder.
+
+### nani-read-script
+
+Reads the contents of a .nani script file by name.
+
+```csharp
+string ReadScript(
+    string scriptName     // Name without extension, case-insensitive, partial match
+)
+```
+
+**Returns:** Full script content with line numbers.
+
+### nani-list-commands
+
+Lists available Naninovel script commands discovered via reflection.
+
+```csharp
+string ListCommands(
+    string? filter = null // Optional name/alias filter
+)
+```
+
+**Returns:** Command names, aliases (e.g., `@char`, `@back`), and descriptions.
+
+---
+
+## 35. Adventure Creator (5 Tools)
+
+**Files:** `AdventureCreator/Editor/Tool_AdventureCreator.*.cs`
+**Asmdef:** `MCPTools.AdventureCreator.Editor` | **Define:** `HAS_ADVENTURE_CREATOR`
+
+### ac-query-managers
+
+Shows status of all 8 AC managers with basic statistics.
+
+```csharp
+string QueryManagers()
+```
+
+**Returns:** Manager assignment status, item/variable/action counts.
+
+### ac-list-inventory
+
+Lists inventory items, categories, recipes, and documents from InventoryManager.
+
+```csharp
+string ListInventory()
+```
+
+**Returns:** Items (ID, label, category), categories, recipes, documents. Limited to 100 items.
+
+### ac-list-variables
+
+Lists global variables from VariablesManager.
+
+```csharp
+string ListVariables()
+```
+
+**Returns:** Variables (ID, label, type). Limited to 100.
+
+### ac-list-actions
+
+Lists available Action types from ActionsManager.
+
+```csharp
+string ListActions(
+    string? filter = null // Optional title/filename filter
+)
+```
+
+**Returns:** Sorted action list (title, filename).
+
+### ac-find-scene-objects
+
+Finds AC objects in the current scene.
+
+```csharp
+string FindSceneObjects()
+```
+
+**Returns:** Hotspots, NPCs, Players, Markers, ActionLists with positions and action counts.
+
+---
+
+## 36. Text Animator (4 Tools)
+
+**Files:** `TextAnimator/Editor/Tool_TextAnimator.*.cs`
+**Asmdef:** `MCPTools.TextAnimator.Editor` | **Define:** `HAS_TEXT_ANIMATOR`
+
+### ta-list-effects
+
+Lists all Text Animator effects discovered via `[EffectInfoAttribute]` reflection.
+
+```csharp
+string ListEffects(
+    string? filter = null // "behaviors", "appearances", or tag name search
+)
+```
+
+**Returns:** Effects grouped by category (Behavior/Appearance) with tag IDs and class names.
+
+### ta-find-components
+
+Finds TextAnimator components in the current scene.
+
+```csharp
+string FindComponents()
+```
+
+**Returns:** Component list with GameObject name, type, animation loop mode, current text.
+
+### ta-list-databases
+
+Lists AnimationsDatabase assets in the project.
+
+```csharp
+string ListDatabases()
+```
+
+**Returns:** Database names and asset paths.
+
+### ta-get-settings
+
+Lists AnimatorSettingsScriptable assets in the project.
+
+```csharp
+string GetSettings()
+```
+
+**Returns:** Settings asset names and paths.
+
+---
+
+## 37. Ink Integration (3 Tools)
+
+**Files:** `InkIntegration/Editor/Tool_InkIntegration.*.cs`
+**Asmdef:** `MCPTools.InkIntegration.Editor` | **Define:** `HAS_INK`
+
+### ink-list-files
+
+Lists all .ink files via InkLibrary.
+
+```csharp
+string ListFiles()
+```
+
+**Returns:** File paths with master/include status, auto-compile flag, compiled status.
+
+### ink-compile
+
+Compiles .ink files to JSON.
+
+```csharp
+string CompileInk(
+    string? fileName = null // File name without extension, or empty for all master files
+)
+```
+
+**Returns:** Compilation status. Check Unity console for results.
+
+### ink-get-story-info
+
+Loads a compiled Ink story and reports its structure.
+
+```csharp
+string GetStoryInfo(
+    string fileName     // .ink file name without extension
+)
+```
+
+**Returns:** Variables (name + value), content line count, choice points, global tags.
+
+---
+
+## Behavior Designer Pro 3 (5 Tools)
+
+**Define:** `HAS_BEHAVIOR_DESIGNER` | **Pattern:** `#if` guard (no asmdef) | **Namespace:** `MCPTools.BehaviorDesigner.Editor`
+
+Behavior tree authoring, runtime control, and state inspection for Opsive Behavior Designer Pro 3 (DOTS-powered). All tools use the MonoBehaviour API which is backward compatible with Pro 2.
+
+### bd-query
+
+Queries a BehaviorTree component on a GameObject. Reports tree name, enabled state, configuration (UpdateMode, EvaluationType), shared variables with values. In play mode, also reports runtime state (Status, IsActive, IsRunning, IsPaused).
+
+```csharp
+string Query(
+    string gameObjectName,   // GameObject with BehaviorTree
+    int? treeIndex = 0       // Index if multiple trees
+)
+```
+
+**Returns:** Tree name, enabled, StartWhenEnabled, PauseWhenDisabled, UpdateMode, EvaluationType, runtime state (play mode), shared variables list.
+
+### bd-control
+
+Controls behavior tree execution. Start, stop, pause, unpause (resume), or restart a tree.
+
+```csharp
+string Control(
+    string gameObjectName,   // GameObject with BehaviorTree
+    string action,           // "start", "stop", "pause", "unpause"/"resume", "restart"
+    int? treeIndex = 0       // Index if multiple trees
+)
+```
+
+**Actions:**
+- `start` / `enable` -- `StartBehavior()`, also resumes paused trees
+- `stop` / `disable` -- `StopBehavior(false)`, fully stops the tree
+- `pause` -- `StopBehavior(true)`, pauses without clearing state
+- `unpause` / `resume` -- resumes a paused tree via `StartBehavior()`
+- `restart` -- `RestartBehavior()`, stops then starts
+
+### bd-list-trees
+
+Lists all BehaviorTree components in the current scene.
+
+```csharp
+string ListTrees()
+```
+
+**Returns:** Per tree: GameObject name, tree name, enabled state, variable count. In play mode, also shows TaskStatus (Inactive, Queued, Running, Success, Failure).
+
+### bd-set-variable
+
+Gets or sets a SharedVariable on a BehaviorTree by name.
+
+```csharp
+string SetVariable(
+    string gameObjectName,   // GameObject with BehaviorTree
+    string variableName,     // Shared variable name
+    string? action = "get",  // "get" or "set"
+    string? value = null,    // Value for set action
+    string? valueType = "string", // "bool", "float", "int", "string", "vector3"
+    int? treeIndex = 0       // Index if multiple trees
+)
+```
+
+**Supported types:** bool, float, int, string, vector3 (parsed as `x,y,z`).
+
+### bd-tick
+
+Manually ticks a BehaviorTree. For trees with `UpdateMode.Manual` that are not auto-updated each frame. Play mode only.
+
+```csharp
+string Tick(
+    string gameObjectName,   // GameObject with BehaviorTree
+    int? count = 1,          // Number of ticks to perform
+    int? treeIndex = 0       // Index if multiple trees
+)
+```
+
+**Returns:** Tick count performed and current TaskStatus after ticking.
 
 ---
 

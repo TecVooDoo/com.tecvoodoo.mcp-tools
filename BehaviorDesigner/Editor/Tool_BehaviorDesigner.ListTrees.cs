@@ -32,8 +32,9 @@ namespace MCPTools.BehaviorDesigner.Editor
                     string goName = tree.gameObject.name;
                     bool enabled = tree.enabled;
                     int varCount = tree.SharedVariables != null ? tree.SharedVariables.Length : 0;
+                    string statusStr = Application.isPlaying ? $" | Status: {tree.Status}" : "";
 
-                    sb.AppendLine($"  [{i}] GO: {goName} | Tree: {treeName} | Enabled: {enabled} | Variables: {varCount}");
+                    sb.AppendLine($"  [{i}] GO: {goName} | Tree: {treeName} | Enabled: {enabled} | Variables: {varCount}{statusStr}");
                 }
 
                 return sb.ToString();

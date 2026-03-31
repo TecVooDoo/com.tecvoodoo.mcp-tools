@@ -1,0 +1,27 @@
+{
+    "name": "MCPTools.TextAnimator.Editor",
+    "rootNamespace": "",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime",
+        "Febucci.TextAnimatorForUnity.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll",
+        "Febucci.TextAnimatorCore.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HAS_TEXT_ANIMATOR"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

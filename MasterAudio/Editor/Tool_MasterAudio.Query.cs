@@ -52,15 +52,7 @@ Use this to inspect the full Master Audio runtime state before making changes.")
                     if (string.IsNullOrEmpty(busName) || busName == MasterAudio.NoGroupName)
                         continue;
 
-                    GroupBus bus = MasterAudio.GetBusByName(busName);
-                    if (bus != null)
-                    {
-                        sb.AppendLine($"  [{i}] {busName} | Volume: {bus.volume:F2} | Muted: {bus.isMuted} | Soloed: {bus.isSoloed} | ActiveVoices: {bus.ActiveVoices}");
-                    }
-                    else
-                    {
-                        sb.AppendLine($"  [{i}] {busName} | (bus reference not found)");
-                    }
+                    sb.AppendLine($"  [{i}] {busName}");
                 }
 
                 // Playlists

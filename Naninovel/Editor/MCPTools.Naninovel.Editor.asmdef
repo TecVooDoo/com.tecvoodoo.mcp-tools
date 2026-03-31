@@ -1,0 +1,28 @@
+{
+    "name": "MCPTools.Naninovel.Editor",
+    "rootNamespace": "",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime",
+        "Elringus.Naninovel.Runtime",
+        "Elringus.Naninovel.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll",
+        "Naninovel.Common.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HAS_NANINOVEL"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

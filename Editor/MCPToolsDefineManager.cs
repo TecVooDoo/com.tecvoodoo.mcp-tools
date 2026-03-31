@@ -46,6 +46,19 @@ namespace MCPTools.Editor
             ("HAS_DOTWEEN",            "DG.Tweening.DOTweenAnimation, DOTweenPro"),
             ("HAS_UNITY_ENTITIES",     "Unity.Entities.SceneSectionComponent, Unity.Entities.Hybrid"),
             ("HAS_UNITY_PHYSICS",      "Unity.Physics.Authoring.PhysicsStepAuthoring, Unity.Physics.Hybrid"),
+            // Audio additions (AudioProject)
+            ("HAS_BROAUDIO",           "Ami.BroAudio.BroAudio, BroAudio"),
+            ("HAS_KOREOGRAPHER",       "SonicBloom.Koreo.Koreographer, SonicBloom.Koreo"),
+            ("HAS_PMG",                "ProcGenMusic.MusicGenerator, Assembly-CSharp"),
+            ("HAS_MAESTRO",            "MidiPlayerTK.MidiFilePlayer, MidiPlayer.Run"),
+            ("HAS_DRYWETMIDI",         "Melanchall.DryWetMidi.Core.MidiFile, Melanchall.DryWetMidi"),
+            ("HAS_FMOD",               "FMODUnity.RuntimeManager, FMODUnity"),
+            ("HAS_CHUNITY",            "ChuckMainInstance, Assembly-CSharp"),
+            // VNPC additions
+            ("HAS_NANINOVEL",          "Naninovel.Engine, Elringus.Naninovel.Runtime"),
+            ("HAS_ADVENTURE_CREATOR",  "AC.KickStarter, AC"),
+            ("HAS_TEXT_ANIMATOR",      "Febucci.TextAnimatorForUnity.TextAnimatorComponentBase, Febucci.TextAnimatorForUnity.Runtime"),
+            ("HAS_INK",                "Ink.Runtime.Story, Ink-Libraries"),
         };
 
         static MCPToolsDefineManager()
@@ -68,6 +81,7 @@ namespace MCPTools.Editor
             string typeName = parts[0].Trim();
             string assemblyName = parts[1].Trim();
 
+            // First pass: match the specified assembly name exactly
             foreach (System.Reflection.Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 string asmSimpleName = asm.GetName().Name ?? "";
@@ -77,6 +91,15 @@ namespace MCPTools.Editor
                     if (t != null) return t;
                 }
             }
+
+            // Second pass: type may live in a different assembly than expected
+            // (e.g. Assets/Plugins/ compiles to Assembly-CSharp-firstpass instead of Assembly-CSharp)
+            foreach (System.Reflection.Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                t = asm.GetType(typeName);
+                if (t != null) return t;
+            }
+
             return null;
         }
 
