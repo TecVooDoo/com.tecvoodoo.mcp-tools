@@ -1565,4 +1565,202 @@ string Tick(
 
 ---
 
+## Juicy Actions
+
+**Files:** `JuicyActions/Editor/Tool_JuicyActions.cs`, `.Query.cs`, `.Play.cs`
+**Define:** `HAS_JUICY_ACTIONS`
+**Pattern:** `#if` guard + reflection (no asmdef)
+**Assembly:** `MagicPigGames.JuicyActions.Runtime`
+
+### juicy-query -- Query Triggers
+
+Lists all Juicy Actions trigger components (ActionOnEvent-derived) on a GameObject. Reports each trigger's type, enabled state, and ActionExecutor details (item count, time mode, cooldown).
+
+```csharp
+string QueryTriggers(
+    string gameObjectName    // GameObject with Juicy Actions triggers
+)
+```
+
+**Returns:** Trigger list with type names, enabled state, and per-executor item counts.
+
+### juicy-play -- Play Trigger
+
+Triggers execution of a Juicy Actions trigger at runtime. Play mode only.
+
+```csharp
+string PlayTrigger(
+    string gameObjectName,   // GameObject with Juicy Actions triggers
+    int triggerIndex = 0     // Zero-based index of which trigger to fire
+)
+```
+
+**Returns:** Confirmation of which trigger was fired.
+
+---
+
+## Boing Kit
+
+**Files:** `BoingKit/Editor/Tool_BoingKit.cs`, `.Query.cs`, `.Configure.cs`
+**Define:** `HAS_BOINGKIT`
+**Pattern:** `#if` guard + reflection (no asmdef)
+**Assembly:** `BoingKit`
+
+### boing-query -- Query Components
+
+Reports all Boing Kit components on a GameObject (BoingEffector, BoingBehavior, BoingBones, BoingReactorField) and their configuration.
+
+```csharp
+string QueryBoingComponents(
+    string gameObjectName    // GameObject to inspect
+)
+```
+
+**Returns:** Per-component field dump: effector radius/impulse, behavior effect toggles/locks, bones chain count/debug, reactor field cells/falloff/propagation.
+
+### boing-configure -- Configure Component
+
+Configures a specific Boing Kit component. Only provided parameters are changed.
+
+```csharp
+string ConfigureBoingComponent(
+    string gameObjectName,           // GameObject with the component
+    string componentType,            // "Effector", "Behavior", "Bones", or "ReactorField"
+    // Effector params:
+    float? radius = null,            // [0-20] Effect radius
+    float? fullEffectRadiusRatio = null, // [0-1]
+    float? maxImpulseSpeed = null,   // [0-100]
+    bool? continuousMotion = null,
+    float? moveDistance = null,       // [-10, 10]
+    float? linearImpulse = null,     // [-200, 200]
+    float? rotationAngle = null,     // [-180, 180]
+    float? angularImpulse = null,    // [-2000, 2000]
+    // Behavior/ReactorField params:
+    bool? enablePositionEffect = null,
+    bool? enableRotationEffect = null,
+    bool? enableScaleEffect = null,  // Behavior only
+    // ReactorField params:
+    float? cellSize = null,          // [0.1-10]
+    int? cellsX = null, int? cellsY = null, int? cellsZ = null,
+    string? falloffMode = null,      // "None", "Circle", "Square"
+    float? falloffRatio = null,      // [0-1]
+    bool? enablePropagation = null
+)
+```
+
+**Returns:** List of changes applied.
+
+---
+
+## MudBun
+
+**Files:** `MudBun/Editor/Tool_MudBun.cs`, `.Query.cs`, `.ConfigureRenderer.cs`, `.ConfigureBrush.cs`
+**Define:** `HAS_MUDBUN`
+**Pattern:** `#if` guard + reflection (no asmdef)
+**Assembly:** `MudBun`
+
+### mudbun-query -- Query Renderer & Brushes
+
+Reports MudBun renderer settings and child brush hierarchy.
+
+```csharp
+string QueryMudBun(
+    string gameObjectName    // GameObject with MudRenderer
+)
+```
+
+**Returns:** Renderer config (RenderMode, MeshingMode, VoxelDensity, MaxVoxelsK, MasterColor/Metallic/Smoothness) + per-brush list (type, Operator, Blend, type-specific params, material Color/Emission/Metallic/Smoothness).
+
+### mudbun-configure-renderer -- Configure Renderer
+
+Configures a MudRenderer component. All params optional except gameObjectName.
+
+```csharp
+string ConfigureRenderer(
+    string gameObjectName,           // GameObject with MudRenderer
+    string? renderMode = null,       // "FlatMesh", "SmoothMesh", "CircleSplats", "QuadSplats", "Decal"
+    string? meshingMode = null,      // "MarchingCubes", "DualQuads", "SurfaceNets", "DualContouring"
+    float? voxelDensity = null,      // [0.1-100]
+    int? maxVoxelsK = null,          // [1-2048]
+    string? masterColorHex = null,   // "#RRGGBB" or "#RRGGBBAA"
+    float? masterMetallic = null,    // [0-1]
+    float? masterSmoothness = null,  // [0-1]
+    float? surfaceShift = null,      // [-1, 1]
+    bool? enable2dMode = null,
+    bool? castShadows = null,
+    bool? receiveShadows = null,
+    float? splatSize = null          // [0-5] for splat render modes
+)
+```
+
+**Returns:** List of changes applied + MarkDirty confirmation.
+
+### mudbun-configure-brush -- Configure Brush
+
+Configures a MudBun brush (primitive) on a named child GameObject.
+
+```csharp
+string ConfigureBrush(
+    string gameObjectName,           // The brush GameObject (child of MudRenderer)
+    string? @operator = null,        // "Union", "Subtract", "Intersect", "Dye", "Pipe", "Engrave"
+    float? blend = null,
+    float? radius = null,            // Sphere, Cylinder
+    float? round = null,             // Box, Cylinder
+    string? colorHex = null,         // "#RRGGBB"
+    string? emissionHex = null,      // "#RRGGBB"
+    float? metallic = null,          // [0-1]
+    float? smoothness = null         // [0-1]
+)
+```
+
+**Returns:** Brush type detected + list of changes applied.
+
+---
+
+## Lumen (Distant Lands)
+
+**Files:** `Lumen/Editor/Tool_Lumen.cs`, `.Query.cs`, `.Configure.cs`
+**Define:** `HAS_LUMEN`
+**Pattern:** `#if` guard + reflection (no asmdef)
+**Assembly:** `DistantLands.Lumen.Runtime`
+
+### lumen-query -- Query Effect Player
+
+Reports LumenEffectPlayer configuration on a GameObject.
+
+```csharp
+string QueryLumen(
+    string gameObjectName    // GameObject with LumenEffectPlayer
+)
+```
+
+**Returns:** scale, brightness, color, range, updateFrequency, fadingTime, init/deinit behaviors, profile name, instantiated layer count.
+
+### lumen-configure -- Configure Effect Player
+
+Configures a LumenEffectPlayer component. All params optional except gameObjectName. Includes runtime fade methods for play mode.
+
+```csharp
+string ConfigureLumen(
+    string gameObjectName,           // GameObject with LumenEffectPlayer
+    float? scale = null,             // Uniform scale modifier
+    float? brightness = null,        // Uniform brightness modifier
+    string? colorHex = null,         // "#RRGGBB" color modifier
+    float? range = null,             // Range multiplier for light layers
+    float? fadingTime = null,        // Transition duration (seconds)
+    string? updateFrequency = null,  // "Always", "OnChanges", "ViaScripting"
+    string? initBehavior = null,     // "Immediate", "FadeToTargetBrightness", etc.
+    string? deinitBehavior = null,   // "Immediate", "FadeBrightnessToZero", etc.
+    bool? autoAssignSun = null,      // Auto-assign directional light as sun
+    // Runtime fade (play mode only):
+    float? fadeToBrightness = null,  // Smooth fade to brightness
+    float? fadeToScale = null,       // Smooth fade to scale
+    string? fadeToColorHex = null    // Smooth fade to color
+)
+```
+
+**Returns:** List of changes applied. Runtime fades use fadingTime as duration.
+
+---
+
 **End of Document**

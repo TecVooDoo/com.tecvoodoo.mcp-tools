@@ -81,6 +81,10 @@ namespace MCPTools.Editor
             ("HAS_TEXTURE_STUDIO",     "TextureStudio.CompositeMap, Assembly-CSharp"),
             ("HAS_BOINGKIT",           "BoingKit.BoingBones, BoingKit"),
             ("HAS_AI_NAVIGATION",      "Unity.AI.Navigation.NavMeshSurface, Unity.AI.Navigation"),
+            // TecVooDoo Session 2 additions
+            ("HAS_JUICY_ACTIONS",      "MagicPigGames.JuicyActions.ActionExecutor, MagicPigGames.JuicyActions.Runtime"),
+            ("HAS_MUDBUN",             "MudBun.MudRenderer, MudBun"),
+            ("HAS_LUMEN",              "DistantLands.Lumen.LumenEffectPlayer, DistantLands.Lumen.Runtime"),
         };
 
         static MCPToolsDefineManager()

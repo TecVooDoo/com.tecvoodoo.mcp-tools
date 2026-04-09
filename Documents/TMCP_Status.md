@@ -13,7 +13,7 @@
 
 ## Current State
 
-**~200 tools** across 43 asset groups. All compiling.
+**~212 tools** across 47 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -60,6 +60,10 @@
 | **Texture Studio** | **3** | `HAS_TEXTURE_STUDIO` | `MCPTools.TextureStudio.Editor` | **New TVD1** |
 | **AI Navigation** | **4** | `HAS_AI_NAVIGATION` | `MCPTools.AINavigation.Editor` | **New TVD1** |
 | **Animancer Pro** | **4** | `HAS_ANIMANCER` | `MCPTools.Animancer.Editor` | **New TVD1** |
+| **Juicy Actions** | **2** | `HAS_JUICY_ACTIONS` | None (`#if` only) | **New TVD2** |
+| **Boing Kit** | **2** | `HAS_BOINGKIT` | None (`#if` only) | **New TVD2** |
+| **MudBun** | **3** | `HAS_MUDBUN` | None (`#if` only) | **New TVD2** |
+| **Lumen** | **2** | `HAS_LUMEN` | None (`#if` only) | **New TVD2** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -124,11 +128,26 @@ All 33 groups built directly in the package folder. No separate source location.
 - **DefineManager fix:** `RemoveStaleDefines()` now uses `AssetDatabase.FindAssets("ClassName t:MonoScript")` for Assembly-CSharp entries. Previously 8 entries (PWB, FinalIK, QuestForge, RopeToolkit, MasterAudio, DialogueSystem, PMG, Chunity) could never be auto-stripped. Added **Tools > TecVooDoo > Rescan MCP Defines** menu item.
 - **Package dependency:** Added `com.ivanmurzak.unity.mcp` as dependency in TMCP package.json.
 - **8 Assembly-CSharp groups migrated to asmdef + reflection:** MasterAudio, DialogueSystem, RopeToolkit, FinalIK, PWB, QuestForge, PMG, Chunity. These now use `defineConstraints` instead of `#if` guards, with 100% reflection for asset type access. More robust on asset removal.
-- **5 own-assembly groups keep `#if` pattern:** Feel, DOTween, BehaviorDesigner, Terrain25D, BridgeBuilder25D. These retain direct API calls with `#if` guards. Asmdefs were tested but `defineConstraints` doesn't prevent missing assembly reference errors for uninstalled assets.
-- **Boing Kit evaluated:** 85+ tunable fields across BoingBones/BoingEffector/BoingReactorField. High MCP value. Tools not yet built (detection entry `HAS_BOINGKIT` added).
+- **8 own-assembly groups keep `#if` pattern:** Feel, DOTween, BehaviorDesigner, Terrain25D, BridgeBuilder25D, JuicyActions, BoingKit, MudBun. These retain reflection-based API calls with `#if` guards. Asmdefs were tested but `defineConstraints` doesn't prevent missing assembly reference errors for uninstalled assets.
 - **`MainThread` using clarification:** `MainThread.Instance.Run()` is in `com.IvanMurzak.ReflectorNet.Utils` (ReflectorNet.dll), NOT in `com.IvanMurzak.Unity.MCP.Editor.Utils`.
 
 **Tool count:** 39 -> 43 groups, ~184 -> ~200 tools.
+
+---
+
+### TecVooDoo Session 2 (Apr 9, 2026) -- 3 new tool groups (Juicy Actions, Boing Kit, MudBun)
+
+**New tool groups (7 tools):**
+- **Juicy Actions (2 tools):** `HAS_JUICY_ACTIONS`, `#if` guard + reflection. `juicy-query` (list all ActionOnEvent-derived triggers on GO, report ActionExecutor items/timeMode/cooldown), `juicy-play` (trigger PlayActions() on a specific trigger by index, play mode only). Detection: `MagicPigGames.JuicyActions.ActionExecutor, MagicPigGames.JuicyActions.Runtime`.
+- **Boing Kit (2 tools):** `HAS_BOINGKIT` (detection already existed from TVD1), `#if` guard + reflection. `boing-query` (report BoingEffector/BoingBehavior/BoingBones/BoingReactorField config on GO), `boing-configure` (set fields by componentType: Effector radius/impulse, Behavior effects/locks, ReactorField cells/falloff/propagation).
+- **MudBun (3 tools):** `HAS_MUDBUN`, `#if` guard + reflection. `mudbun-query` (renderer settings + child brush hierarchy with type/operator/blend/material), `mudbun-configure-renderer` (RenderMode, MeshingMode, VoxelDensity, MasterColor/Metallic/Smoothness, SplatSize, shadows), `mudbun-configure-brush` (Operator, Blend, Radius, Round, Color/Emission/Metallic/Smoothness per brush). Detection: `MudBun.MudRenderer, MudBun`.
+
+**Infrastructure:**
+- Added `HAS_JUICY_ACTIONS` and `HAS_MUDBUN` to MCPToolsDefineManager.cs.
+
+**Lumen (2 tools):** `HAS_LUMEN`, `#if` guard + reflection. `lumen-query` (report LumenEffectPlayer config: scale/brightness/color/range/profile/layers/update frequency/fading/init-deinit behaviors), `lumen-configure` (set all player properties + runtime fade methods: FadeBrightness/FadeScale/FadeColor). Detection: `DistantLands.Lumen.LumenEffectPlayer, DistantLands.Lumen.Runtime`. UPM package at `Packages/com.distantlands.lumen`.
+
+**Tool count:** 43 -> 47 groups, ~200 -> ~212 tools.
 
 ---
 
