@@ -1,22 +1,110 @@
-#if HAS_PMG
 #nullable enable
 using System;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using ProcGenMusic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace TecVooDoo.MCPTools.Editor
 {
     [McpPluginToolType]
     public partial class Tool_PMG
     {
-        private static MusicGenerator? FindGenerator()
+        const string MUSIC_GENERATOR_TYPE_NAME   = "ProcGenMusic.MusicGenerator";
+        const string GENERATOR_STATE_TYPE_NAME   = "ProcGenMusic.GeneratorState";
+        const string CONFIGURATION_DATA_TYPE_NAME = "ProcGenMusic.ConfigurationData";
+        const string SCALE_TYPE_NAME             = "ProcGenMusic.Scale";
+        const string MODE_TYPE_NAME              = "ProcGenMusic.Mode";
+
+        static Type? _genTypeCached;
+        static Type MusicGeneratorType
         {
-            return UnityEngine.Object.FindFirstObjectByType<MusicGenerator>();
+            get
+            {
+                if (_genTypeCached == null)
+                    _genTypeCached = FindType(MUSIC_GENERATOR_TYPE_NAME);
+                if (_genTypeCached == null)
+                    throw new InvalidOperationException($"Type '{MUSIC_GENERATOR_TYPE_NAME}' not found. Is PMG installed?");
+                return _genTypeCached;
+            }
+        }
+
+        static Type? FindType(string fullTypeName)
+        {
+            foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type? type = asm.GetType(fullTypeName);
+                if (type != null) return type;
+            }
+            return null;
+        }
+
+        static object? Get(object target, string name)
+        {
+            Type type = target.GetType();
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            PropertyInfo? prop = type.GetProperty(name, flags);
+            if (prop != null) return prop.GetValue(target);
+            FieldInfo? field = type.GetField(name, flags);
+            if (field != null) return field.GetValue(target);
+            return null;
+        }
+
+        static bool Set(object target, string name, object value)
+        {
+            Type type = target.GetType();
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+            PropertyInfo? prop = type.GetProperty(name, flags);
+            if (prop != null && prop.CanWrite) { prop.SetValue(target, value); return true; }
+            FieldInfo? field = type.GetField(name, flags);
+            if (field != null) { field.SetValue(target, value); return true; }
+            return false;
+        }
+
+        static object? Call(object target, string methodName, params object[] args)
+        {
+            Type type = target.GetType();
+            Type[] argTypes = new Type[args.Length];
+            for (int i = 0; i < args.Length; i++)
+                argTypes[i] = args[i].GetType();
+            MethodInfo? method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance, null, argTypes, null);
+            if (method == null)
+                method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
+            if (method == null)
+                throw new Exception($"Method '{methodName}' not found on {type.Name}.");
+            return method.Invoke(target, args);
+        }
+
+        /// <summary>
+        /// Find MusicGenerator in scene via reflection of FindFirstObjectByType.
+        /// </summary>
+        private static object? FindGenerator()
+        {
+            // UnityEngine.Object.FindFirstObjectByType<MusicGenerator>()
+            // We call the generic method via reflection since we only have the Type at runtime.
+            var findMethod = typeof(UnityEngine.Object).GetMethod(
+                "FindFirstObjectByType",
+                BindingFlags.Public | BindingFlags.Static,
+                null,
+                Type.EmptyTypes,
+                null
+            );
+            if (findMethod == null)
+            {
+                // Fallback: FindObjectOfType
+                var fallback = typeof(UnityEngine.Object).GetMethod(
+                    "FindObjectOfType",
+                    BindingFlags.Public | BindingFlags.Static,
+                    null,
+                    new[] { typeof(Type) },
+                    null
+                );
+                return fallback?.Invoke(null, new object[] { MusicGeneratorType });
+            }
+            var generic = findMethod.MakeGenericMethod(MusicGeneratorType);
+            return generic.Invoke(null, null);
         }
 
         [McpPluginTool("pmg-query", Title = "Procedural Music Generator / Query State")]
@@ -27,19 +115,22 @@ Requires a MusicGenerator component in the active scene.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                MusicGenerator? gen = FindGenerator();
+                var gen = FindGenerator();
                 if (gen == null)
                     return "ERROR: MusicGenerator not found in scene.";
 
-                ConfigurationData cfg = gen.ConfigurationData;
+                var cfg = Get(gen, "ConfigurationData");
+                if (cfg == null)
+                    return "ERROR: Could not read ConfigurationData from MusicGenerator.";
+
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("=== Procedural Music Generator ===");
-                sb.AppendLine($"  State:    {gen.GeneratorState}");
-                sb.AppendLine($"  AutoPlay: {gen.AutoPlay}");
-                sb.AppendLine($"  Tempo:    {cfg.Tempo:F1} BPM");
-                sb.AppendLine($"  Key:      {cfg.KeySteps} (semitones from C)");
-                sb.AppendLine($"  Scale:    {cfg.Scale}");
-                sb.AppendLine($"  Mode:     {cfg.Mode}");
+                sb.AppendLine($"  State:    {Get(gen, "GeneratorState")}");
+                sb.AppendLine($"  AutoPlay: {Get(gen, "AutoPlay")}");
+                sb.AppendLine($"  Tempo:    {Get(cfg, "Tempo"):F1} BPM");
+                sb.AppendLine($"  Key:      {Get(cfg, "KeySteps")} (semitones from C)");
+                sb.AppendLine($"  Scale:    {Get(cfg, "Scale")}");
+                sb.AppendLine($"  Mode:     {Get(cfg, "Mode")}");
                 return sb.ToString();
             });
         }
@@ -50,11 +141,16 @@ Requires a MusicGenerator component in the active scene.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                MusicGenerator? gen = FindGenerator();
+                var gen = FindGenerator();
                 if (gen == null)
                     return "ERROR: MusicGenerator not found in scene.";
 
-                gen.SetState(GeneratorState.Playing);
+                var stateType = FindType(GENERATOR_STATE_TYPE_NAME);
+                if (stateType == null)
+                    return "ERROR: GeneratorState type not found.";
+
+                var playingValue = Enum.Parse(stateType, "Playing");
+                Call(gen, "SetState", playingValue);
                 return $"OK: MusicGenerator state set to Playing";
             });
         }
@@ -65,11 +161,16 @@ Requires a MusicGenerator component in the active scene.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                MusicGenerator? gen = FindGenerator();
+                var gen = FindGenerator();
                 if (gen == null)
                     return "ERROR: MusicGenerator not found in scene.";
 
-                gen.SetState(GeneratorState.Stopped);
+                var stateType = FindType(GENERATOR_STATE_TYPE_NAME);
+                if (stateType == null)
+                    return "ERROR: GeneratorState type not found.";
+
+                var stoppedValue = Enum.Parse(stateType, "Stopped");
+                Call(gen, "SetState", stoppedValue);
                 return "OK: MusicGenerator state set to Stopped";
             });
         }
@@ -91,38 +192,61 @@ Only parameters you provide will be changed. Changes take effect on the next mea
         {
             return MainThread.Instance.Run(() =>
             {
-                MusicGenerator? gen = FindGenerator();
+                var gen = FindGenerator();
                 if (gen == null)
                     return "ERROR: MusicGenerator not found in scene.";
 
-                ConfigurationData cfg = gen.ConfigurationData;
+                var cfg = Get(gen, "ConfigurationData");
+                if (cfg == null)
+                    return "ERROR: Could not read ConfigurationData from MusicGenerator.";
+
                 StringBuilder changes = new StringBuilder();
 
                 if (tempo.HasValue)
                 {
-                    cfg.Tempo = tempo.Value;
+                    Set(cfg, "Tempo", tempo.Value);
                     changes.Append($" Tempo={tempo.Value:F1}BPM");
                 }
 
                 if (keySteps.HasValue)
                 {
-                    cfg.KeySteps = keySteps.Value;
+                    Set(cfg, "KeySteps", keySteps.Value);
                     changes.Append($" Key={keySteps.Value}");
                 }
 
                 if (!string.IsNullOrEmpty(scale))
                 {
-                    if (!Enum.TryParse<Scale>(scale, true, out Scale scaleVal))
-                        throw new ArgumentException($"Unknown scale '{scale}'.", nameof(scale));
-                    cfg.Scale = scaleVal;
-                    changes.Append($" Scale={scaleVal}");
+                    var scaleType = FindType(SCALE_TYPE_NAME);
+                    if (scaleType == null)
+                        throw new ArgumentException($"Scale enum type not found.");
+                    if (!Enum.IsDefined(scaleType, scale!))
+                    {
+                        // Try case-insensitive
+                        object? parsed = null;
+                        try { parsed = Enum.Parse(scaleType, scale!, true); } catch { }
+                        if (parsed == null)
+                            throw new ArgumentException($"Unknown scale '{scale}'.");
+                        Set(cfg, "Scale", parsed);
+                        changes.Append($" Scale={parsed}");
+                    }
+                    else
+                    {
+                        var scaleVal = Enum.Parse(scaleType, scale!);
+                        Set(cfg, "Scale", scaleVal);
+                        changes.Append($" Scale={scaleVal}");
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(mode))
                 {
-                    if (!Enum.TryParse<Mode>(mode, true, out Mode modeVal))
-                        throw new ArgumentException($"Unknown mode '{mode}'.", nameof(mode));
-                    cfg.Mode = modeVal;
+                    var modeType = FindType(MODE_TYPE_NAME);
+                    if (modeType == null)
+                        throw new ArgumentException($"Mode enum type not found.");
+                    object? modeVal = null;
+                    try { modeVal = Enum.Parse(modeType, mode!, true); } catch { }
+                    if (modeVal == null)
+                        throw new ArgumentException($"Unknown mode '{mode}'.");
+                    Set(cfg, "Mode", modeVal);
                     changes.Append($" Mode={modeVal}");
                 }
 
@@ -134,4 +258,3 @@ Only parameters you provide will be changed. Changes take effect on the next mea
         }
     }
 }
-#endif

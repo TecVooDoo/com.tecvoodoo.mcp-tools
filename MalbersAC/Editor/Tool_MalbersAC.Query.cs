@@ -1,3 +1,4 @@
+#if HAS_MALBERS_AC
 #nullable enable
 using System.ComponentModel;
 using System.Linq;
@@ -135,3 +136,4 @@ Use this to understand an animal's configuration before making changes.")]
         }
     }
 }
+#endif

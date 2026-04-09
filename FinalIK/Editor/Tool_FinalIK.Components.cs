@@ -1,13 +1,12 @@
-#if HAS_FINALIK
 #nullable enable
+using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using com.IvanMurzak.Unity.MCP.Runtime.Data;
 using com.IvanMurzak.Unity.MCP.Runtime.Extensions;
-using RootMotion.FinalIK;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,25 +26,36 @@ rotate to look at a target. Great for NPC gaze and attention systems.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                var go = targetRef.FindGameObject(out var error);
-                if (error != null) throw new System.Exception(error);
-                if (go == null) throw new System.Exception("GameObject not found.");
+                if (LookAtIKType == null)
+                    throw new Exception("RootMotion.FinalIK.LookAtIK type not found in loaded assemblies.");
 
-                var lookat = go.GetComponent<LookAtIK>();
+                var go = targetRef.FindGameObject(out var error);
+                if (error != null) throw new Exception(error);
+                if (go == null) throw new Exception("GameObject not found.");
+
+                var lookat = go.GetComponent(LookAtIKType);
                 if (lookat == null)
-                    lookat = Undo.AddComponent<LookAtIK>(go);
+                    lookat = Undo.AddComponent(go, LookAtIKType);
 
                 if (targetPosition.HasValue)
-                    lookat.solver.IKPosition = targetPosition.Value;
+                {
+                    var solver = Get(lookat, "solver");
+                    if (solver != null)
+                        Set(solver, "IKPosition", targetPosition.Value);
+                }
 
                 EditorUtility.SetDirty(go);
+
+                var solverObj = Get(lookat, "solver");
+                var ikPos = solverObj != null ? Get(solverObj, "IKPosition") : null;
+                string tgtPos = ikPos is Vector3 v ? FormatVector3(v) : "(0.00, 0.00, 5.00)";
 
                 return new AddIKResponse
                 {
                     gameObjectName = go.name,
                     instanceId = go.GetInstanceID(),
                     ikType = "LookAtIK",
-                    targetPosition = FormatVector3(lookat.solver.IKPosition)
+                    targetPosition = tgtPos
                 };
             });
         }
@@ -62,25 +72,36 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                var go = targetRef.FindGameObject(out var error);
-                if (error != null) throw new System.Exception(error);
-                if (go == null) throw new System.Exception("GameObject not found.");
+                if (AimIKType == null)
+                    throw new Exception("RootMotion.FinalIK.AimIK type not found in loaded assemblies.");
 
-                var aim = go.GetComponent<AimIK>();
+                var go = targetRef.FindGameObject(out var error);
+                if (error != null) throw new Exception(error);
+                if (go == null) throw new Exception("GameObject not found.");
+
+                var aim = go.GetComponent(AimIKType);
                 if (aim == null)
-                    aim = Undo.AddComponent<AimIK>(go);
+                    aim = Undo.AddComponent(go, AimIKType);
 
                 if (targetPosition.HasValue)
-                    aim.solver.IKPosition = targetPosition.Value;
+                {
+                    var solver = Get(aim, "solver");
+                    if (solver != null)
+                        Set(solver, "IKPosition", targetPosition.Value);
+                }
 
                 EditorUtility.SetDirty(go);
+
+                var solverObj = Get(aim, "solver");
+                var ikPos = solverObj != null ? Get(solverObj, "IKPosition") : null;
+                string tgtPos = ikPos is Vector3 v ? FormatVector3(v) : "(0.00, 0.00, 5.00)";
 
                 return new AddIKResponse
                 {
                     gameObjectName = go.name,
                     instanceId = go.GetInstanceID(),
                     ikType = "AimIK",
-                    targetPosition = FormatVector3(aim.solver.IKPosition)
+                    targetPosition = tgtPos
                 };
             });
         }
@@ -91,12 +112,37 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                var iks = Object.FindObjectsByType<IK>(FindObjectsSortMode.None);
+                if (IKType == null)
+                    throw new Exception("RootMotion.FinalIK.IK type not found in loaded assemblies.");
+
+                // FindObjectsByType<T>(FindObjectsSortMode) -- use reflection on Object
+                var findMethod = typeof(UnityEngine.Object).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .FirstOrDefault(m => m.Name == "FindObjectsByType"
+                        && m.IsGenericMethod
+                        && m.GetParameters().Length == 1
+                        && m.GetParameters()[0].ParameterType == typeof(FindObjectsSortMode));
+
+                Component[] iks;
+                if (findMethod != null)
+                {
+                    var generic = findMethod.MakeGenericMethod(IKType);
+                    var result = generic.Invoke(null, new object[] { FindObjectsSortMode.None });
+                    iks = ((Array)result!).Cast<Component>().ToArray();
+                }
+                else
+                {
+                    // Fallback for older Unity
+#pragma warning disable CS0618
+                    iks = UnityEngine.Object.FindObjectsOfType(IKType).Cast<Component>().ToArray();
+#pragma warning restore CS0618
+                }
+
                 var lines = iks.Select(ik =>
                 {
                     var typeName = ik.GetType().Name;
-                    var solver = ik.GetIKSolver();
-                    return $"[{ik.gameObject.GetInstanceID()}] {ik.gameObject.name} ({typeName}) enabled={ik.enabled}";
+                    var behaviour = ik as Behaviour;
+                    var enabledStr = behaviour != null ? behaviour.enabled.ToString() : "?";
+                    return $"[{ik.gameObject.GetInstanceID()}] {ik.gameObject.name} ({typeName}) enabled={enabledStr}";
                 }).ToArray();
 
                 return new ListIKResponse
@@ -122,4 +168,3 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
         }
     }
 }
-#endif

@@ -1,11 +1,9 @@
-#if HAS_MASTERAUDIO
 #nullable enable
 using System;
 using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
-using DarkTonic.MasterAudio;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -32,45 +30,44 @@ For fade action, provide volume and optional fadeTime.")]
 
             return MainThread.Instance.Run(() =>
             {
-                if (MasterAudio.SafeInstance == null)
-                    throw new InvalidOperationException("MasterAudio instance not found in scene.");
+                EnsureInstance();
 
                 string act = action.ToLowerInvariant().Trim();
 
                 switch (act)
                 {
                     case "mute":
-                        MasterAudio.MuteGroup(groupName);
+                        CallMA("MuteGroup", groupName);
                         return $"OK: Group '{groupName}' muted.";
 
                     case "unmute":
-                        MasterAudio.UnmuteGroup(groupName);
+                        CallMA("UnmuteGroup", groupName);
                         return $"OK: Group '{groupName}' unmuted.";
 
                     case "solo":
-                        MasterAudio.SoloGroup(groupName);
+                        CallMA("SoloGroup", groupName);
                         return $"OK: Group '{groupName}' soloed.";
 
                     case "unsolo":
-                        MasterAudio.UnsoloGroup(groupName);
+                        CallMA("UnsoloGroup", groupName);
                         return $"OK: Group '{groupName}' unsoloed.";
 
                     case "pause":
-                        MasterAudio.PauseSoundGroup(groupName);
+                        CallMA("PauseSoundGroup", groupName);
                         return $"OK: Group '{groupName}' paused.";
 
                     case "unpause":
-                        MasterAudio.UnpauseSoundGroup(groupName);
+                        CallMA("UnpauseSoundGroup", groupName);
                         return $"OK: Group '{groupName}' unpaused.";
 
                     case "stop":
-                        MasterAudio.StopAllOfSound(groupName);
+                        CallMA("StopAllOfSound", groupName);
                         return $"OK: Group '{groupName}' stopped.";
 
                     case "fade":
                         float targetVol = volume ?? 0f;
                         float fadeDur = fadeTime ?? 1f;
-                        MasterAudio.FadeSoundGroupToVolume(groupName, targetVol, fadeDur);
+                        CallMA("FadeSoundGroupToVolume", groupName, targetVol, fadeDur);
                         return $"OK: Group '{groupName}' fading to {targetVol:F2} over {fadeDur:F2}s.";
 
                     default:
@@ -82,4 +79,3 @@ For fade action, provide volume and optional fadeTime.")]
         }
     }
 }
-#endif

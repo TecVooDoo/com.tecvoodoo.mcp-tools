@@ -1,13 +1,12 @@
-#if HAS_PWB
 #nullable enable
+using System;
+using System.Collections;
 using System.ComponentModel;
-using System.Linq;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using com.IvanMurzak.Unity.MCP.Runtime.Data;
 using com.IvanMurzak.Unity.MCP.Runtime.Extensions;
-using PluginMaster;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,63 +39,82 @@ Specify the palette and brush by index, or search by brush name.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                var palettes = PaletteManager.allPalettes;
-                MultibrushSettings? brush = null;
+                var palettes = GetStatic(PaletteManagerType, "allPalettes") as IList;
+                if (palettes == null)
+                    throw new Exception("Could not retrieve PaletteManager.allPalettes.");
+
+                object? brush = null;
                 string paletteName = "";
 
                 if (!string.IsNullOrEmpty(brushName))
                 {
-                    // Search by name across all palettes
-                    var searchLower = brushName.ToLower();
+                    var searchLower = brushName!.ToLower();
                     foreach (var pal in palettes)
                     {
-                        foreach (var b in pal.brushes)
+                        if (pal == null) continue;
+                        var brushes = Get(pal, "brushes") as Array;
+                        if (brushes == null) continue;
+                        foreach (var b in brushes)
                         {
-                            if (b.name.ToLower().Contains(searchLower))
+                            if (b == null) continue;
+                            string bName = Get(b, "name")?.ToString() ?? "";
+                            if (bName.ToLower().Contains(searchLower))
                             {
                                 brush = b;
-                                paletteName = pal.name;
+                                paletteName = Get(pal, "name")?.ToString() ?? "";
                                 break;
                             }
                         }
                         if (brush != null) break;
                     }
                     if (brush == null)
-                        throw new System.Exception($"No brush found matching name '{brushName}' in any palette.");
+                        throw new Exception($"No brush found matching name '{brushName}' in any palette.");
                 }
                 else
                 {
                     if (paletteIndex < 0 || paletteIndex >= palettes.Count)
-                        throw new System.Exception($"Palette index {paletteIndex} out of range. Have {palettes.Count} palettes.");
+                        throw new Exception($"Palette index {paletteIndex} out of range. Have {palettes.Count} palettes.");
 
-                    var palette = palettes[paletteIndex];
-                    paletteName = palette.name;
-                    var brushes = palette.brushes;
+                    var palette = palettes[paletteIndex]!;
+                    paletteName = Get(palette, "name")?.ToString() ?? "";
+                    var brushes = Get(palette, "brushes") as Array;
+                    if (brushes == null)
+                        throw new Exception($"Could not read brushes from palette '{paletteName}'.");
 
                     if (brushIndex < 0 || brushIndex >= brushes.Length)
-                        throw new System.Exception($"Brush index {brushIndex} out of range. Palette '{palette.name}' has {brushes.Length} brushes.");
+                        throw new Exception($"Brush index {brushIndex} out of range. Palette '{paletteName}' has {brushes.Length} brushes.");
 
-                    brush = brushes[brushIndex];
+                    brush = brushes.GetValue(brushIndex)!;
                 }
 
-                var items = brush.items.Where(i => i.prefab != null).ToArray();
-                if (items.Length == 0)
-                    throw new System.Exception($"Brush '{brush.name}' has no valid prefab items.");
+                // Get valid items (those with non-null prefab)
+                var items = Get(brush, "items") as IList;
+                var validItems = new System.Collections.Generic.List<object>();
+                if (items != null)
+                {
+                    foreach (var item in items)
+                    {
+                        if (item == null) continue;
+                        var prefab = Get(item, "prefab") as GameObject;
+                        if (prefab != null)
+                            validItems.Add(item);
+                    }
+                }
+                if (validItems.Count == 0)
+                    throw new Exception($"Brush '{Get(brush, "name")}' has no valid prefab items.");
 
-                if (itemIndex < 0 || itemIndex >= items.Length)
+                if (itemIndex < 0 || itemIndex >= validItems.Count)
                     itemIndex = 0;
 
-                var prefab = items[itemIndex].prefab;
+                var selectedPrefab = (GameObject)Get(validItems[itemIndex], "prefab")!;
 
-                // Instantiate
-                var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(selectedPrefab);
                 Undo.RegisterCreatedObjectUndo(go, "PWB Place Brush");
 
-                // Set parent
                 if (parentGameObjectRef?.IsValid(out _) == true)
                 {
                     var parentGo = parentGameObjectRef.FindGameObject(out var error);
-                    if (error != null) throw new System.Exception(error);
+                    if (error != null) throw new Exception(error);
                     if (parentGo != null)
                         go.transform.SetParent(parentGo.transform, false);
                 }
@@ -111,8 +129,8 @@ Specify the palette and brush by index, or search by brush name.")]
                 {
                     gameObjectName = go.name,
                     instanceId = go.GetInstanceID(),
-                    prefabName = prefab.name,
-                    brushName = brush.name,
+                    prefabName = selectedPrefab.name,
+                    brushName = Get(brush, "name")?.ToString() ?? "",
                     paletteName = paletteName,
                     position = FormatVector3(go.transform.position)
                 };
@@ -136,4 +154,3 @@ Specify the palette and brush by index, or search by brush name.")]
         }
     }
 }
-#endif

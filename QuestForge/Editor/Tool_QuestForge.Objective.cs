@@ -1,10 +1,11 @@
-#if HAS_MALBERS_QUESTFORGE
 #nullable enable
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
-using MalbersAnimations.QuestForge;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,74 +40,94 @@ Each type has specific parameters. Only parameters relevant to the chosen type a
         {
             return MainThread.Instance.Run(() =>
             {
-                Quest quest = AssetDatabase.LoadAssetAtPath<Quest>(questAssetPath);
-                if (quest == null)
-                    throw new System.Exception($"Quest not found at '{questAssetPath}'.");
+                var questType = FindType(QUEST_TYPE_NAME);
+                if (questType == null)
+                    throw new Exception($"Type '{QUEST_TYPE_NAME}' not found. Is QuestForge installed?");
 
-                if (quest.objectives == null)
-                    quest.objectives = new System.Collections.Generic.List<QuestObjective>();
+                var quest = AssetDatabase.LoadAssetAtPath(questAssetPath, questType);
+                if (quest == null)
+                    throw new Exception($"Quest not found at '{questAssetPath}'.");
+
+                // Ensure objectives list exists
+                var objectives = Get(quest, "objectives") as IList;
+                if (objectives == null)
+                {
+                    var objType = FindType(QUEST_OBJECTIVE_TYPE_NAME);
+                    if (objType == null)
+                        throw new Exception($"Type '{QUEST_OBJECTIVE_TYPE_NAME}' not found.");
+                    var listType = typeof(List<>).MakeGenericType(objType);
+                    objectives = (IList)Activator.CreateInstance(listType)!;
+                    Set(quest, "objectives", objectives);
+                }
 
                 string typeLower = objectiveType.ToLower();
-                QuestObjective objective;
+                object objective;
 
                 if (typeLower == "kill")
                 {
-                    var kill = new KillObjective();
-                    kill.targetTag = targetId;
-                    kill.requiredKills = requiredCount;
+                    var killType = FindType(KILL_OBJECTIVE_TYPE_NAME);
+                    if (killType == null) throw new Exception($"Type '{KILL_OBJECTIVE_TYPE_NAME}' not found.");
+                    objective = Activator.CreateInstance(killType)!;
+                    Set(objective, "targetTag", targetId);
+                    Set(objective, "requiredKills", requiredCount);
                     if (!string.IsNullOrEmpty(specificId))
-                        kill.specificEnemyId = specificId;
-                    objective = kill;
+                        Set(objective, "specificEnemyId", specificId);
                 }
                 else if (typeLower == "collect")
                 {
-                    var collect = new CollectObjective();
-                    collect.itemId = targetId;
-                    collect.requiredAmount = requiredCount;
-                    objective = collect;
+                    var collectType = FindType(COLLECT_OBJECTIVE_TYPE_NAME);
+                    if (collectType == null) throw new Exception($"Type '{COLLECT_OBJECTIVE_TYPE_NAME}' not found.");
+                    objective = Activator.CreateInstance(collectType)!;
+                    Set(objective, "itemId", targetId);
+                    Set(objective, "requiredAmount", requiredCount);
                 }
                 else if (typeLower == "talkto")
                 {
-                    var talk = new TalkToObjective();
-                    talk.npcId = targetId;
+                    var talkType = FindType(TALKTO_OBJECTIVE_TYPE_NAME);
+                    if (talkType == null) throw new Exception($"Type '{TALKTO_OBJECTIVE_TYPE_NAME}' not found.");
+                    objective = Activator.CreateInstance(talkType)!;
+                    Set(objective, "npcId", targetId);
                     if (!string.IsNullOrEmpty(specificId))
-                        talk.specificDialogueId = specificId;
-                    objective = talk;
+                        Set(objective, "specificDialogueId", specificId);
                 }
                 else if (typeLower == "gotolocation")
                 {
-                    var goTo = new GoToLocationObjective();
-                    goTo.useManualValues = true;
-                    goTo.manualLocationId = targetId;
-                    goTo.manualTargetPosition = new Vector3(posX, posY, posZ);
-                    goTo.manualRequiredDistance = requiredDistance;
-                    objective = goTo;
+                    var goToType = FindType(GOTO_OBJECTIVE_TYPE_NAME);
+                    if (goToType == null) throw new Exception($"Type '{GOTO_OBJECTIVE_TYPE_NAME}' not found.");
+                    objective = Activator.CreateInstance(goToType)!;
+                    Set(objective, "useManualValues", true);
+                    Set(objective, "manualLocationId", targetId);
+                    Set(objective, "manualTargetPosition", new Vector3(posX, posY, posZ));
+                    Set(objective, "manualRequiredDistance", requiredDistance);
                 }
                 else if (typeLower == "interact")
                 {
-                    var interact = new InteractObjective();
-                    interact.interactableId = targetId;
-                    interact.requiredInteractions = requiredCount;
-                    objective = interact;
+                    var interactType = FindType(INTERACT_OBJECTIVE_TYPE_NAME);
+                    if (interactType == null) throw new Exception($"Type '{INTERACT_OBJECTIVE_TYPE_NAME}' not found.");
+                    objective = Activator.CreateInstance(interactType)!;
+                    Set(objective, "interactableId", targetId);
+                    Set(objective, "requiredInteractions", requiredCount);
                 }
                 else
                 {
-                    throw new System.Exception($"Unknown objective type '{objectiveType}'. Use: Kill, Collect, TalkTo, GoToLocation, Interact.");
+                    throw new Exception($"Unknown objective type '{objectiveType}'. Use: Kill, Collect, TalkTo, GoToLocation, Interact.");
                 }
 
-                quest.objectives.Add(objective);
+                objectives.Add(objective);
 
                 EditorUtility.SetDirty(quest);
                 AssetDatabase.SaveAssets();
 
+                string questId = Get(quest, "QuestID")?.ToString() ?? "";
+
                 return new AddObjectiveResponse
                 {
                     questAssetPath = questAssetPath,
-                    questId = quest.QuestID,
+                    questId = questId,
                     objectiveType = objectiveType,
                     targetId = targetId,
                     requiredCount = requiredCount,
-                    totalObjectives = quest.objectives.Count
+                    totalObjectives = objectives.Count
                 };
             });
         }
@@ -122,4 +143,3 @@ Each type has specific parameters. Only parameters relevant to the chosen type a
         }
     }
 }
-#endif

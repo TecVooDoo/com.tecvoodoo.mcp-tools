@@ -1,10 +1,11 @@
-#if HAS_ROPE_TOOLKIT
 #nullable enable
+using System;
+using System.Collections;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using UnityEngine;
 
 namespace MCPTools.RopeToolkit.Editor
@@ -24,54 +25,86 @@ Returns simulation settings (stiffness, energyLoss, gravity, substeps), collisio
             return MainThread.Instance.Run(() =>
             {
                 var rope = GetRope(gameObjectName);
-                var m = rope.measurements;
+                var sim = GetStruct(rope, "simulation")
+                          ?? throw new Exception("Could not read rope.simulation.");
+                var col = GetStruct(rope, "collisions")
+                          ?? throw new Exception("Could not read rope.collisions.");
+                var m   = Get(rope, "measurements");
+
                 var sb = new StringBuilder();
 
-                sb.AppendLine($"=== Rope: {rope.name} ===");
+                var ropeName = Get(rope, "name");
+                sb.AppendLine($"=== Rope: {ropeName} ===");
+
                 sb.AppendLine($"\n-- Simulation --");
-                sb.AppendLine($"  resolution:         {rope.simulation.resolution:F3}");
-                sb.AppendLine($"  massPerMeter:       {rope.simulation.massPerMeter:F3}");
-                sb.AppendLine($"  stiffness:          {rope.simulation.stiffness:F3}");
-                sb.AppendLine($"  energyLoss:         {rope.simulation.energyLoss:F3}");
-                sb.AppendLine($"  lengthMultiplier:   {rope.simulation.lengthMultiplier:F3}");
-                sb.AppendLine($"  gravityMultiplier:  {rope.simulation.gravityMultiplier:F3}");
-                sb.AppendLine($"  useCustomGravity:   {rope.simulation.useCustomGravity}");
-                if (rope.simulation.useCustomGravity)
-                    sb.AppendLine($"  customGravity:      {FormatVector3(rope.simulation.customGravity)}");
-                sb.AppendLine($"  substeps:           {rope.simulation.substeps}");
-                sb.AppendLine($"  solverIterations:   {rope.simulation.solverIterations}");
-                sb.AppendLine($"  enabled:            {rope.simulation.enabled}");
+                sb.AppendLine($"  resolution:         {GetStructField(sim, "resolution"):F3}");
+                sb.AppendLine($"  massPerMeter:       {GetStructField(sim, "massPerMeter"):F3}");
+                sb.AppendLine($"  stiffness:          {GetStructField(sim, "stiffness"):F3}");
+                sb.AppendLine($"  energyLoss:         {GetStructField(sim, "energyLoss"):F3}");
+                sb.AppendLine($"  lengthMultiplier:   {GetStructField(sim, "lengthMultiplier"):F3}");
+                sb.AppendLine($"  gravityMultiplier:  {GetStructField(sim, "gravityMultiplier"):F3}");
+                var useCustomGravity = GetStructField(sim, "useCustomGravity");
+                sb.AppendLine($"  useCustomGravity:   {useCustomGravity}");
+                if (useCustomGravity is true)
+                {
+                    var cg = GetStructField(sim, "customGravity");
+                    if (cg is Vector3 cgVec)
+                        sb.AppendLine($"  customGravity:      {FormatVector3(cgVec)}");
+                    else
+                        sb.AppendLine($"  customGravity:      {cg}");
+                }
+                sb.AppendLine($"  substeps:           {GetStructField(sim, "substeps")}");
+                sb.AppendLine($"  solverIterations:   {GetStructField(sim, "solverIterations")}");
+                sb.AppendLine($"  enabled:            {GetStructField(sim, "enabled")}");
 
                 sb.AppendLine($"\n-- Collision --");
-                sb.AppendLine($"  enabled:            {rope.collisions.enabled}");
-                sb.AppendLine($"  influenceRigidbodies: {rope.collisions.influenceRigidbodies}");
-                sb.AppendLine($"  friction:           {rope.collisions.friction:F3}");
-                sb.AppendLine($"  stride:             {rope.collisions.stride}");
-                sb.AppendLine($"  collisionMargin:    {rope.collisions.collisionMargin:F3}");
+                sb.AppendLine($"  enabled:            {GetStructField(col, "enabled")}");
+                sb.AppendLine($"  influenceRigidbodies: {GetStructField(col, "influenceRigidbodies")}");
+                sb.AppendLine($"  friction:           {GetStructField(col, "friction"):F3}");
+                sb.AppendLine($"  stride:             {GetStructField(col, "stride")}");
+                sb.AppendLine($"  collisionMargin:    {GetStructField(col, "collisionMargin"):F3}");
 
                 sb.AppendLine($"\n-- Appearance --");
-                sb.AppendLine($"  radius:             {rope.radius:F4}");
-                sb.AppendLine($"  radialVertices:     {rope.radialVertices}");
-                sb.AppendLine($"  isLoop:             {rope.isLoop}");
-                sb.AppendLine($"  material:           {(rope.material != null ? rope.material.name : "none")}");
-                sb.AppendLine($"  shadowMode:         {rope.shadowMode}");
+                sb.AppendLine($"  radius:             {Get(rope, "radius"):F4}");
+                sb.AppendLine($"  radialVertices:     {Get(rope, "radialVertices")}");
+                sb.AppendLine($"  isLoop:             {Get(rope, "isLoop")}");
+                var material = Get(rope, "material");
+                string matName = "none";
+                if (material is UnityEngine.Object matObj && matObj != null) matName = matObj.name;
+                sb.AppendLine($"  material:           {matName}");
+                sb.AppendLine($"  shadowMode:         {Get(rope, "shadowMode")}");
 
                 sb.AppendLine($"\n-- Measurements --");
-                sb.AppendLine($"  spawnCurveLength:   {m.spawnCurveLength:F3}");
-                sb.AppendLine($"  realCurveLength:    {m.realCurveLength:F3}");
-                sb.AppendLine($"  segmentCount:       {m.segmentCount}");
-                sb.AppendLine($"  particleCount:      {m.particleCount}");
-                sb.AppendLine($"  particleSpacing:    {m.particleSpacing:F4}");
-                sb.AppendLine($"  spawnPoints:        {rope.spawnPoints.Count}");
+                if (m != null)
+                {
+                    sb.AppendLine($"  spawnCurveLength:   {GetStructField(m, "spawnCurveLength"):F3}");
+                    sb.AppendLine($"  realCurveLength:    {GetStructField(m, "realCurveLength"):F3}");
+                    sb.AppendLine($"  segmentCount:       {GetStructField(m, "segmentCount")}");
+                    sb.AppendLine($"  particleCount:      {GetStructField(m, "particleCount")}");
+                    sb.AppendLine($"  particleSpacing:    {GetStructField(m, "particleSpacing"):F4}");
+                }
 
-                var connections = rope.GetComponents<global::RopeToolkit.RopeConnection>();
-                sb.AppendLine($"\n-- Connections ({connections.Length}) --");
-                foreach (var c in connections)
-                    sb.AppendLine($"  type={c.type} location={c.ropeLocation:F3} autoFind={c.autoFindRopeLocation}");
+                var spawnPoints = Get(rope, "spawnPoints");
+                if (spawnPoints is ICollection spCol)
+                    sb.AppendLine($"  spawnPoints:        {spCol.Count}");
+
+                // RopeConnection components
+                if (RopeConnectionType != null)
+                {
+                    var ropeGo = (rope as Component)!.gameObject;
+                    var connections = ropeGo.GetComponents(RopeConnectionType);
+                    sb.AppendLine($"\n-- Connections ({connections.Length}) --");
+                    foreach (var c in connections)
+                    {
+                        var cType = Get(c, "type");
+                        var cLoc  = Get(c, "ropeLocation");
+                        var cAuto = Get(c, "autoFindRopeLocation");
+                        sb.AppendLine($"  type={cType} location={cLoc:F3} autoFind={cAuto}");
+                    }
+                }
 
                 return sb.ToString();
             });
         }
     }
 }
-#endif

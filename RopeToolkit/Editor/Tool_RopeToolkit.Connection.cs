@@ -1,9 +1,9 @@
-#if HAS_ROPE_TOOLKIT
 #nullable enable
+using System;
 using System.ComponentModel;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,25 +35,69 @@ If a RopeConnection already exists, configures the first one found.")]
                 var rope = GetRope(gameObjectName);
                 var go = rope.gameObject;
 
-                var connection = go.GetComponent<global::RopeToolkit.RopeConnection>();
+                if (RopeConnectionType == null)
+                    throw new Exception("RopeToolkit.RopeConnection type not found.");
+                if (RopeConnectionTypeEnum == null)
+                    throw new Exception("RopeToolkit.RopeConnectionType enum not found.");
+
+                var connection = go.GetComponent(RopeConnectionType);
                 if (connection == null)
-                    connection = go.AddComponent<global::RopeToolkit.RopeConnection>();
+                    connection = go.AddComponent(RopeConnectionType);
 
-                if (!System.Enum.TryParse<global::RopeToolkit.RopeConnectionType>(connectionType, true, out var connType))
-                    throw new System.Exception($"Unknown connectionType '{connectionType}'. Valid: PinRopeToTransform, PinTransformToRope, PullRigidbodyToRope, TwoWayCouplingBetweenRigidbodyAndRope");
+                if (!Enum.IsDefined(RopeConnectionTypeEnum, connectionType))
+                {
+                    // Try case-insensitive parse
+                    object? parsed = null;
+                    foreach (var name in Enum.GetNames(RopeConnectionTypeEnum))
+                    {
+                        if (string.Equals(name, connectionType, StringComparison.OrdinalIgnoreCase))
+                        {
+                            parsed = Enum.Parse(RopeConnectionTypeEnum, name);
+                            break;
+                        }
+                    }
+                    if (parsed == null)
+                        throw new Exception($"Unknown connectionType '{connectionType}'. Valid: PinRopeToTransform, PinTransformToRope, PullRigidbodyToRope, TwoWayCouplingBetweenRigidbodyAndRope");
 
-                connection.type = connType;
-                connection.ropeLocation = Mathf.Clamp01(ropeLocation);
-                connection.autoFindRopeLocation = autoFindRopeLocation;
+                    var typeField = connection.GetType().GetField("type", BindingFlags.Public | BindingFlags.Instance);
+                    if (typeField != null) typeField.SetValue(connection, parsed);
+                }
+                else
+                {
+                    var parsed = Enum.Parse(RopeConnectionTypeEnum, connectionType);
+                    var typeField = connection.GetType().GetField("type", BindingFlags.Public | BindingFlags.Instance);
+                    if (typeField != null) typeField.SetValue(connection, parsed);
+                }
 
-                if (stiffness.HasValue) connection.rigidbodySettings.stiffness = Mathf.Clamp01(stiffness.Value);
-                if (damping.HasValue) connection.rigidbodySettings.damping = Mathf.Clamp01(damping.Value);
+                Set(connection, "ropeLocation", Mathf.Clamp01(ropeLocation));
+                Set(connection, "autoFindRopeLocation", autoFindRopeLocation);
+
+                if (stiffness.HasValue || damping.HasValue)
+                {
+                    var rbSettings = Get(connection, "rigidbodySettings");
+                    if (rbSettings != null)
+                    {
+                        if (stiffness.HasValue) SetStructField(rbSettings, "stiffness", Mathf.Clamp01(stiffness.Value));
+                        if (damping.HasValue)   SetStructField(rbSettings, "damping", Mathf.Clamp01(damping.Value));
+                        // rigidbodySettings might be a struct -- write back
+                        var rbField = connection.GetType().GetField("rigidbodySettings", BindingFlags.Public | BindingFlags.Instance);
+                        if (rbField != null) rbField.SetValue(connection, rbSettings);
+                        else
+                        {
+                            var rbProp = connection.GetType().GetProperty("rigidbodySettings", BindingFlags.Public | BindingFlags.Instance);
+                            if (rbProp != null && rbProp.CanWrite) rbProp.SetValue(connection, rbSettings);
+                        }
+                    }
+                }
 
                 EditorUtility.SetDirty(go);
 
-                return $"OK: RopeConnection on '{gameObjectName}' configured. type={connection.type} location={connection.ropeLocation:F3} autoFind={connection.autoFindRopeLocation}";
+                var connTypeVal = Get(connection, "type");
+                var locVal      = Get(connection, "ropeLocation");
+                var autoVal     = Get(connection, "autoFindRopeLocation");
+
+                return $"OK: RopeConnection on '{gameObjectName}' configured. type={connTypeVal} location={locVal:F3} autoFind={autoVal}";
             });
         }
     }
 }
-#endif

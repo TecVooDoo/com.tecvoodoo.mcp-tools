@@ -1,10 +1,10 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.5.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.7.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** March 30, 2026 (SpaceSucks Session 1)
+**Last Updated:** April 9, 2026 (TecVooDoo Session 1)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -13,20 +13,20 @@
 
 ## Current State
 
-**~177 tools** across 37 asset groups. All compiling.
+**~200 tools** across 43 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
 | Flexalon | 7 | `HAS_FLEXALON` | `MCPTools.Flexalon.Editor` | Stable |
-| Prefab World Builder | 4 | `HAS_PWB` | None (`#if` only) | Stable |
+| Prefab World Builder | 4 | `HAS_PWB` | `MCPTools.PWB.Editor` | **Updated TVD1** |
 | RayFire | 8 | `HAS_RAYFIRE` | `MCPTools.RayFire.Editor` | Stable |
 | MagicaCloth 2 | 7 | `HAS_MAGICACLOTH2` | `MCPTools.MagicaCloth2.Editor` | Stable |
-| Final IK | 5 | `HAS_FINALIK` | None (`#if` only) | Stable |
+| Final IK | 5 | `HAS_FINALIK` | `MCPTools.FinalIK.Editor` | **Updated TVD1** |
 | Asset Inventory | 4 | `HAS_ASSETINVENTORY` | `MCPTools.AssetInventory.Editor` | Stable |
 | Malbers AC | 8 | `HAS_MALBERS_AC` | `MCPTools.MalbersAC.Editor` | Stable |
-| Quest Forge | 5 | `HAS_MALBERS_QUESTFORGE` | None (`#if` only) | Stable |
+| Quest Forge | 5 | `HAS_MALBERS_QUESTFORGE` | `MCPTools.QuestForge.Editor` | **Updated TVD1** |
 | Retarget Pro | 4 | `HAS_RETARGETPRO` | `MCPTools.RetargetPro.Editor` | Stable |
-| Rope Toolkit | 5 | `HAS_ROPE_TOOLKIT` | None (`#if` only) | Stable |
+| Rope Toolkit | 5 | `HAS_ROPE_TOOLKIT` | `MCPTools.RopeToolkit.Editor` | **Updated TVD1** |
 | Heathen Physics | 5 | `HAS_HEATHEN_PHYSICS` | `MCPTools.HeathenPhysics.Editor` | Stable |
 | Heathen Ballistics | 5 | `HAS_HEATHEN_BALLISTICS` | `MCPTools.HeathenBallistics.Editor` | Stable |
 | Feel | 4 | `HAS_FEEL` | None (`#if` only) | Stable |
@@ -34,9 +34,9 @@
 | Cinemachine | 5 | `HAS_CINEMACHINE` | `MCPTools.Cinemachine.Editor` | Stable |
 | Animation Rigging | 5 | `HAS_ANIMATION_RIGGING` | `MCPTools.AnimationRigging.Editor` | Stable |
 | ALINE | 4 | `HAS_ALINE` | `MCPTools.ALINE.Editor` | Stable |
-| **Master Audio** | **6** | `HAS_MASTERAUDIO` | None (`#if` only) | **New S4** |
+| **Master Audio** | **6** | `HAS_MASTERAUDIO` | `MCPTools.MasterAudio.Editor` | **New S4, Updated TVD1** |
 | **A* Pathfinding** | **6** | `HAS_ASTAR` | `MCPTools.AStarPathfinding.Editor` | **New S4** |
-| **Dialogue System** | **6** | `HAS_DIALOGUE_SYSTEM` | None (`#if` only) | **New S4** |
+| **Dialogue System** | **6** | `HAS_DIALOGUE_SYSTEM` | `MCPTools.DialogueSystem.Editor` | **New S4, Updated TVD1** |
 | **SensorToolkit 2** | **5** | `HAS_SENSORTOOLKIT` | `MCPTools.SensorToolkit.Editor` | **New S4** |
 | **UCC (Opsive)** | **5** | `HAS_UCC` | `MCPTools.UCC.Editor` | **New S4** |
 | **Behavior Designer** | **5** | `HAS_BEHAVIOR_DESIGNER` | None (`#if` only) | **Updated SS1** |
@@ -45,15 +45,21 @@
 | **Unity Physics** | **4** | `HAS_UNITY_PHYSICS` | `MCPTools.UnityPhysics.Editor` | **New S4b** |
 | **Bro Audio** | **4** | `HAS_BROAUDIO` | `MCPTools.BroAudio.Editor` | **New S5** |
 | **Koreographer** | **2** | `HAS_KOREOGRAPHER` | `MCPTools.Koreographer.Editor` | **New S5** |
-| **PMG** | **4** | `HAS_PMG` | None (`#if` only) | **New S5** |
+| **PMG** | **4** | `HAS_PMG` | `MCPTools.PMG.Editor` | **New S5, Updated TVD1** |
 | **Maestro MIDI** | **4** | `HAS_MAESTRO` | `MCPTools.Maestro.Editor` | **New S5** |
 | **DryWetMIDI** | **1** | `HAS_DRYWETMIDI` | `MCPTools.DryWetMIDI.Editor` | **New S5** |
 | **FMOD Studio** | **5** | `HAS_FMOD` | `MCPTools.FMOD.Editor` | **New S5** |
-| **Chunity** | **4** | `HAS_CHUNITY` | None (`#if` only) | **New S5** |
+| **Chunity** | **4** | `HAS_CHUNITY` | `MCPTools.Chunity.Editor` | **New S5, Updated TVD1** |
 | **Naninovel** | **5** | `HAS_NANINOVEL` | `MCPTools.Naninovel.Editor` | **New VNPC** |
 | **Adventure Creator** | **5** | `HAS_ADVENTURE_CREATOR` | `MCPTools.AdventureCreator.Editor` | **New VNPC** |
 | **Text Animator** | **4** | `HAS_TEXT_ANIMATOR` | `MCPTools.TextAnimator.Editor` | **New VNPC** |
 | **Ink Integration** | **3** | `HAS_INK` | `MCPTools.InkIntegration.Editor` | **New VNPC** |
+| **2.5D Terrain** | **3** | `HAS_TERRAIN25D` | None (`#if` only) | **New S63** |
+| **2.5D Bridge Builder** | **4** | `HAS_BRIDGEBUILDER25D` | None (`#if` only) | **New S63** |
+| **Decal Collider** | **3** | `HAS_DECAL_COLLIDER` | `MCPTools.DecalCollider.Editor` | **New TVD1** |
+| **Texture Studio** | **3** | `HAS_TEXTURE_STUDIO` | `MCPTools.TextureStudio.Editor` | **New TVD1** |
+| **AI Navigation** | **4** | `HAS_AI_NAVIGATION` | `MCPTools.AINavigation.Editor` | **New TVD1** |
+| **Animancer Pro** | **4** | `HAS_ANIMANCER` | `MCPTools.Animancer.Editor` | **New TVD1** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -63,7 +69,10 @@
 
 All 33 groups built directly in the package folder. No separate source location.
 
-**Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. Assets without asmdef use `#if HAS_*` guards (FinalIK, PWB, Quest Forge, Rope Toolkit, Feel, Master Audio, Dialogue System, DOTween, PMG, Chunity, Behavior Designer). Assets with asmdef use `defineConstraints` for the same effect.
+**Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. Three compilation patterns:
+1. **Asmdef with direct refs** -- asset has its own assembly (e.g., Cinemachine, AnimationRigging, Animancer, Feel, DOTween, Terrain25D, BridgeBuilder25D, BehaviorDesigner). Asmdef references asset assembly + MCP assemblies, uses `defineConstraints`.
+2. **Asmdef with reflection** -- asset is in Assembly-CSharp (no asmdef). Asmdef references only MCP assemblies, all asset type access via reflection (e.g., DecalCollider, TextureStudio, MasterAudio, DialogueSystem, RopeToolkit, FinalIK, PWB, QuestForge, PMG, Chunity).
+3. **`#if HAS_*` guards** -- legacy pattern, still used by Feel, DOTween, Terrain25D, BridgeBuilder25D, BehaviorDesigner as belt-and-suspenders alongside their asmdefs. Works in local UPM packages. `MainThread` is in `com.IvanMurzak.ReflectorNet.Utils` (ReflectorNet.dll), NOT `com.IvanMurzak.Unity.MCP.Editor.Utils`.
 
 ---
 
@@ -102,6 +111,26 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 1 (Apr 9, 2026) -- 4 new tool groups + infrastructure fixes
+
+**New tool groups (14 tools):**
+- **Decal Collider (3 tools):** `HAS_DECAL_COLLIDER`, `MCPTools.DecalCollider.Editor` (asmdef + reflection). `decal-query` (full config + rebuild stats + hit objects), `decal-configure` (mode, projection, size, subdivisions, LOD), `decal-rebuild` (trigger rebuild + set sprite/text/color/lookAt + save mesh).
+- **Texture Studio (3 tools):** `HAS_TEXTURE_STUDIO`, `MCPTools.TextureStudio.Editor` (asmdef + reflection). `texstudio-query` (layers, hierarchy, blend modes, materials, states), `texstudio-set-param` (SetParam overloads + transform + sprite + state management), `texstudio-render` (UpdateTexture + ApplyMap + bake PNG).
+- **AI Navigation (4 tools):** `HAS_AI_NAVIGATION`, `MCPTools.AINavigation.Editor` (asmdef + direct refs). `nav-query` (surfaces, links, modifiers, volumes, agents), `nav-configure-surface` (collect, geometry, layers, tiles, voxels), `nav-bake` (sync BuildNavMesh, single or all), `nav-configure-link` (start/end, width, cost, bidirectional, transforms).
+- **Animancer Pro (4 tools):** `HAS_ANIMANCER`, `MCPTools.Animancer.Editor` (asmdef + direct refs). `animancer-query` (graph state, layers, current/active states, registered states), `animancer-play` (play/crossfade by clip name, layer, speed, startTime), `animancer-stop` (specific clip or all), `animancer-configure` (speed, weight, time, normalizedTime, isPlaying on registered state).
+
+**Infrastructure:**
+- **DefineManager fix:** `RemoveStaleDefines()` now uses `AssetDatabase.FindAssets("ClassName t:MonoScript")` for Assembly-CSharp entries. Previously 8 entries (PWB, FinalIK, QuestForge, RopeToolkit, MasterAudio, DialogueSystem, PMG, Chunity) could never be auto-stripped. Added **Tools > TecVooDoo > Rescan MCP Defines** menu item.
+- **Package dependency:** Added `com.ivanmurzak.unity.mcp` as dependency in TMCP package.json.
+- **8 Assembly-CSharp groups migrated to asmdef + reflection:** MasterAudio, DialogueSystem, RopeToolkit, FinalIK, PWB, QuestForge, PMG, Chunity. These now use `defineConstraints` instead of `#if` guards, with 100% reflection for asset type access. More robust on asset removal.
+- **5 own-assembly groups keep `#if` pattern:** Feel, DOTween, BehaviorDesigner, Terrain25D, BridgeBuilder25D. These retain direct API calls with `#if` guards. Asmdefs were tested but `defineConstraints` doesn't prevent missing assembly reference errors for uninstalled assets.
+- **Boing Kit evaluated:** 85+ tunable fields across BoingBones/BoingEffector/BoingReactorField. High MCP value. Tools not yet built (detection entry `HAS_BOINGKIT` added).
+- **`MainThread` using clarification:** `MainThread.Instance.Run()` is in `com.IvanMurzak.ReflectorNet.Utils` (ReflectorNet.dll), NOT in `com.IvanMurzak.Unity.MCP.Editor.Utils`.
+
+**Tool count:** 39 -> 43 groups, ~184 -> ~200 tools.
+
+---
 
 ### SpaceSucks Session 1 (Mar 30, 2026) -- BD Pro 3 upgrade + asmdef crash fix
 

@@ -1,10 +1,10 @@
-#if HAS_DIALOGUE_SYSTEM
 #nullable enable
+using System;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using PixelCrushers.DialogueSystem;
 
 namespace MCPTools.DialogueSystem.Editor
 {
@@ -31,7 +31,7 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                if (!DialogueManager.hasInstance)
+                if (!HasDialogueManager())
                     return "ERROR: No DialogueManager instance found in the scene.";
 
                 string actionLower = (action ?? "get").ToLowerInvariant();
@@ -40,11 +40,19 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                 {
                     case "get":
                     {
-                        QuestState currentState = QuestLog.GetQuestState(questName);
-                        string description = QuestLog.GetQuestDescription(questName);
-                        string successDesc = QuestLog.GetQuestDescription(questName, QuestState.Success);
-                        string failureDesc = QuestLog.GetQuestDescription(questName, QuestState.Failure);
-                        int entryCount = QuestLog.GetQuestEntryCount(questName);
+                        var currentState = CallStatic(QuestLogType, "GetQuestState", questName);
+                        var description = CallStatic(QuestLogType, "GetQuestDescription", questName);
+
+                        // GetQuestDescription with QuestState param
+                        var successState = ParseQuestStateEnum("success");
+                        var failureState = ParseQuestStateEnum("failure");
+                        var successDesc = CallStaticExplicit(QuestLogType, "GetQuestDescription",
+                            new Type[] { typeof(string), QuestStateType! }, questName, successState!);
+                        var failureDesc = CallStaticExplicit(QuestLogType, "GetQuestDescription",
+                            new Type[] { typeof(string), QuestStateType! }, questName, failureState!);
+
+                        var entryCount = CallStatic(QuestLogType, "GetQuestEntryCount", questName);
+                        int entryCountInt = entryCount is int ec ? ec : 0;
 
                         StringBuilder sb = new StringBuilder();
                         sb.AppendLine($"Quest: {questName}");
@@ -52,12 +60,12 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                         sb.AppendLine($"  Description: {description}");
                         sb.AppendLine($"  Success Desc: {successDesc}");
                         sb.AppendLine($"  Failure Desc: {failureDesc}");
-                        sb.AppendLine($"  Entry Count: {entryCount}");
+                        sb.AppendLine($"  Entry Count: {entryCountInt}");
 
-                        for (int i = 1; i <= entryCount; i++)
+                        for (int i = 1; i <= entryCountInt; i++)
                         {
-                            QuestState entryQState = QuestLog.GetQuestEntryState(questName, i);
-                            string entryDesc = QuestLog.GetQuestEntry(questName, i);
+                            var entryQState = CallStatic(QuestLogType, "GetQuestEntryState", questName, i);
+                            var entryDesc = CallStatic(QuestLogType, "GetQuestEntry", questName, i);
                             sb.AppendLine($"  Entry {i}: [{entryQState}] {entryDesc}");
                         }
 
@@ -69,8 +77,12 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                         if (string.IsNullOrEmpty(state))
                             return "ERROR: 'state' parameter is required for 'set' action.";
 
-                        QuestState newState = ParseQuestState(state);
-                        QuestLog.SetQuestState(questName, newState);
+                        var newState = ParseQuestStateEnum(state);
+                        if (newState == null)
+                            return "ERROR: Could not resolve QuestState type.";
+
+                        CallStaticExplicit(QuestLogType, "SetQuestState",
+                            new Type[] { typeof(string), QuestStateType! }, questName, newState);
                         return $"Set quest '{questName}' state to {newState}.";
                     }
 
@@ -79,8 +91,8 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                         if (entryNumber == null)
                             return "ERROR: 'entryNumber' parameter is required for 'getentry' action.";
 
-                        QuestState entryQState = QuestLog.GetQuestEntryState(questName, entryNumber.Value);
-                        string entryDesc = QuestLog.GetQuestEntry(questName, entryNumber.Value);
+                        var entryQState = CallStatic(QuestLogType, "GetQuestEntryState", questName, entryNumber.Value);
+                        var entryDesc = CallStatic(QuestLogType, "GetQuestEntry", questName, entryNumber.Value);
                         return $"Quest '{questName}' Entry {entryNumber.Value}: [{entryQState}] {entryDesc}";
                     }
 
@@ -91,8 +103,13 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                         if (string.IsNullOrEmpty(entryState))
                             return "ERROR: 'entryState' parameter is required for 'setentry' action.";
 
-                        QuestState newEntryState = ParseQuestState(entryState);
-                        QuestLog.SetQuestEntryState(questName, entryNumber.Value, newEntryState);
+                        var newEntryState = ParseQuestStateEnum(entryState);
+                        if (newEntryState == null)
+                            return "ERROR: Could not resolve QuestState type.";
+
+                        CallStaticExplicit(QuestLogType, "SetQuestEntryState",
+                            new Type[] { typeof(string), typeof(int), QuestStateType! },
+                            questName, entryNumber.Value, newEntryState);
                         return $"Set quest '{questName}' entry {entryNumber.Value} state to {newEntryState}.";
                     }
 
@@ -101,7 +118,13 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                         StringBuilder sb = new StringBuilder();
                         sb.AppendLine("=== ALL QUESTS ===");
 
-                        string[] allQuests = QuestLog.GetAllQuests(QuestState.Unassigned | QuestState.Active | QuestState.Success | QuestState.Failure);
+                        var allFlags = AllQuestStateFlags();
+                        if (allFlags == null)
+                            return "ERROR: Could not resolve QuestState type.";
+
+                        var allQuests = CallStaticExplicit(QuestLogType, "GetAllQuests",
+                            new Type[] { QuestStateType! }, allFlags) as string[];
+
                         if (allQuests == null || allQuests.Length == 0)
                         {
                             sb.AppendLine("  (no quests found)");
@@ -110,7 +133,7 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                         {
                             foreach (string quest in allQuests)
                             {
-                                QuestState qs = QuestLog.GetQuestState(quest);
+                                var qs = CallStatic(QuestLogType, "GetQuestState", quest);
                                 sb.AppendLine($"  [{qs}] {quest}");
                             }
                         }
@@ -123,19 +146,5 @@ Quest states: 'unassigned', 'active', 'success', 'failure'.")]
                 }
             });
         }
-
-        static QuestState ParseQuestState(string stateStr)
-        {
-            string lower = stateStr.ToLowerInvariant();
-            switch (lower)
-            {
-                case "unassigned": return QuestState.Unassigned;
-                case "active":     return QuestState.Active;
-                case "success":    return QuestState.Success;
-                case "failure":    return QuestState.Failure;
-                default:           return QuestState.Unassigned;
-            }
-        }
     }
 }
-#endif

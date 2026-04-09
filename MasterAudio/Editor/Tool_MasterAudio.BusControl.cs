@@ -1,11 +1,9 @@
-#if HAS_MASTERAUDIO
 #nullable enable
 using System;
 using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
-using DarkTonic.MasterAudio;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -35,51 +33,50 @@ For pitch action, provide pitch value.")]
 
             return MainThread.Instance.Run(() =>
             {
-                if (MasterAudio.SafeInstance == null)
-                    throw new InvalidOperationException("MasterAudio instance not found in scene.");
+                EnsureInstance();
 
                 string act = action.ToLowerInvariant().Trim();
 
                 switch (act)
                 {
                     case "mute":
-                        MasterAudio.MuteBus(busName);
+                        CallMA("MuteBus", busName);
                         return $"OK: Bus '{busName}' muted.";
 
                     case "unmute":
-                        MasterAudio.UnmuteBus(busName);
+                        CallMA("UnmuteBus", busName);
                         return $"OK: Bus '{busName}' unmuted.";
 
                     case "solo":
-                        MasterAudio.SoloBus(busName);
+                        CallMA("SoloBus", busName);
                         return $"OK: Bus '{busName}' soloed.";
 
                     case "unsolo":
-                        MasterAudio.UnsoloBus(busName);
+                        CallMA("UnsoloBus", busName);
                         return $"OK: Bus '{busName}' unsoloed.";
 
                     case "pause":
-                        MasterAudio.PauseBus(busName);
+                        CallMA("PauseBus", busName);
                         return $"OK: Bus '{busName}' paused.";
 
                     case "unpause":
-                        MasterAudio.UnpauseBus(busName);
+                        CallMA("UnpauseBus", busName);
                         return $"OK: Bus '{busName}' unpaused.";
 
                     case "stop":
-                        MasterAudio.StopBus(busName);
+                        CallMA("StopBus", busName);
                         return $"OK: Bus '{busName}' stopped.";
 
                     case "fade":
                         float targetVol = volume ?? 0f;
                         float fadeDur = fadeTime ?? 1f;
-                        MasterAudio.FadeBusToVolume(busName, targetVol, fadeDur);
+                        CallMA("FadeBusToVolume", busName, targetVol, fadeDur);
                         return $"OK: Bus '{busName}' fading to {targetVol:F2} over {fadeDur:F2}s.";
 
                     case "pitch":
                         if (!pitch.HasValue)
                             throw new ArgumentException("pitch parameter required for pitch action.", nameof(pitch));
-                        MasterAudio.ChangeBusPitch(busName, pitch.Value);
+                        CallMA("ChangeBusPitch", busName, pitch.Value);
                         return $"OK: Bus '{busName}' pitch set to {pitch.Value:F2}.";
 
                     default:
@@ -91,4 +88,3 @@ For pitch action, provide pitch value.")]
         }
     }
 }
-#endif

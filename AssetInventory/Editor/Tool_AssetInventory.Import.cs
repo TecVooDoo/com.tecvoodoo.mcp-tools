@@ -38,16 +38,26 @@ Optionally adds the prefab to the scene after import completes.")]
                 var options = new AssetSearch.Options
                 {
                     SearchPhrase = fileName,
-                    MaxResults = 100,
-                    RawSearchType = "Prefabs"
+                    MaxResults = 0
                 };
 
                 var result = AssetSearch.Execute(options);
+
                 var match = result.Files.FirstOrDefault(f =>
                 {
                     var p = f.Path;
                     return p != null && p.Replace("\\", "/") == normalizedTarget;
                 });
+
+                // Try looser match via GetPath if exact path fails
+                if (match == null)
+                {
+                    match = result.Files.FirstOrDefault(f =>
+                    {
+                        var p = f.GetPath(true);
+                        return p != null && p.Replace("\\", "/") == normalizedTarget;
+                    });
+                }
 
                 if (match == null)
                     throw new System.Exception($"Asset not found in database: '{assetPath}'. Use asset-inventory-search-prefabs to verify the exact path.");

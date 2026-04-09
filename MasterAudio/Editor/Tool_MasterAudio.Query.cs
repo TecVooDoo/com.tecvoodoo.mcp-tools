@@ -1,13 +1,13 @@
-#if HAS_MASTERAUDIO
 #nullable enable
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
-using DarkTonic.MasterAudio;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -20,48 +20,69 @@ Use this to inspect the full Master Audio runtime state before making changes.")
         {
             return MainThread.Instance.Run(() =>
             {
-                if (MasterAudio.SafeInstance == null)
-                    throw new InvalidOperationException("MasterAudio instance not found in scene. Add a MasterAudio prefab first.");
+                EnsureInstance();
 
+                Type maType = MasterAudioType;
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("=== Master Audio State ===");
-                sb.AppendLine($"  MasterVolume:    {MasterAudio.MasterVolumeLevel:F2}");
-                sb.AppendLine($"  MixerMuted:      {MasterAudio.MixerMuted}");
-                sb.AppendLine($"  PlaylistsMuted:  {MasterAudio.PlaylistsMuted}");
+
+                object? masterVol = GetStatic("MasterVolumeLevel");
+                object? mixerMuted = GetStatic("MixerMuted");
+                object? playlistsMuted = GetStatic("PlaylistsMuted");
+
+                sb.AppendLine($"  MasterVolume:    {masterVol:F2}");
+                sb.AppendLine($"  MixerMuted:      {mixerMuted}");
+                sb.AppendLine($"  PlaylistsMuted:  {playlistsMuted}");
 
                 // Sound Groups
-                List<string> groupNames = MasterAudio.RuntimeSoundGroupNames;
-                sb.AppendLine($"\n-- Sound Groups ({groupNames.Count}) --");
-                for (int i = 0; i < groupNames.Count; i++)
-                {
-                    string name = groupNames[i];
-                    if (string.IsNullOrEmpty(name) || name == MasterAudio.NoGroupName)
-                        continue;
+                object? groupNamesObj = GetStatic("RuntimeSoundGroupNames");
+                string? noGroupName = GetStatic("NoGroupName") as string;
 
-                    float groupVol = MasterAudio.GetGroupVolume(name);
-                    bool isPlaying = MasterAudio.IsSoundGroupPlaying(name);
-                    sb.AppendLine($"  [{i}] {name} | Volume: {groupVol:F2} | Playing: {isPlaying}");
+                if (groupNamesObj is IList groupNames)
+                {
+                    sb.AppendLine($"\n-- Sound Groups ({groupNames.Count}) --");
+                    for (int i = 0; i < groupNames.Count; i++)
+                    {
+                        string? name = groupNames[i] as string;
+                        if (string.IsNullOrEmpty(name) || name == noGroupName)
+                            continue;
+
+                        object? groupVol = CallMA("GetGroupVolume", name!);
+                        object? isPlaying = CallMA("IsSoundGroupPlaying", name!);
+                        sb.AppendLine($"  [{i}] {name} | Volume: {groupVol:F2} | Playing: {isPlaying}");
+                    }
                 }
 
                 // Buses
-                List<string> busNames = MasterAudio.RuntimeBusNames;
-                sb.AppendLine($"\n-- Buses ({busNames.Count}) --");
-                for (int i = 0; i < busNames.Count; i++)
+                object? busNamesObj = GetStatic("RuntimeBusNames");
+                if (busNamesObj is IList busNames)
                 {
-                    string busName = busNames[i];
-                    if (string.IsNullOrEmpty(busName) || busName == MasterAudio.NoGroupName)
-                        continue;
+                    sb.AppendLine($"\n-- Buses ({busNames.Count}) --");
+                    for (int i = 0; i < busNames.Count; i++)
+                    {
+                        string? busName = busNames[i] as string;
+                        if (string.IsNullOrEmpty(busName) || busName == noGroupName)
+                            continue;
 
-                    sb.AppendLine($"  [{i}] {busName}");
+                        sb.AppendLine($"  [{i}] {busName}");
+                    }
                 }
 
                 // Playlists
-                List<MasterAudio.Playlist> playlists = MasterAudio.MusicPlaylists;
-                sb.AppendLine($"\n-- Playlists ({playlists.Count}) --");
-                for (int i = 0; i < playlists.Count; i++)
+                object? playlistsObj = GetStatic("MusicPlaylists");
+                if (playlistsObj is IList playlists)
                 {
-                    MasterAudio.Playlist pl = playlists[i];
-                    sb.AppendLine($"  [{i}] {pl.playlistName} | Songs: {pl.MusicSettings.Count}");
+                    sb.AppendLine($"\n-- Playlists ({playlists.Count}) --");
+                    for (int i = 0; i < playlists.Count; i++)
+                    {
+                        object? pl = playlists[i];
+                        if (pl == null) continue;
+
+                        object? plName = Get(pl.GetType(), pl, "playlistName");
+                        object? musicSettings = Get(pl.GetType(), pl, "MusicSettings");
+                        int songCount = musicSettings is IList ms ? ms.Count : 0;
+                        sb.AppendLine($"  [{i}] {plName} | Songs: {songCount}");
+                    }
                 }
 
                 return sb.ToString();
@@ -69,4 +90,3 @@ Use this to inspect the full Master Audio runtime state before making changes.")
         }
     }
 }
-#endif

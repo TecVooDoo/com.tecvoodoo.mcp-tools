@@ -1,3 +1,4 @@
+#if HAS_MALBERS_AC
 #nullable enable
 using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
@@ -75,3 +76,4 @@ For 2.5D top-down: lock Y axis (LockY=true) so movement stays on the XZ plane.")
         }
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if HAS_MALBERS_AC
 #nullable enable
 using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
@@ -65,3 +66,4 @@ Only provided parameters are changed; others are left as-is.")]
         }
     }
 }
+#endif

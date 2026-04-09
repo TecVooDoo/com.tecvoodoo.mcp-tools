@@ -1,3 +1,4 @@
+#if HAS_MALBERS_AC
 #nullable enable
 using System.ComponentModel;
 using System.Text;
@@ -164,3 +165,4 @@ Use 'ac-query-stats' first to see available stats.")]
         }
     }
 }
+#endif

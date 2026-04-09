@@ -1,12 +1,12 @@
-#if HAS_MALBERS_QUESTFORGE
 #nullable enable
+using System;
+using System.Collections;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
-using MalbersAnimations.QuestForge;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,30 +35,42 @@ Quest types: Main, Side, Daily, Repeatable.")]
         {
             return MainThread.Instance.Run(() =>
             {
+                var questTypeRef = FindType(QUEST_TYPE_NAME);
+                if (questTypeRef == null)
+                    throw new Exception($"Type '{QUEST_TYPE_NAME}' not found. Is QuestForge installed?");
+
                 string directory = Path.GetDirectoryName(assetPath);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                Quest quest = ScriptableObject.CreateInstance<Quest>();
-                quest.QuestID = questId;
-                quest.questName = questName;
-                quest.questDescription = description;
+                var quest = ScriptableObject.CreateInstance(questTypeRef);
 
-                if (System.Enum.TryParse<Quest.QuestType>(questType, true, out var parsedType))
-                    quest.questType = parsedType;
+                Set(quest, "QuestID", questId);
+                Set(quest, "questName", questName);
+                Set(quest, "questDescription", description);
 
-                quest.isRepeatable = isRepeatable;
+                // Parse quest type enum: Quest.QuestType
+                var questTypeEnumType = questTypeRef.GetNestedType("QuestType");
+                if (questTypeEnumType != null && Enum.TryParse(questTypeEnumType, questType, true, out var parsedType))
+                    Set(quest, "questType", parsedType!);
+
+                Set(quest, "isRepeatable", isRepeatable);
 
                 AssetDatabase.CreateAsset(quest, assetPath);
                 AssetDatabase.SaveAssets();
 
+                string resultId = Get(quest, "QuestID")?.ToString() ?? questId;
+                string resultName = Get(quest, "questName")?.ToString() ?? questName;
+                string resultType = Get(quest, "questType")?.ToString() ?? questType;
+                bool resultRepeatable = (bool)(Get(quest, "isRepeatable") ?? isRepeatable);
+
                 return new CreateQuestResponse
                 {
                     assetPath = assetPath,
-                    questId = quest.QuestID,
-                    questName = quest.questName,
-                    questType = quest.questType.ToString(),
-                    isRepeatable = quest.isRepeatable
+                    questId = resultId,
+                    questName = resultName,
+                    questType = resultType,
+                    isRepeatable = resultRepeatable
                 };
             });
         }
@@ -74,6 +86,10 @@ Use to get an overview of all quests in the project.")]
         {
             return MainThread.Instance.Run(() =>
             {
+                var questTypeRef = FindType(QUEST_TYPE_NAME);
+                if (questTypeRef == null)
+                    throw new Exception($"Type '{QUEST_TYPE_NAME}' not found. Is QuestForge installed?");
+
                 string[] guids;
                 if (!string.IsNullOrEmpty(searchFolder))
                     guids = AssetDatabase.FindAssets("t:Quest", new[] { searchFolder });
@@ -86,23 +102,37 @@ Use to get an overview of all quests in the project.")]
                 foreach (string guid in guids)
                 {
                     string path = AssetDatabase.GUIDToAssetPath(guid);
-                    Quest quest = AssetDatabase.LoadAssetAtPath<Quest>(path);
+                    var quest = AssetDatabase.LoadAssetAtPath(path, questTypeRef);
                     if (quest == null) continue;
 
                     count++;
-                    int objCount = quest.objectives != null ? quest.objectives.Count : 0;
-                    int prereqCount = quest.prerequisiteQuestIDs != null ? quest.prerequisiteQuestIDs.Count : 0;
+                    string qId = Get(quest, "QuestID")?.ToString() ?? "?";
+                    string qName = Get(quest, "questName")?.ToString() ?? "?";
+                    string qType = Get(quest, "questType")?.ToString() ?? "?";
+                    bool repeatable = (bool)(Get(quest, "isRepeatable") ?? false);
 
-                    sb.AppendLine($"  [{quest.QuestID}] {quest.questName} | Type: {quest.questType} | Objectives: {objCount} | Prerequisites: {prereqCount} | Repeatable: {quest.isRepeatable}");
+                    var objectives = Get(quest, "objectives") as IList;
+                    int objCount = objectives != null ? objectives.Count : 0;
+
+                    var prereqs = Get(quest, "prerequisiteQuestIDs") as IList;
+                    int prereqCount = prereqs != null ? prereqs.Count : 0;
+
+                    sb.AppendLine($"  [{qId}] {qName} | Type: {qType} | Objectives: {objCount} | Prerequisites: {prereqCount} | Repeatable: {repeatable}");
                     sb.AppendLine($"    Path: {path}");
 
-                    if (quest.objectives != null)
+                    if (objectives != null)
                     {
-                        foreach (var obj in quest.objectives)
+                        foreach (var obj in objectives)
                         {
                             if (obj == null) continue;
                             string objType = obj.GetType().Name;
-                            sb.AppendLine($"    - {objType}: {obj.GetProgressText(null)}");
+                            string progressText = "";
+                            try
+                            {
+                                progressText = Call(obj, "GetProgressText", (object)null!)?.ToString() ?? "";
+                            }
+                            catch { /* method may not exist or may fail with null */ }
+                            sb.AppendLine($"    - {objType}: {progressText}");
                         }
                     }
                 }
@@ -131,4 +161,3 @@ Use to get an overview of all quests in the project.")]
         }
     }
 }
-#endif

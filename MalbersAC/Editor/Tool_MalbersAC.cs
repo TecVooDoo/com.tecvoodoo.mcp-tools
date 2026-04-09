@@ -1,3 +1,4 @@
+#if HAS_MALBERS_AC
 #nullable enable
 using com.IvanMurzak.McpPlugin;
 
@@ -17,3 +18,4 @@ namespace MCPTools.MalbersAC.Editor
         }
     }
 }
+#endif

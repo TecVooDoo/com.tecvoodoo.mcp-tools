@@ -1,10 +1,10 @@
-#if HAS_DIALOGUE_SYSTEM
 #nullable enable
+using System;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using PixelCrushers.DialogueSystem;
 
 namespace MCPTools.DialogueSystem.Editor
 {
@@ -22,21 +22,28 @@ Examples: 'return Variable[""PlayerName""]', 'return GetRelationship(1, 2, ""rom
         {
             return MainThread.Instance.Run(() =>
             {
-                if (!DialogueManager.hasInstance)
+                if (!HasDialogueManager())
                     return "ERROR: No DialogueManager instance found in the scene.";
 
-                Lua.Result result = Lua.Run(code);
+                // Lua.Run(code) returns a Lua.Result
+                object? result = CallStatic(LuaType, "Run", code);
+                if (result == null)
+                    return "ERROR: Lua.Run returned null.";
+
+                string asString = Get(result, "asString")?.ToString() ?? "(null)";
+                string asBool = Get(result, "asBool")?.ToString() ?? "(null)";
+                string asFloat = Get(result, "asFloat")?.ToString() ?? "(null)";
+                string isTable = Get(result, "isTable")?.ToString() ?? "(null)";
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"Lua code: {code}");
-                sb.AppendLine($"Result (string): {result.asString}");
-                sb.AppendLine($"Result (bool): {result.asBool}");
-                sb.AppendLine($"Result (float): {result.asFloat}");
-                sb.AppendLine($"IsTable: {result.isTable}");
+                sb.AppendLine($"Result (string): {asString}");
+                sb.AppendLine($"Result (bool): {asBool}");
+                sb.AppendLine($"Result (float): {asFloat}");
+                sb.AppendLine($"IsTable: {isTable}");
 
                 return sb.ToString();
             });
         }
     }
 }
-#endif

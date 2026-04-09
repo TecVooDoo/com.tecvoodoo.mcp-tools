@@ -1,10 +1,12 @@
-#if HAS_DIALOGUE_SYSTEM
 #nullable enable
+using System;
+using System.Collections;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using PixelCrushers.DialogueSystem;
+using UnityEngine;
 
 namespace MCPTools.DialogueSystem.Editor
 {
@@ -21,38 +23,45 @@ Output is limited to 50 items per category. Requires DialogueManager in the scen
             {
                 StringBuilder sb = new StringBuilder();
 
-                if (!DialogueManager.hasInstance)
-                {
+                if (!HasDialogueManager())
                     return "ERROR: No DialogueManager instance found in the scene.";
-                }
 
-                DialogueDatabase db = DialogueManager.masterDatabase;
+                object? db = GetMasterDatabase();
                 if (db == null)
-                {
                     return "ERROR: DialogueManager has no masterDatabase assigned.";
-                }
 
                 // Active conversation state
                 sb.AppendLine("=== ACTIVE CONVERSATION STATE ===");
-                sb.AppendLine($"  IsConversationActive: {DialogueManager.isConversationActive}");
-                sb.AppendLine($"  LastConversationStarted: {DialogueManager.lastConversationStarted}");
-                string actorName = DialogueManager.currentActor != null ? DialogueManager.currentActor.name : "(none)";
-                string conversantName = DialogueManager.currentConversant != null ? DialogueManager.currentConversant.name : "(none)";
+                bool isActive = GetStatic(DmType, "isConversationActive") is true;
+                string lastConv = GetStatic(DmType, "lastConversationStarted")?.ToString() ?? "(none)";
+                sb.AppendLine($"  IsConversationActive: {isActive}");
+                sb.AppendLine($"  LastConversationStarted: {lastConv}");
+
+                var currentActor = GetStatic(DmType, "currentActor") as Transform;
+                var currentConversant = GetStatic(DmType, "currentConversant") as Transform;
+                string actorName = currentActor != null ? currentActor.name : "(none)";
+                string conversantName = currentConversant != null ? currentConversant.name : "(none)";
                 sb.AppendLine($"  CurrentActor: {actorName}");
                 sb.AppendLine($"  CurrentConversant: {conversantName}");
 
                 // Conversations
                 sb.AppendLine("\n=== CONVERSATIONS ===");
-                if (db.conversations != null)
+                var conversations = Get(db, "conversations") as IList;
+                if (conversations != null)
                 {
-                    int convCount = db.conversations.Count;
+                    int convCount = conversations.Count;
                     sb.AppendLine($"  Total: {convCount}");
-                    int limit = System.Math.Min(convCount, 50);
+                    int limit = Math.Min(convCount, 50);
                     for (int i = 0; i < limit; i++)
                     {
-                        Conversation conv = db.conversations[i];
-                        int entryCount = conv.dialogueEntries != null ? conv.dialogueEntries.Count : 0;
-                        sb.AppendLine($"  [{conv.id}] \"{conv.Title}\" | ActorID: {conv.ActorID} | ConversantID: {conv.ConversantID} | Entries: {entryCount}");
+                        object conv = conversations[i]!;
+                        int id = (int)(Get(conv, "id") ?? 0);
+                        string title = Get(conv, "Title")?.ToString() ?? "(unknown)";
+                        int actorID = (int)(Get(conv, "ActorID") ?? 0);
+                        int conversantID = (int)(Get(conv, "ConversantID") ?? 0);
+                        var entries = Get(conv, "dialogueEntries") as IList;
+                        int entryCount = entries?.Count ?? 0;
+                        sb.AppendLine($"  [{id}] \"{title}\" | ActorID: {actorID} | ConversantID: {conversantID} | Entries: {entryCount}");
                     }
                     if (convCount > 50)
                         sb.AppendLine($"  ... and {convCount - 50} more conversations.");
@@ -64,15 +73,19 @@ Output is limited to 50 items per category. Requires DialogueManager in the scen
 
                 // Actors
                 sb.AppendLine("\n=== ACTORS ===");
-                if (db.actors != null)
+                var actors = Get(db, "actors") as IList;
+                if (actors != null)
                 {
-                    int actorCount = db.actors.Count;
+                    int actorCount = actors.Count;
                     sb.AppendLine($"  Total: {actorCount}");
-                    int limit = System.Math.Min(actorCount, 50);
+                    int limit = Math.Min(actorCount, 50);
                     for (int i = 0; i < limit; i++)
                     {
-                        Actor actor = db.actors[i];
-                        sb.AppendLine($"  [{actor.id}] \"{actor.Name}\" | IsPlayer: {actor.IsPlayer}");
+                        object actor = actors[i]!;
+                        int id = (int)(Get(actor, "id") ?? 0);
+                        string name = Get(actor, "Name")?.ToString() ?? "(unknown)";
+                        bool isPlayer = Get(actor, "IsPlayer") is true;
+                        sb.AppendLine($"  [{id}] \"{name}\" | IsPlayer: {isPlayer}");
                     }
                     if (actorCount > 50)
                         sb.AppendLine($"  ... and {actorCount - 50} more actors.");
@@ -84,17 +97,20 @@ Output is limited to 50 items per category. Requires DialogueManager in the scen
 
                 // Variables
                 sb.AppendLine("\n=== VARIABLES ===");
-                if (db.variables != null)
+                var variables = Get(db, "variables") as IList;
+                if (variables != null)
                 {
-                    int varCount = db.variables.Count;
+                    int varCount = variables.Count;
                     sb.AppendLine($"  Total: {varCount}");
-                    int limit = System.Math.Min(varCount, 50);
+                    int limit = Math.Min(varCount, 50);
                     for (int i = 0; i < limit; i++)
                     {
-                        Variable variable = db.variables[i];
-                        string initVal = variable.InitialValue;
-                        string varType = variable.Type.ToString();
-                        sb.AppendLine($"  [{variable.id}] \"{variable.Name}\" | Type: {varType} | InitialValue: {initVal}");
+                        object variable = variables[i]!;
+                        int id = (int)(Get(variable, "id") ?? 0);
+                        string name = Get(variable, "Name")?.ToString() ?? "(unknown)";
+                        string initVal = Get(variable, "InitialValue")?.ToString() ?? "";
+                        string varType = Get(variable, "Type")?.ToString() ?? "(unknown)";
+                        sb.AppendLine($"  [{id}] \"{name}\" | Type: {varType} | InitialValue: {initVal}");
                     }
                     if (varCount > 50)
                         sb.AppendLine($"  ... and {varCount - 50} more variables.");
@@ -106,12 +122,13 @@ Output is limited to 50 items per category. Requires DialogueManager in the scen
 
                 // Quests (items where !IsItem)
                 sb.AppendLine("\n=== QUESTS ===");
-                if (db.items != null)
+                var items = Get(db, "items") as IList;
+                if (items != null)
                 {
                     int questCount = 0;
-                    foreach (Item item in db.items)
+                    foreach (object? item in items)
                     {
-                        if (!item.IsItem)
+                        if (item != null && Get(item, "IsItem") is false)
                             questCount++;
                     }
                     sb.AppendLine($"  Quest count: {questCount}");
@@ -126,4 +143,3 @@ Output is limited to 50 items per category. Requires DialogueManager in the scen
         }
     }
 }
-#endif

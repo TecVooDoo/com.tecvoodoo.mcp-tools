@@ -1,14 +1,11 @@
-#if HAS_FINALIK
 #nullable enable
+using System;
 using System.ComponentModel;
-using System.Linq;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using com.IvanMurzak.Unity.MCP.Runtime.Data;
 using com.IvanMurzak.Unity.MCP.Runtime.Extensions;
-using RootMotion;
-using RootMotion.FinalIK;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,51 +26,133 @@ This is the main IK component for bipeds — controls hands, feet, body, and sho
         {
             return MainThread.Instance.Run(() =>
             {
-                var go = targetRef.FindGameObject(out var error);
-                if (error != null) throw new System.Exception(error);
-                if (go == null) throw new System.Exception("GameObject not found.");
+                if (FullBodyBipedIKType == null)
+                    throw new Exception("RootMotion.FinalIK.FullBodyBipedIK type not found in loaded assemblies.");
+                if (BipedReferencesType == null)
+                    throw new Exception("RootMotion.BipedReferences type not found in loaded assemblies.");
 
-                var fbbik = go.GetComponent<FullBodyBipedIK>();
+                var go = targetRef.FindGameObject(out var error);
+                if (error != null) throw new Exception(error);
+                if (go == null) throw new Exception("GameObject not found.");
+
+                var fbbik = go.GetComponent(FullBodyBipedIKType);
                 if (fbbik == null)
-                    fbbik = Undo.AddComponent<FullBodyBipedIK>(go);
+                    fbbik = Undo.AddComponent(go, FullBodyBipedIKType);
 
                 if (autoDetect)
                 {
-                    var references = new BipedReferences();
-                    BipedReferences.AutoDetectReferences(ref references, go.transform,
-                        new BipedReferences.AutoDetectParams(true, false));
+                    // Create BipedReferences instance
+                    var references = Activator.CreateInstance(BipedReferencesType)!;
 
-                    if (!references.isFilled)
+                    // Find AutoDetectParams type and create instance
+                    var autoDetectParamsType = BipedReferencesType.GetNestedType("AutoDetectParams");
+                    object? autoDetectParams = null;
+                    if (autoDetectParamsType != null)
+                    {
+                        // Constructor(bool legsParentInRoot, bool includeEyes)
+                        var ctor = autoDetectParamsType.GetConstructor(new[] { typeof(bool), typeof(bool) });
+                        if (ctor != null)
+                            autoDetectParams = ctor.Invoke(new object[] { true, false });
+                        else
+                            autoDetectParams = Activator.CreateInstance(autoDetectParamsType);
+                    }
+
+                    // Call BipedReferences.AutoDetectReferences(ref references, transform, params)
+                    var autoDetectMethod = BipedReferencesType.GetMethod("AutoDetectReferences",
+                        BindingFlags.Public | BindingFlags.Static);
+                    if (autoDetectMethod != null)
+                    {
+                        var args = new object?[] { references, go.transform, autoDetectParams };
+                        autoDetectMethod.Invoke(null, args);
+                        // ref parameter -- get updated value
+                        references = args[0]!;
+                    }
+
+                    // Check isFilled
+                    var isFilledProp = BipedReferencesType.GetProperty("isFilled", BindingFlags.Public | BindingFlags.Instance);
+                    bool isFilled = isFilledProp != null && (bool)isFilledProp.GetValue(references)!;
+
+                    if (!isFilled)
                     {
                         // Try via Animator humanoid
                         var animator = go.GetComponent<Animator>();
                         if (animator != null && animator.isHuman)
                         {
-                            BipedReferences.AssignHumanoidReferences(ref references, animator,
-                                new BipedReferences.AutoDetectParams(true, false));
+                            var assignMethod = BipedReferencesType.GetMethod("AssignHumanoidReferences",
+                                BindingFlags.Public | BindingFlags.Static);
+                            if (assignMethod != null)
+                            {
+                                var args2 = new object?[] { references, animator, autoDetectParams };
+                                assignMethod.Invoke(null, args2);
+                                references = args2[0]!;
+                            }
                         }
                     }
 
-                    if (!references.isFilled)
-                        throw new System.Exception("Could not auto-detect biped references. Assign manually.");
+                    isFilled = isFilledProp != null && (bool)isFilledProp.GetValue(references)!;
+                    if (!isFilled)
+                        throw new Exception("Could not auto-detect biped references. Assign manually.");
 
-                    var rootNode = IKSolverFullBodyBiped.DetectRootNodeBone(references);
-                    fbbik.SetReferences(references, rootNode);
+                    // Detect root node: IKSolverFullBodyBiped.DetectRootNodeBone(references)
+                    Transform? rootNode = null;
+                    if (IKSolverFBBType != null)
+                    {
+                        var detectMethod = IKSolverFBBType.GetMethod("DetectRootNodeBone",
+                            BindingFlags.Public | BindingFlags.Static);
+                        if (detectMethod != null)
+                            rootNode = detectMethod.Invoke(null, new[] { references }) as Transform;
+                    }
+
+                    // fbbik.SetReferences(references, rootNode)
+                    var setRefsMethod = fbbik.GetType().GetMethod("SetReferences",
+                        BindingFlags.Public | BindingFlags.Instance);
+                    if (setRefsMethod != null)
+                        setRefsMethod.Invoke(fbbik, new object?[] { references, rootNode });
                 }
 
+                // Check for errors
                 string errorMsg = "";
-                bool hasError = fbbik.ReferencesError(ref errorMsg);
+                bool hasError = false;
+                var refsErrorMethod = fbbik.GetType().GetMethod("ReferencesError",
+                    BindingFlags.Public | BindingFlags.Instance);
+                if (refsErrorMethod != null)
+                {
+                    var args = new object[] { errorMsg };
+                    var result = refsErrorMethod.Invoke(fbbik, args);
+                    if (result is bool b) hasError = b;
+                    errorMsg = (string)args[0];
+                }
 
                 EditorUtility.SetDirty(go);
+
+                // Read references.isFilled
+                var refsField = Get(fbbik, "references");
+                bool refsFilled = false;
+                if (refsField != null)
+                {
+                    var isFProp = refsField.GetType().GetProperty("isFilled", BindingFlags.Public | BindingFlags.Instance);
+                    if (isFProp != null)
+                        refsFilled = (bool)isFProp.GetValue(refsField)!;
+                }
+
+                // Read solver.rootNode
+                var solver = Get(fbbik, "solver");
+                string rootNodeName = "none";
+                if (solver != null)
+                {
+                    var rn = Get(solver, "rootNode");
+                    if (rn is Transform rnT && rnT != null)
+                        rootNodeName = rnT.name;
+                }
 
                 return new AddFBBIKResponse
                 {
                     gameObjectName = go.name,
                     instanceId = go.GetInstanceID(),
-                    referencesDetected = fbbik.references.isFilled,
+                    referencesDetected = refsFilled,
                     hasError = hasError,
                     errorMessage = errorMsg,
-                    rootNode = fbbik.solver.rootNode != null ? fbbik.solver.rootNode.name : "none"
+                    rootNode = rootNodeName
                 };
             });
         }
@@ -97,47 +176,61 @@ Set positionWeight to 1 to fully control the effector, 0 to release it.")]
         {
             return MainThread.Instance.Run(() =>
             {
+                if (FullBodyBipedIKType == null)
+                    throw new Exception("RootMotion.FinalIK.FullBodyBipedIK type not found in loaded assemblies.");
+
                 var go = targetRef.FindGameObject(out var error);
-                if (error != null) throw new System.Exception(error);
-                if (go == null) throw new System.Exception("GameObject not found.");
+                if (error != null) throw new Exception(error);
+                if (go == null) throw new Exception("GameObject not found.");
 
-                var fbbik = go.GetComponent<FullBodyBipedIK>();
+                var fbbik = go.GetComponent(FullBodyBipedIKType);
                 if (fbbik == null)
-                    throw new System.Exception($"'{go.name}' has no FullBodyBipedIK component.");
+                    throw new Exception($"'{go.name}' has no FullBodyBipedIK component.");
 
-                IKEffector effector = GetEffector(fbbik, effectorName);
+                var effector = GetEffectorReflection(fbbik, effectorName);
 
-                if (position.HasValue) effector.position = position.Value;
-                if (positionWeight.HasValue) effector.positionWeight = Mathf.Clamp01(positionWeight.Value);
-                if (rotationWeight.HasValue) effector.rotationWeight = Mathf.Clamp01(rotationWeight.Value);
+                if (position.HasValue)       Set(effector, "position", position.Value);
+                if (positionWeight.HasValue)  Set(effector, "positionWeight", Mathf.Clamp01(positionWeight.Value));
+                if (rotationWeight.HasValue)  Set(effector, "rotationWeight", Mathf.Clamp01(rotationWeight.Value));
 
                 EditorUtility.SetDirty(go);
+
+                var posVal = Get(effector, "position");
+                string posStr = posVal is Vector3 pv ? FormatVector3(pv) : posVal?.ToString() ?? "";
+                var pwVal = Get(effector, "positionWeight");
+                var rwVal = Get(effector, "rotationWeight");
 
                 return new SetEffectorResponse
                 {
                     gameObjectName = go.name,
                     instanceId = go.GetInstanceID(),
                     effectorName = effectorName,
-                    position = FormatVector3(effector.position),
-                    positionWeight = effector.positionWeight,
-                    rotationWeight = effector.rotationWeight
+                    position = posStr,
+                    positionWeight = pwVal is float pw ? pw : 0f,
+                    rotationWeight = rwVal is float rw ? rw : 0f
                 };
             });
         }
 
-        static IKEffector GetEffector(FullBodyBipedIK fbbik, string name)
+        static object GetEffectorReflection(object fbbik, string name)
         {
-            switch (name.ToLower().Replace(" ", ""))
+            var solver = Get(fbbik, "solver")
+                         ?? throw new Exception("Could not access fbbik.solver.");
+
+            string fieldName = name.ToLower().Replace(" ", "") switch
             {
-                case "body":           return fbbik.solver.bodyEffector;
-                case "lefthand":       return fbbik.solver.leftHandEffector;
-                case "righthand":      return fbbik.solver.rightHandEffector;
-                case "leftfoot":       return fbbik.solver.leftFootEffector;
-                case "rightfoot":      return fbbik.solver.rightFootEffector;
-                case "leftshoulder":   return fbbik.solver.leftShoulderEffector;
-                case "rightshoulder":  return fbbik.solver.rightShoulderEffector;
-                default: throw new System.Exception($"Unknown effector '{name}'. Use: Body, LeftHand, RightHand, LeftFoot, RightFoot, LeftShoulder, RightShoulder.");
-            }
+                "body"          => "bodyEffector",
+                "lefthand"      => "leftHandEffector",
+                "righthand"     => "rightHandEffector",
+                "leftfoot"      => "leftFootEffector",
+                "rightfoot"     => "rightFootEffector",
+                "leftshoulder"  => "leftShoulderEffector",
+                "rightshoulder" => "rightShoulderEffector",
+                _ => throw new Exception($"Unknown effector '{name}'. Use: Body, LeftHand, RightHand, LeftFoot, RightFoot, LeftShoulder, RightShoulder.")
+            };
+
+            return Get(solver, fieldName)
+                   ?? throw new Exception($"Effector '{fieldName}' not found on solver.");
         }
 
         public class AddFBBIKResponse
@@ -161,4 +254,3 @@ Set positionWeight to 1 to fully control the effector, 0 to release it.")]
         }
     }
 }
-#endif

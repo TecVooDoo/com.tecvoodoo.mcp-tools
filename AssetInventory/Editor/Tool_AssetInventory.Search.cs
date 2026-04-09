@@ -29,20 +29,21 @@ The search uses the Asset Inventory 4 indexed database for fast results.")]
         {
             return MainThread.Instance.Run(() =>
             {
+                bool hasPackageFilter = !string.IsNullOrEmpty(packageFilter);
                 var options = new AssetSearch.Options
                 {
                     SearchPhrase = searchPhrase,
-                    MaxResults = maxResults,
+                    MaxResults = hasPackageFilter ? 0 : maxResults,
                     RawSearchType = fileType
                 };
 
                 var result = AssetSearch.Execute(options);
 
                 var files = result.Files.AsEnumerable();
-                if (!string.IsNullOrEmpty(packageFilter))
-                    files = files.Where(f => (f.SafeName ?? "").ToLower().Contains(packageFilter.ToLower()));
+                if (hasPackageFilter)
+                    files = files.Where(f => (f.SafeName ?? "").ToLower().Contains(packageFilter!.ToLower()));
 
-                var lines = files.Select(f =>
+                var lines = files.Take(maxResults).Select(f =>
                 {
                     var pkg = f.SafeName ?? "unknown";
                     var path = f.GetPath(true) ?? f.FileName ?? "?";
@@ -73,20 +74,21 @@ This is a convenience wrapper that filters to Prefabs type only.")]
         {
             return MainThread.Instance.Run(() =>
             {
+                bool hasPackageFilter = !string.IsNullOrEmpty(packageFilter);
                 var options = new AssetSearch.Options
                 {
                     SearchPhrase = searchPhrase,
-                    MaxResults = maxResults,
+                    MaxResults = hasPackageFilter ? 0 : maxResults,
                     RawSearchType = "Prefabs"
                 };
 
                 var result = AssetSearch.Execute(options);
 
                 var files = result.Files.AsEnumerable();
-                if (!string.IsNullOrEmpty(packageFilter))
-                    files = files.Where(f => (f.SafeName ?? "").ToLower().Contains(packageFilter.ToLower()));
+                if (hasPackageFilter)
+                    files = files.Where(f => (f.SafeName ?? "").ToLower().Contains(packageFilter!.ToLower()));
 
-                var lines = files.Select(f =>
+                var lines = files.Take(maxResults).Select(f =>
                 {
                     var path = f.GetPath(true) ?? f.FileName ?? "?";
                     var pkg = f.SafeName ?? "unknown";

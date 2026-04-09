@@ -1,9 +1,9 @@
-#if HAS_ROPE_TOOLKIT
 #nullable enable
+using System;
 using System.ComponentModel;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,21 +35,29 @@ lengthMultiplier [0-2.0]: dynamic extension/retraction of rope length.")]
             return MainThread.Instance.Run(() =>
             {
                 var rope = GetRope(gameObjectName);
-                var sim = rope.simulation;
 
-                if (stiffness.HasValue) sim.stiffness = Mathf.Clamp(stiffness.Value, 0.01f, 1.0f);
-                if (energyLoss.HasValue) sim.energyLoss = Mathf.Clamp01(energyLoss.Value);
-                if (gravityMultiplier.HasValue) sim.gravityMultiplier = Mathf.Clamp01(gravityMultiplier.Value);
-                if (substeps.HasValue) sim.substeps = Mathf.Clamp(substeps.Value, 1, 10);
-                if (solverIterations.HasValue) sim.solverIterations = Mathf.Clamp(solverIterations.Value, 1, 32);
-                if (lengthMultiplier.HasValue) sim.lengthMultiplier = Mathf.Clamp(lengthMultiplier.Value, 0f, 2.0f);
-                if (resolution.HasValue) sim.resolution = Mathf.Max(0.1f, resolution.Value);
-                if (enabled.HasValue) sim.enabled = enabled.Value;
+                // simulation is a struct -- read-modify-write
+                var sim = GetStruct(rope, "simulation")
+                          ?? throw new Exception("Could not read rope.simulation.");
 
-                rope.simulation = sim;
+                if (stiffness.HasValue)    SetStructField(sim, "stiffness", Mathf.Clamp(stiffness.Value, 0.01f, 1.0f));
+                if (energyLoss.HasValue)   SetStructField(sim, "energyLoss", Mathf.Clamp01(energyLoss.Value));
+                if (gravityMultiplier.HasValue) SetStructField(sim, "gravityMultiplier", Mathf.Clamp01(gravityMultiplier.Value));
+                if (substeps.HasValue)     SetStructField(sim, "substeps", Mathf.Clamp(substeps.Value, 1, 10));
+                if (solverIterations.HasValue) SetStructField(sim, "solverIterations", Mathf.Clamp(solverIterations.Value, 1, 32));
+                if (lengthMultiplier.HasValue) SetStructField(sim, "lengthMultiplier", Mathf.Clamp(lengthMultiplier.Value, 0f, 2.0f));
+                if (resolution.HasValue)   SetStructField(sim, "resolution", Mathf.Max(0.1f, resolution.Value));
+                if (enabled.HasValue)      SetStructField(sim, "enabled", enabled.Value);
+
+                SetStruct(rope, "simulation", sim);
                 EditorUtility.SetDirty(rope);
 
-                return $"OK: Rope '{gameObjectName}' simulation updated. stiffness={sim.stiffness:F3} energyLoss={sim.energyLoss:F3} substeps={sim.substeps} solverIterations={sim.solverIterations}";
+                var stiffVal = GetStructField(sim, "stiffness");
+                var elVal    = GetStructField(sim, "energyLoss");
+                var subVal   = GetStructField(sim, "substeps");
+                var siVal    = GetStructField(sim, "solverIterations");
+
+                return $"OK: Rope '{gameObjectName}' simulation updated. stiffness={stiffVal:F3} energyLoss={elVal:F3} substeps={subVal} solverIterations={siVal}";
             });
         }
 
@@ -72,18 +80,25 @@ collisionMargin [0-1.0]: extra buffer around rope particles for collision.")]
             return MainThread.Instance.Run(() =>
             {
                 var rope = GetRope(gameObjectName);
-                var col = rope.collisions;
 
-                if (enabled.HasValue) col.enabled = enabled.Value;
-                if (influenceRigidbodies.HasValue) col.influenceRigidbodies = influenceRigidbodies.Value;
-                if (friction.HasValue) col.friction = Mathf.Clamp(friction.Value, 0f, 20f);
-                if (stride.HasValue) col.stride = Mathf.Clamp(stride.Value, 1, 20);
-                if (collisionMargin.HasValue) col.collisionMargin = Mathf.Clamp01(collisionMargin.Value);
+                // collisions is a struct -- read-modify-write
+                var col = GetStruct(rope, "collisions")
+                          ?? throw new Exception("Could not read rope.collisions.");
 
-                rope.collisions = col;
+                if (enabled.HasValue)            SetStructField(col, "enabled", enabled.Value);
+                if (influenceRigidbodies.HasValue) SetStructField(col, "influenceRigidbodies", influenceRigidbodies.Value);
+                if (friction.HasValue)           SetStructField(col, "friction", Mathf.Clamp(friction.Value, 0f, 20f));
+                if (stride.HasValue)             SetStructField(col, "stride", Mathf.Clamp(stride.Value, 1, 20));
+                if (collisionMargin.HasValue)    SetStructField(col, "collisionMargin", Mathf.Clamp01(collisionMargin.Value));
+
+                SetStruct(rope, "collisions", col);
                 EditorUtility.SetDirty(rope);
 
-                return $"OK: Rope '{gameObjectName}' collision updated. enabled={col.enabled} friction={col.friction:F3} stride={col.stride}";
+                var enVal  = GetStructField(col, "enabled");
+                var frVal  = GetStructField(col, "friction");
+                var stVal  = GetStructField(col, "stride");
+
+                return $"OK: Rope '{gameObjectName}' collision updated. enabled={enVal} friction={frVal:F3} stride={stVal}";
             });
         }
 
@@ -104,15 +119,18 @@ materialName: name of a material already in the scene or project to assign (opti
             {
                 var rope = GetRope(gameObjectName);
 
-                if (radius.HasValue) rope.radius = Mathf.Clamp(radius.Value, 0.001f, 1.0f);
-                if (radialVertices.HasValue) rope.radialVertices = Mathf.Clamp(radialVertices.Value, 3, 32);
-                if (isLoop.HasValue) rope.isLoop = isLoop.Value;
+                if (radius.HasValue)         Set(rope, "radius", Mathf.Clamp(radius.Value, 0.001f, 1.0f));
+                if (radialVertices.HasValue)  Set(rope, "radialVertices", Mathf.Clamp(radialVertices.Value, 3, 32));
+                if (isLoop.HasValue)          Set(rope, "isLoop", isLoop.Value);
 
                 EditorUtility.SetDirty(rope);
 
-                return $"OK: Rope '{gameObjectName}' appearance updated. radius={rope.radius:F4} radialVertices={rope.radialVertices} isLoop={rope.isLoop}";
+                var r  = Get(rope, "radius");
+                var rv = Get(rope, "radialVertices");
+                var il = Get(rope, "isLoop");
+
+                return $"OK: Rope '{gameObjectName}' appearance updated. radius={r:F4} radialVertices={rv} isLoop={il}";
             });
         }
     }
 }
-#endif

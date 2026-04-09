@@ -1,3 +1,4 @@
+#if HAS_MALBERS_AC
 #nullable enable
 using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
@@ -125,3 +126,4 @@ Use 'ac-query-animal' first to see available speed sets and their speeds.")]
         }
     }
 }
+#endif

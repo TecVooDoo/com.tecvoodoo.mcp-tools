@@ -4,7 +4,7 @@
     "references": [
         "com.IvanMurzak.Unity.MCP.Editor",
         "com.IvanMurzak.Unity.MCP.Runtime",
-        "MalbersAnimations"
+        "GUID:f0a1b964e56e3424a8ef69ae9ed9944c"
     ],
     "includePlatforms": [
         "Editor"

@@ -1,12 +1,11 @@
-#if HAS_MALBERS_QUESTFORGE
 #nullable enable
+using System;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
-using MalbersAnimations.QuestForge;
 using UnityEditor;
 using UnityEngine;
 
@@ -51,12 +50,15 @@ Categories: QuestObjective, QuestGiver, Waypoint, Location, Enemy, NPC, Item, Me
         {
             return MainThread.Instance.Run(() =>
             {
+                var poiType = FindType(POI_TYPE_NAME);
+                if (poiType == null)
+                    throw new Exception($"Type '{POI_TYPE_NAME}' not found. Is QuestForge installed?");
+
                 string directory = Path.GetDirectoryName(assetPath);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                PointOfInterest poi = ScriptableObject.CreateInstance<PointOfInterest>();
-
+                var poi = ScriptableObject.CreateInstance(poiType);
                 AssetDatabase.CreateAsset(poi, assetPath);
 
                 // Use SerializedObject to set private [SerializeField] fields
@@ -68,8 +70,10 @@ Categories: QuestObjective, QuestGiver, Waypoint, Location, Enemy, NPC, Item, Me
                 so.FindProperty("hideUntilDiscovered").boolValue = hideUntilDiscovered;
                 so.FindProperty("priority").intValue = priority;
 
-                if (System.Enum.TryParse<POICategory>(category, true, out var parsedCategory))
-                    so.FindProperty("category").enumValueIndex = (int)parsedCategory;
+                // Parse category enum via reflection
+                var poiCategoryType = FindType(POI_CATEGORY_TYPE_NAME);
+                if (poiCategoryType != null && Enum.TryParse(poiCategoryType, category, true, out var parsedCategory))
+                    so.FindProperty("category").enumValueIndex = (int)parsedCategory!;
 
                 if (!string.IsNullOrEmpty(description))
                     so.FindProperty("description").stringValue = description;
@@ -77,25 +81,31 @@ Categories: QuestObjective, QuestGiver, Waypoint, Location, Enemy, NPC, Item, Me
                 so.ApplyModifiedPropertiesWithoutUndo();
 
                 // Use public setter methods for location data
-                poi.SetWorldPosition(new Vector3(posX, posY, posZ));
-                poi.SetLocationRadius(radius);
+                Call(poi, "SetWorldPosition", new Vector3(posX, posY, posZ));
+                Call(poi, "SetLocationRadius", radius);
 
                 if (!string.IsNullOrEmpty(locationId))
-                    poi.SetLocationId(locationId);
+                    Call(poi, "SetLocationId", locationId!);
 
                 EditorUtility.SetDirty(poi);
                 AssetDatabase.SaveAssets();
 
+                string resultName = Get(poi, "POIName")?.ToString() ?? poiName;
+                string resultCategory = Get(poi, "Category")?.ToString() ?? category;
+                string resultLocId = Get(poi, "LocationId")?.ToString() ?? "";
+                bool resultMinimap = (bool)(Get(poi, "ShowOnMinimap") ?? showOnMinimap);
+                bool resultCompass = (bool)(Get(poi, "ShowOnCompass") ?? showOnCompass);
+
                 return new CreatePOIResponse
                 {
                     assetPath = assetPath,
-                    poiName = poi.POIName,
-                    category = poi.Category.ToString(),
-                    locationId = poi.LocationId ?? "",
+                    poiName = resultName,
+                    category = resultCategory,
+                    locationId = resultLocId,
                     worldPosition = $"({posX:F1}, {posY:F1}, {posZ:F1})",
                     radius = radius,
-                    showOnMinimap = poi.ShowOnMinimap,
-                    showOnCompass = poi.ShowOnCompass
+                    showOnMinimap = resultMinimap,
+                    showOnCompass = resultCompass
                 };
             });
         }
@@ -110,6 +120,10 @@ Shows name, category, location ID, position, and display settings for each POI."
         {
             return MainThread.Instance.Run(() =>
             {
+                var poiType = FindType(POI_TYPE_NAME);
+                if (poiType == null)
+                    throw new Exception($"Type '{POI_TYPE_NAME}' not found. Is QuestForge installed?");
+
                 string[] guids;
                 if (!string.IsNullOrEmpty(searchFolder))
                     guids = AssetDatabase.FindAssets("t:PointOfInterest", new[] { searchFolder });
@@ -122,13 +136,28 @@ Shows name, category, location ID, position, and display settings for each POI."
                 foreach (string guid in guids)
                 {
                     string path = AssetDatabase.GUIDToAssetPath(guid);
-                    PointOfInterest poi = AssetDatabase.LoadAssetAtPath<PointOfInterest>(path);
+                    var poi = AssetDatabase.LoadAssetAtPath(path, poiType);
                     if (poi == null) continue;
 
                     count++;
-                    Vector3 pos = poi.WorldPosition;
-                    sb.AppendLine($"  {poi.POIName} | Category: {poi.Category} | LocationID: {poi.LocationId ?? "none"} | Pos: ({pos.x:F1}, {pos.y:F1}, {pos.z:F1}) | Radius: {poi.LocationRadius:F1}");
-                    sb.AppendLine($"    Minimap: {poi.ShowOnMinimap} | Compass: {poi.ShowOnCompass} | FastTravel: {poi.EnableFastTravel} | Hidden: {poi.HideUntilDiscovered} | Priority: {poi.Priority}");
+                    object? posObj = Get(poi, "WorldPosition");
+                    Vector3 pos = posObj is Vector3 v ? v : Vector3.zero;
+                    string name = Get(poi, "POIName")?.ToString() ?? "?";
+                    string cat = Get(poi, "Category")?.ToString() ?? "?";
+                    string locId = Get(poi, "LocationId")?.ToString() ?? "none";
+                    float locRadius = 0f;
+                    object? radObj = Get(poi, "LocationRadius");
+                    if (radObj is float f) locRadius = f;
+                    bool minimap = (bool)(Get(poi, "ShowOnMinimap") ?? false);
+                    bool compass = (bool)(Get(poi, "ShowOnCompass") ?? false);
+                    bool fastTravel = (bool)(Get(poi, "EnableFastTravel") ?? false);
+                    bool hidden = (bool)(Get(poi, "HideUntilDiscovered") ?? false);
+                    int prio = 0;
+                    object? prioObj = Get(poi, "Priority");
+                    if (prioObj is int pi) prio = pi;
+
+                    sb.AppendLine($"  {name} | Category: {cat} | LocationID: {locId} | Pos: ({pos.x:F1}, {pos.y:F1}, {pos.z:F1}) | Radius: {locRadius:F1}");
+                    sb.AppendLine($"    Minimap: {minimap} | Compass: {compass} | FastTravel: {fastTravel} | Hidden: {hidden} | Priority: {prio}");
                     sb.AppendLine($"    Path: {path}");
                 }
 
@@ -159,4 +188,3 @@ Shows name, category, location ID, position, and display settings for each POI."
         }
     }
 }
-#endif

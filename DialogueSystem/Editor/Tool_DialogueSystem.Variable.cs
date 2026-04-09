@@ -1,9 +1,9 @@
-#if HAS_DIALOGUE_SYSTEM
 #nullable enable
+using System;
 using System.ComponentModel;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using PixelCrushers.DialogueSystem;
 
 namespace MCPTools.DialogueSystem.Editor
 {
@@ -25,7 +25,7 @@ Variable names should match exactly as defined in the dialogue database.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                if (!DialogueManager.hasInstance)
+                if (!HasDialogueManager())
                     return "ERROR: No DialogueManager instance found in the scene.";
 
                 string actionLower = (action ?? "get").ToLowerInvariant();
@@ -34,8 +34,10 @@ Variable names should match exactly as defined in the dialogue database.")]
                 {
                     case "get":
                     {
-                        Lua.Result result = Lua.Run("return Variable['" + variableName + "']");
-                        return $"Variable['{variableName}'] = {result.asString}";
+                        string luaCode = "return Variable['" + variableName + "']";
+                        object? result = CallStatic(LuaType, "Run", luaCode);
+                        string asString = result != null ? (Get(result, "asString")?.ToString() ?? "(null)") : "(null)";
+                        return $"Variable['{variableName}'] = {asString}";
                     }
 
                     case "set":
@@ -60,12 +62,14 @@ Variable names should match exactly as defined in the dialogue database.")]
                             luaValue = "\"" + value.Replace("\"", "\\\"") + "\"";
                         }
 
-                        string luaCode = "Variable['" + variableName + "'] = " + luaValue;
-                        Lua.Run(luaCode);
+                        string setCode = "Variable['" + variableName + "'] = " + luaValue;
+                        CallStatic(LuaType, "Run", setCode);
 
                         // Read back to confirm
-                        Lua.Result confirmResult = Lua.Run("return Variable['" + variableName + "']");
-                        return $"Set Variable['{variableName}'] = {luaValue}. Current value: {confirmResult.asString}";
+                        string confirmCode = "return Variable['" + variableName + "']";
+                        object? confirmResult = CallStatic(LuaType, "Run", confirmCode);
+                        string asString = confirmResult != null ? (Get(confirmResult, "asString")?.ToString() ?? "(null)") : "(null)";
+                        return $"Set Variable['{variableName}'] = {luaValue}. Current value: {asString}";
                     }
 
                     default:
@@ -75,4 +79,3 @@ Variable names should match exactly as defined in the dialogue database.")]
         }
     }
 }
-#endif

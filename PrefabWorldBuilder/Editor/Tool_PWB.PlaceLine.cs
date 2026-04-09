@@ -1,13 +1,12 @@
-#if HAS_PWB
 #nullable enable
+using System;
+using System.Collections;
 using System.ComponentModel;
-using System.Linq;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using com.IvanMurzak.Unity.MCP.Runtime.Data;
 using com.IvanMurzak.Unity.MCP.Runtime.Extensions;
-using PluginMaster;
 using UnityEditor;
 using UnityEngine;
 
@@ -42,17 +41,25 @@ Objects are evenly spaced along the line. Great for fences, walls, paths, etc.")
         {
             return MainThread.Instance.Run(() =>
             {
-                var palettes = PaletteManager.allPalettes;
-                MultibrushSettings? brush = null;
+                var palettes = GetStatic(PaletteManagerType, "allPalettes") as IList;
+                if (palettes == null)
+                    throw new Exception("Could not retrieve PaletteManager.allPalettes.");
+
+                object? brush = null;
 
                 if (!string.IsNullOrEmpty(brushName))
                 {
-                    var searchLower = brushName.ToLower();
+                    var searchLower = brushName!.ToLower();
                     foreach (var pal in palettes)
                     {
-                        foreach (var b in pal.brushes)
+                        if (pal == null) continue;
+                        var brushes = Get(pal, "brushes") as Array;
+                        if (brushes == null) continue;
+                        foreach (var b in brushes)
                         {
-                            if (b.name.ToLower().Contains(searchLower))
+                            if (b == null) continue;
+                            string bName = Get(b, "name")?.ToString() ?? "";
+                            if (bName.ToLower().Contains(searchLower))
                             {
                                 brush = b;
                                 break;
@@ -61,32 +68,46 @@ Objects are evenly spaced along the line. Great for fences, walls, paths, etc.")
                         if (brush != null) break;
                     }
                     if (brush == null)
-                        throw new System.Exception($"No brush found matching '{brushName}'.");
+                        throw new Exception($"No brush found matching '{brushName}'.");
                 }
                 else
                 {
                     if (paletteIndex < 0 || paletteIndex >= palettes.Count)
-                        throw new System.Exception($"Palette index {paletteIndex} out of range.");
-                    var palette = palettes[paletteIndex];
-                    var brushes = palette.brushes;
+                        throw new Exception($"Palette index {paletteIndex} out of range.");
+                    var palette = palettes[paletteIndex]!;
+                    var brushes = Get(palette, "brushes") as Array;
+                    if (brushes == null)
+                        throw new Exception("Could not read brushes from palette.");
                     if (brushIndex < 0 || brushIndex >= brushes.Length)
-                        throw new System.Exception($"Brush index {brushIndex} out of range.");
-                    brush = brushes[brushIndex];
+                        throw new Exception($"Brush index {brushIndex} out of range.");
+                    brush = brushes.GetValue(brushIndex)!;
                 }
 
-                var items = brush.items.Where(i => i.prefab != null).ToArray();
-                if (items.Length == 0)
-                    throw new System.Exception($"Brush '{brush.name}' has no valid prefabs.");
+                // Get valid items (those with non-null prefab)
+                var items = Get(brush, "items") as IList;
+                var validItems = new System.Collections.Generic.List<GameObject>();
+                if (items != null)
+                {
+                    foreach (var item in items)
+                    {
+                        if (item == null) continue;
+                        var prefab = Get(item, "prefab") as GameObject;
+                        if (prefab != null)
+                            validItems.Add(prefab);
+                    }
+                }
+                if (validItems.Count == 0)
+                    throw new Exception($"Brush '{Get(brush, "name")}' has no valid prefabs.");
 
                 GameObject? parentGo = null;
                 if (parentGameObjectRef?.IsValid(out _) == true)
                 {
                     parentGo = parentGameObjectRef.FindGameObject(out var error);
-                    if (error != null) throw new System.Exception(error);
+                    if (error != null) throw new Exception(error);
                 }
 
-                // Create a container
-                var container = new GameObject($"PWBLine_{brush.name}");
+                string brushNameStr = Get(brush, "name")?.ToString() ?? "brush";
+                var container = new GameObject($"PWBLine_{brushNameStr}");
                 Undo.RegisterCreatedObjectUndo(container, "PWB Place Line");
                 if (parentGo != null)
                     container.transform.SetParent(parentGo.transform, false);
@@ -104,8 +125,7 @@ Objects are evenly spaced along the line. Great for fences, walls, paths, etc.")
                     float t = count > 1 ? i / (float)(count - 1) : 0.5f;
                     var pos = Vector3.Lerp(startPosition, endPosition, t);
 
-                    // Cycle through items for multi-prefab brushes
-                    var prefab = items[i % items.Length].prefab;
+                    var prefab = validItems[i % validItems.Count];
                     var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
                     Undo.RegisterCreatedObjectUndo(go, "PWB Place Line Item");
                     go.transform.SetParent(container.transform);
@@ -121,7 +141,7 @@ Objects are evenly spaced along the line. Great for fences, walls, paths, etc.")
                 {
                     containerName = container.name,
                     containerInstanceId = container.GetInstanceID(),
-                    brushName = brush.name,
+                    brushName = brushNameStr,
                     placedCount = placed,
                     startPosition = FormatVector3(startPosition),
                     endPosition = FormatVector3(endPosition)
@@ -143,33 +163,64 @@ The prefab is specified by its asset path. Use this to populate palettes program
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
                 if (prefab == null)
-                    throw new System.Exception($"Prefab not found at: {prefabPath}");
+                    throw new Exception($"Prefab not found at: {prefabPath}");
 
-                var palettes = PaletteManager.allPalettes;
+                var palettes = GetStatic(PaletteManagerType, "allPalettes") as IList;
+                if (palettes == null)
+                    throw new Exception("Could not retrieve PaletteManager.allPalettes.");
+
                 if (palettes.Count == 0)
                 {
-                    var newPalette = new PaletteData("Palette1", System.DateTime.Now.ToBinary());
-                    PaletteManager.AddPalette(newPalette, save: true);
-                    palettes = PaletteManager.allPalettes;
+                    // Create a new palette: new PaletteData("Palette1", DateTime.Now.ToBinary())
+                    var paletteDataType = FindType(PALETTE_DATA_TYPE);
+                    if (paletteDataType == null)
+                        throw new Exception($"Type '{PALETTE_DATA_TYPE}' not found.");
+                    var newPalette = Activator.CreateInstance(paletteDataType, "Palette1", DateTime.Now.ToBinary());
+                    // PaletteManager.AddPalette(newPalette, save: true)
+                    CallStatic(PaletteManagerType, "AddPalette", newPalette!, true);
+                    palettes = GetStatic(PaletteManagerType, "allPalettes") as IList;
+                    if (palettes == null)
+                        throw new Exception("Could not retrieve palettes after creating one.");
                 }
                 if (paletteIndex < 0 || paletteIndex >= palettes.Count)
-                    throw new System.Exception($"Palette index {paletteIndex} out of range. Have {palettes.Count} palettes.");
+                    throw new Exception($"Palette index {paletteIndex} out of range. Have {palettes.Count} palettes.");
 
-                var palette = palettes[paletteIndex];
+                var palette = palettes[paletteIndex]!;
+                string palName = Get(palette, "name")?.ToString() ?? "";
 
                 // Check if already in palette
-                if (palette.brushes.Any(b => b.ContainsPrefabPath(prefabPath)))
-                    throw new System.Exception($"Prefab '{prefab.name}' already exists in palette '{palette.name}'.");
+                var brushes = Get(palette, "brushes") as Array;
+                if (brushes != null)
+                {
+                    foreach (var b in brushes)
+                    {
+                        if (b == null) continue;
+                        bool contains = (bool)(Call(b, "ContainsPrefabPath", prefabPath) ?? false);
+                        if (contains)
+                            throw new Exception($"Prefab '{prefab.name}' already exists in palette '{palName}'.");
+                    }
+                }
 
-                var brush = MultibrushSettings.Create(prefab, palette);
-                palette.AddBrush(brush);
+                // MultibrushSettings.Create(prefab, palette)
+                var multibrushType = FindType(MULTIBRUSH_TYPE);
+                if (multibrushType == null)
+                    throw new Exception($"Type '{MULTIBRUSH_TYPE}' not found.");
+                var newBrush = CallStatic(multibrushType, "Create", prefab, palette);
+                if (newBrush == null)
+                    throw new Exception("MultibrushSettings.Create returned null.");
+
+                // palette.AddBrush(brush)
+                Call(palette, "AddBrush", newBrush);
+
+                string newBrushName = Get(newBrush, "name")?.ToString() ?? "";
+                int totalBrushes = (int)(Get(palette, "brushCount") ?? 0);
 
                 return new AddToPaletteResponse
                 {
                     prefabName = prefab.name,
-                    paletteName = palette.name,
-                    brushName = brush.name,
-                    totalBrushes = palette.brushCount
+                    paletteName = palName,
+                    brushName = newBrushName,
+                    totalBrushes = totalBrushes
                 };
             });
         }
@@ -203,4 +254,3 @@ The prefab is specified by its asset path. Use this to populate palettes program
         }
     }
 }
-#endif

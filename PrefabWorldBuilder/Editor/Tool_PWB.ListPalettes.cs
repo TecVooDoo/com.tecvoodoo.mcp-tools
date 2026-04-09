@@ -1,11 +1,10 @@
-#if HAS_PWB
 #nullable enable
+using System;
+using System.Collections;
 using System.ComponentModel;
-using System.Linq;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
-using PluginMaster;
 
 namespace MCPTools.PWB.Editor
 {
@@ -22,25 +21,47 @@ Use the brush name or palette index with other PWB tools.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                var palettes = PaletteManager.allPalettes;
+                // PaletteManager.allPalettes (static property)
+                var palettes = GetStatic(PaletteManagerType, "allPalettes") as IList;
+                if (palettes == null)
+                    throw new Exception("Could not retrieve PaletteManager.allPalettes.");
+
                 var lines = new System.Collections.Generic.List<string>();
 
                 for (int p = 0; p < palettes.Count; p++)
                 {
-                    var palette = palettes[p];
-                    lines.Add($"Palette [{p}]: \"{palette.name}\" ({palette.brushCount} brushes, id={palette.hexId})");
+                    var palette = palettes[p]!;
+                    string palName  = Get(palette, "name")?.ToString() ?? "?";
+                    int brushCount  = (int)(Get(palette, "brushCount") ?? 0);
+                    string hexId    = Get(palette, "hexId")?.ToString() ?? "?";
+                    lines.Add($"Palette [{p}]: \"{palName}\" ({brushCount} brushes, id={hexId})");
 
                     if (includeBrushes)
                     {
-                        var brushes = palette.brushes;
-                        for (int b = 0; b < brushes.Length; b++)
+                        var brushes = Get(palette, "brushes") as Array;
+                        if (brushes != null)
                         {
-                            var brush = brushes[b];
-                            var prefabNames = string.Join(", ",
-                                brush.items
-                                    .Where(i => i.prefab != null)
-                                    .Select(i => i.prefab.name));
-                            lines.Add($"  Brush [{b}]: \"{brush.name}\" ({brush.itemCount} items: {prefabNames})");
+                            for (int b = 0; b < brushes.Length; b++)
+                            {
+                                var brush = brushes.GetValue(b)!;
+                                string bName = Get(brush, "name")?.ToString() ?? "?";
+                                int itemCount = (int)(Get(brush, "itemCount") ?? 0);
+
+                                // Collect prefab names from items
+                                var items = Get(brush, "items") as IList;
+                                var prefabNames = new System.Collections.Generic.List<string>();
+                                if (items != null)
+                                {
+                                    foreach (var item in items)
+                                    {
+                                        if (item == null) continue;
+                                        var prefab = Get(item, "prefab") as UnityEngine.GameObject;
+                                        if (prefab != null)
+                                            prefabNames.Add(prefab.name);
+                                    }
+                                }
+                                lines.Add($"  Brush [{b}]: \"{bName}\" ({itemCount} items: {string.Join(", ", prefabNames)})");
+                            }
                         }
                     }
                 }
@@ -62,4 +83,3 @@ Use the brush name or palette index with other PWB tools.")]
         }
     }
 }
-#endif

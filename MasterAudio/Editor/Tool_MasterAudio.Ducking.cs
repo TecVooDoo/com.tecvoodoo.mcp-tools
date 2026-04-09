@@ -1,11 +1,9 @@
-#if HAS_MASTERAUDIO
 #nullable enable
 using System;
 using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
-using DarkTonic.MasterAudio;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -37,8 +35,7 @@ riseVolStart: normalized position (0-1) of remaining sound when volume restore b
 
             return MainThread.Instance.Run(() =>
             {
-                if (MasterAudio.SafeInstance == null)
-                    throw new InvalidOperationException("MasterAudio instance not found in scene.");
+                EnsureInstance();
 
                 string act = action.ToLowerInvariant().Trim();
 
@@ -49,11 +46,11 @@ riseVolStart: normalized position (0-1) of remaining sound when volume restore b
                         float unduck = unduckTime ?? 1f;
                         float rise = riseVolStart ?? 0.5f;
 
-                        MasterAudio.AddSoundGroupToDuckList(groupName, rise, volCut, unduck);
+                        CallMA("AddSoundGroupToDuckList", groupName, rise, volCut, unduck);
                         return $"OK: Group '{groupName}' added to duck list. VolCut={volCut:F1}dB UnduckTime={unduck:F2}s RiseStart={rise:F2}";
 
                     case "remove":
-                        MasterAudio.RemoveSoundGroupFromDuckList(groupName);
+                        CallMA("RemoveSoundGroupFromDuckList", groupName);
                         return $"OK: Group '{groupName}' removed from duck list.";
 
                     default:
@@ -65,4 +62,3 @@ riseVolStart: normalized position (0-1) of remaining sound when volume restore b
         }
     }
 }
-#endif

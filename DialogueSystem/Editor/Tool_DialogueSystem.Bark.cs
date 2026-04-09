@@ -1,9 +1,9 @@
-#if HAS_DIALOGUE_SYSTEM
 #nullable enable
+using System;
 using System.ComponentModel;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using PixelCrushers.DialogueSystem;
 using UnityEngine;
 
 namespace MCPTools.DialogueSystem.Editor
@@ -29,7 +29,7 @@ If both are provided, barkText takes priority. Requires a speaker GameObject in 
         {
             return MainThread.Instance.Run(() =>
             {
-                if (!DialogueManager.hasInstance)
+                if (!HasDialogueManager())
                     return "ERROR: No DialogueManager instance found in the scene.";
 
                 Transform? speakerTransform = FindTransformByName(speakerName);
@@ -43,7 +43,7 @@ If both are provided, barkText takes priority. Requires a speaker GameObject in 
                 // Raw text bark takes priority
                 if (!string.IsNullOrEmpty(barkText))
                 {
-                    DialogueManager.BarkString(barkText, speakerTransform, listenerTransform);
+                    CallStatic(DmType, "BarkString", barkText, speakerTransform, listenerTransform!);
                     return $"Barked raw text from '{speakerName}': \"{barkText}\"";
                 }
 
@@ -52,12 +52,12 @@ If both are provided, barkText takes priority. Requires a speaker GameObject in 
                 {
                     if (entryID.HasValue)
                     {
-                        DialogueManager.Bark(conversationTitle, speakerTransform, listenerTransform, entryID.Value);
+                        CallStatic(DmType, "Bark", conversationTitle, speakerTransform, listenerTransform!, entryID.Value);
                         return $"Barked from '{conversationTitle}' entry {entryID.Value} via '{speakerName}'.";
                     }
                     else
                     {
-                        DialogueManager.Bark(conversationTitle, speakerTransform, listenerTransform);
+                        CallStatic(DmType, "Bark", conversationTitle, speakerTransform, listenerTransform!);
                         return $"Barked from '{conversationTitle}' via '{speakerName}'.";
                     }
                 }
@@ -67,4 +67,3 @@ If both are provided, barkText takes priority. Requires a speaker GameObject in 
         }
     }
 }
-#endif

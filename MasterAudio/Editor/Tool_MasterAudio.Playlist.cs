@@ -1,11 +1,9 @@
-#if HAS_MASTERAUDIO
 #nullable enable
 using System;
 using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
-using DarkTonic.MasterAudio;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -36,8 +34,7 @@ controllerName is optional -- omit to use the first/default PlaylistController."
 
             return MainThread.Instance.Run(() =>
             {
-                if (MasterAudio.SafeInstance == null)
-                    throw new InvalidOperationException("MasterAudio instance not found in scene.");
+                EnsureInstance();
 
                 string act = action.ToLowerInvariant().Trim();
                 bool hasController = !string.IsNullOrEmpty(controllerName);
@@ -46,81 +43,79 @@ controllerName is optional -- omit to use the first/default PlaylistController."
                 {
                     case "play":
                         if (hasController)
-                            MasterAudio.TriggerPlaylistClip(controllerName, clipName ?? string.Empty);
+                            CallMA("TriggerPlaylistClip", controllerName!, clipName ?? string.Empty);
                         else
-                            MasterAudio.TriggerPlaylistClip(clipName ?? string.Empty);
+                            CallMA("TriggerPlaylistClip", clipName ?? string.Empty);
                         return $"OK: Playlist play triggered.{(clipName != null ? $" Clip: '{clipName}'" : "")}";
 
                     case "stop":
                         if (hasController)
-                            MasterAudio.StopPlaylist(controllerName);
+                            CallMA("StopPlaylist", controllerName!);
                         else
-                            MasterAudio.StopPlaylist();
+                            CallMA("StopPlaylist");
                         return $"OK: Playlist stopped.";
 
                     case "next":
                         if (hasController)
-                            MasterAudio.TriggerNextPlaylistClip(controllerName);
+                            CallMA("TriggerNextPlaylistClip", controllerName!);
                         else
-                            MasterAudio.TriggerNextPlaylistClip();
+                            CallMA("TriggerNextPlaylistClip");
                         return $"OK: Next playlist clip triggered.";
 
                     case "previous":
-                        // TriggerPreviousPlaylistClip does not exist in this MA version.
-                        // Fall back to random as closest alternative.
                         return $"WARNING: 'previous' not supported in this Master Audio version. Use 'next' or 'random'.";
 
                     case "random":
                         if (hasController)
-                            MasterAudio.TriggerRandomPlaylistClip(controllerName);
+                            CallMA("TriggerRandomPlaylistClip", controllerName!);
                         else
-                            MasterAudio.TriggerRandomPlaylistClip();
+                            CallMA("TriggerRandomPlaylistClip");
                         return $"OK: Random playlist clip triggered.";
 
                     case "pause":
                         if (hasController)
-                            MasterAudio.PausePlaylist(controllerName);
+                            CallMA("PausePlaylist", controllerName!);
                         else
-                            MasterAudio.PausePlaylist();
+                            CallMA("PausePlaylist");
                         return $"OK: Playlist paused.";
 
                     case "unpause":
                         if (hasController)
-                            MasterAudio.UnpausePlaylist(controllerName);
+                            CallMA("UnpausePlaylist", controllerName!);
                         else
-                            MasterAudio.UnpausePlaylist();
+                            CallMA("UnpausePlaylist");
                         return $"OK: Playlist unpaused.";
 
                     case "mute":
                         if (hasController)
-                            MasterAudio.MutePlaylist(controllerName);
+                            CallMA("MutePlaylist", controllerName!);
                         else
-                            MasterAudio.MutePlaylist();
+                            CallMA("MutePlaylist");
                         return $"OK: Playlist muted.";
 
                     case "unmute":
                         if (hasController)
-                            MasterAudio.UnmutePlaylist(controllerName);
+                            CallMA("UnmutePlaylist", controllerName!);
                         else
-                            MasterAudio.UnmutePlaylist();
+                            CallMA("UnmutePlaylist");
                         return $"OK: Playlist unmuted.";
 
                     case "fade":
                         float targetVol = volume ?? 0f;
                         float fadeDur = fadeTime ?? 1f;
                         if (hasController)
-                            MasterAudio.FadePlaylistToVolume(controllerName, targetVol, fadeDur);
+                            CallMA("FadePlaylistToVolume", controllerName!, targetVol, fadeDur);
                         else
-                            MasterAudio.FadePlaylistToVolume(targetVol, fadeDur);
+                            CallMA("FadePlaylistToVolume", targetVol, fadeDur);
                         return $"OK: Playlist fading to {targetVol:F2} over {fadeDur:F2}s.";
 
                     case "change":
                         if (string.IsNullOrEmpty(playlistName))
                             throw new ArgumentException("playlistName required for 'change' action.", nameof(playlistName));
                         if (hasController)
-                            MasterAudio.ChangePlaylistByName(controllerName, playlistName);
+                            CallMA("ChangePlaylistByName", controllerName!, playlistName);
                         else
-                            MasterAudio.ChangePlaylistByName(playlistName);
+                            CallMA("ChangePlaylistByName", playlistName);
                         return $"OK: Playlist changed to '{playlistName}'.";
 
                     default:
@@ -132,4 +127,3 @@ controllerName is optional -- omit to use the first/default PlaylistController."
         }
     }
 }
-#endif

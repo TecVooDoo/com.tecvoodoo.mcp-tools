@@ -1,9 +1,9 @@
-#if HAS_DIALOGUE_SYSTEM
 #nullable enable
+using System;
 using System.ComponentModel;
+using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
-using PixelCrushers.DialogueSystem;
 using UnityEngine;
 
 namespace MCPTools.DialogueSystem.Editor
@@ -31,7 +31,7 @@ GameObjects by scene name, and an initial entry ID.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                if (!DialogueManager.hasInstance)
+                if (!HasDialogueManager())
                     return "ERROR: No DialogueManager instance found in the scene.";
 
                 string actionLower = action.ToLowerInvariant();
@@ -51,19 +51,19 @@ GameObjects by scene name, and an initial entry ID.")]
                         if (!string.IsNullOrEmpty(conversantName) && conversantTransform == null)
                             return $"ERROR: Conversant GameObject '{conversantName}' not found in scene.";
 
-                        DialogueManager.StartConversation(title, actorTransform, conversantTransform, entryID);
+                        CallStatic(DmType, "StartConversation", title, actorTransform!, conversantTransform!, entryID);
                         return $"Started conversation '{title}' (actor: {actorName ?? "(none)"}, conversant: {conversantName ?? "(none)"}, entryID: {entryID}).";
                     }
 
                     case "stop":
                     {
-                        DialogueManager.StopConversation();
+                        CallStatic(DmType, "StopConversation");
                         return "Stopped current conversation.";
                     }
 
                     case "stopall":
                     {
-                        DialogueManager.StopAllConversations();
+                        CallStatic(DmType, "StopAllConversations");
                         return "Stopped all active conversations.";
                     }
 
@@ -75,7 +75,8 @@ GameObjects by scene name, and an initial entry ID.")]
                         Transform? actorTransform = FindTransformByName(actorName);
                         Transform? conversantTransform = FindTransformByName(conversantName);
 
-                        bool hasValid = DialogueManager.ConversationHasValidEntry(title, actorTransform, conversantTransform);
+                        var result = CallStatic(DmType, "ConversationHasValidEntry", title, actorTransform!, conversantTransform!);
+                        bool hasValid = result is true;
                         return $"Conversation '{title}' has valid entry: {hasValid}";
                     }
 
@@ -86,4 +87,3 @@ GameObjects by scene name, and an initial entry ID.")]
         }
     }
 }
-#endif

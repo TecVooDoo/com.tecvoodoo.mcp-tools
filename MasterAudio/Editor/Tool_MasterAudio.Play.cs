@@ -1,4 +1,3 @@
-#if HAS_MASTERAUDIO
 #nullable enable
 using System;
 using System.ComponentModel;
@@ -6,7 +5,6 @@ using System.Globalization;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
-using DarkTonic.MasterAudio;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -36,8 +34,7 @@ Provide position as 'x,y,z' for 3D spatialized playback.")]
 
             return MainThread.Instance.Run(() =>
             {
-                if (MasterAudio.SafeInstance == null)
-                    throw new InvalidOperationException("MasterAudio instance not found in scene.");
+                EnsureInstance();
 
                 if (!string.IsNullOrEmpty(position))
                 {
@@ -50,8 +47,8 @@ Provide position as 'x,y,z' for 3D spatialized playback.")]
                     float z = float.Parse(parts[2].Trim(), CultureInfo.InvariantCulture);
                     Vector3 pos = new Vector3(x, y, z);
 
-                    bool played3D = MasterAudio.PlaySound3DAtVector3AndForget(
-                        groupName, pos, vol, pitch, del);
+                    object? result = CallMA("PlaySound3DAtVector3AndForget", groupName, pos, vol, pitch, del);
+                    bool played3D = result is bool b && b;
 
                     if (played3D)
                         return $"OK: Playing 3D sound '{groupName}' at ({x:F1},{y:F1},{z:F1}) vol={vol:F2} delay={del:F2}s";
@@ -60,8 +57,8 @@ Provide position as 'x,y,z' for 3D spatialized playback.")]
                 }
                 else
                 {
-                    bool played2D = MasterAudio.PlaySoundAndForget(
-                        groupName, vol, pitch, del);
+                    object? result = CallMA("PlaySoundAndForget", groupName, vol, pitch, del);
+                    bool played2D = result is bool b && b;
 
                     if (played2D)
                         return $"OK: Playing 2D sound '{groupName}' vol={vol:F2} delay={del:F2}s";
@@ -72,4 +69,3 @@ Provide position as 'x,y,z' for 3D spatialized playback.")]
         }
     }
 }
-#endif
