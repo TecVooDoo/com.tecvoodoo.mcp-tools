@@ -13,7 +13,7 @@
 
 ## Current State
 
-**~212 tools** across 47 asset groups. All compiling.
+**~219 tools** across 49 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -64,6 +64,8 @@
 | **Boing Kit** | **2** | `HAS_BOINGKIT` | None (`#if` only) | **New TVD2** |
 | **MudBun** | **3** | `HAS_MUDBUN` | None (`#if` only) | **New TVD2** |
 | **Lumen** | **2** | `HAS_LUMEN` | None (`#if` only) | **New TVD2** |
+| **Timeflow** | **4** | `HAS_TIMEFLOW` | None (`#if` only) | **New TVD2** |
+| **uLipSync** | **3** | `HAS_ULIPSYNC` | None (`#if` only) | **New M3 S2** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -95,6 +97,7 @@ All 33 groups built directly in the package folder. No separate source location.
 | UCC reflection | UCC tools use 100% reflection-based API access for resilience across versions. |
 | DOTween detect type | DefineManager detects `DOTweenAnimation, DOTweenPro` (Pro DLL), not core `DOTween.dll`. |
 | Agent API verification | Build agents must verify actual API signatures from source before writing code. Never assume from documentation knowledge or eval summaries. |
+| Texture Studio Render | `CompositeMap.CreateMapTexture` takes 4 params `(int, int, bool mipmaps, bool linear)`, not 2. **Fixed SD Session 5** -- added missing `false, false` args. |
 | Assets/Plugins/ assembly | Assets installed under `Assets/Plugins/` compile to `Assembly-CSharp-firstpass`, not `Assembly-CSharp`. `FindType` now has a fallback that searches ALL assemblies if the specified one misses. Fixed HOK Session 22 -- DS was in firstpass, define manager couldn't find it. |
 | Cross-version API drift | Shared package compiles in every project. Asset version differences between projects cause compile errors. MA v1.0.4 renamed `PauseGroup`->`PauseSoundGroup`, changed `PlaySoundAndForget` return from `PlaySoundResult`->`bool`. DS v2.2.68 changed `GetQuestDescription` second param from `string`->`QuestState` enum. Fixed HOK Session 22. |
 
@@ -147,7 +150,9 @@ All 33 groups built directly in the package folder. No separate source location.
 
 **Lumen (2 tools):** `HAS_LUMEN`, `#if` guard + reflection. `lumen-query` (report LumenEffectPlayer config: scale/brightness/color/range/profile/layers/update frequency/fading/init-deinit behaviors), `lumen-configure` (set all player properties + runtime fade methods: FadeBrightness/FadeScale/FadeColor). Detection: `DistantLands.Lumen.LumenEffectPlayer, DistantLands.Lumen.Runtime`. UPM package at `Packages/com.distantlands.lumen`.
 
-**Tool count:** 43 -> 47 groups, ~200 -> ~212 tools.
+**Timeflow (4 tools):** `HAS_TIMEFLOW`, `#if` guard + reflection. `timeflow-query` (timeline state, objects, behaviors), `timeflow-control` (Play/Stop/Pause/SetTime/Reverse with timeScale/loop), `timeflow-configure-tween` (interpolation, repeat, min/max vectors, amount, pingpong, triggers), `timeflow-configure-event` (trigger time, SendMessage target, function, parameter, limits). Detection: `AxonGenesis.Timeflow, Timeflow`. ENTRY-100 re-eval: Conditional -> Recommended.
+
+**Tool count:** 43 -> 49 groups, ~200 -> ~219 tools.
 
 ---
 

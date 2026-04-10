@@ -85,6 +85,9 @@ namespace MCPTools.Editor
             ("HAS_JUICY_ACTIONS",      "MagicPigGames.JuicyActions.ActionExecutor, MagicPigGames.JuicyActions.Runtime"),
             ("HAS_MUDBUN",             "MudBun.MudRenderer, MudBun"),
             ("HAS_LUMEN",              "DistantLands.Lumen.LumenEffectPlayer, DistantLands.Lumen.Runtime"),
+            ("HAS_TIMEFLOW",           "AxonGenesis.Timeflow, Timeflow"),
+            // M3AnimatedSeries additions
+            ("HAS_ULIPSYNC",           "uLipSync.uLipSync, uLipSync.Runtime"),
         };
 
         static MCPToolsDefineManager()

@@ -1763,4 +1763,154 @@ string ConfigureLumen(
 
 ---
 
+## uLipSync (3 tools)
+
+**Asset:** uLipSync 3.1.5 (hecomi) -- MFCC-based lip sync
+**Define:** `HAS_ULIPSYNC`
+**Detection:** `uLipSync.uLipSync, uLipSync.Runtime`
+**Namespace:** `MCPTools.uLipSync.Editor`
+**Compilation:** `#if HAS_ULIPSYNC` guards (no asmdef -- reflection-based)
+**Source:** `uLipSync/Editor/Tool_uLipSync*.cs`
+**Added:** M3AnimatedSeries Session 2, April 9, 2026
+
+### lipsync-query
+
+Reports all uLipSync components on a GameObject hierarchy and their configuration. Lists profile phonemes, blendshape mappings, baked data info. Can also list all Profile and BakedData assets in the project.
+
+```csharp
+string QueryLipSync(
+    string? gameObjectName = null,  // GO to inspect (searches hierarchy)
+    bool listAssets = false          // Also list Profile/BakedData assets
+)
+```
+
+**Returns:** Component details (analyzer profile, blendshape mappings with resolved names, baked data player config, timeline events, texture mappings) and optionally all available Profile/BakedData assets with paths and phoneme counts.
+
+---
+
+### lipsync-configure
+
+Configures uLipSync components on a GameObject. Sets Profile on the analyzer, configures blendshape mappings, and adjusts volume/smoothness parameters.
+
+```csharp
+string ConfigureLipSync(
+    string gameObjectName,
+    // Analyzer
+    string? profileName = null,          // Profile asset name
+    float? outputSoundGain = null,       // [0-1] Mute playback: 0
+    // BlendShape
+    string? phonemes = null,             // Comma-separated: "A,I,U,E,O,N,-"
+    string? blendShapeNames = null,      // Comma-separated blendshape names (must match phoneme count)
+    string? skinnedMeshRendererName = null, // SMR child name
+    float? minVolume = null,             // Log10, default -2.5
+    float? maxVolume = null,             // Log10, default -1.5
+    float? smoothness = null,            // [0-0.3], default 0.05
+    bool? usePhonemeBlend = null,        // Weighted blend vs winner-take-all
+    // BakedDataPlayer
+    float? playerVolume = null,          // [0-1]
+    float? timeOffset = null             // [-0.3 to 0.3] Positive = mouth opens earlier
+)
+```
+
+**Returns:** List of changes applied. Validates blendshape names against the SkinnedMeshRenderer mesh.
+
+---
+
+### lipsync-bake
+
+Bakes AudioClip(s) into uLipSync BakedData ScriptableObject assets using a calibrated Profile. Equivalent to Window > uLipSync > Baked Data Generator. Supports single clip or batch directory baking.
+
+```csharp
+string BakeLipSyncData(
+    string profileName,              // Calibrated Profile asset name
+    string? audioClipName = null,    // Single clip to bake (mutually exclusive with inputDirectory)
+    string? inputDirectory = null,   // Directory of AudioClips to batch-bake
+    string? outputDirectory = null   // Output dir (created if needed, default: same as input)
+)
+```
+
+**Returns:** Per-clip bake results with output paths and durations. Creates BakedData .asset files ready for uLipSyncBakedDataPlayer or Timeline tracks.
+
+---
+
+## Timeflow (Axon Genesis)
+
+**Files:** `Timeflow/Editor/Tool_Timeflow.cs`, `.Query.cs`, `.Control.cs`, `.ConfigureTween.cs`, `.ConfigureEvent.cs`
+**Define:** `HAS_TIMEFLOW`
+**Pattern:** `#if` guard + reflection (no asmdef)
+**Assembly:** `Timeflow`
+
+### timeflow-query -- Query Timeline
+
+Reports Timeflow state, TimeflowObjects, and behaviors in hierarchy.
+
+```csharp
+string QueryTimeflow(
+    string gameObjectName    // GameObject with Timeflow component
+)
+```
+
+**Returns:** CurrentTime, StartTime, EndTime, IsPlaying, loop, time scale, auto-play settings, Director sync state, child Timeflow count, per-object behavior list.
+
+### timeflow-control -- Playback Control
+
+Controls Timeflow playback. Works in edit mode and play mode.
+
+```csharp
+string ControlTimeflow(
+    string gameObjectName,           // GameObject with Timeflow
+    string action,                   // "Play", "PlayFromStart", "PlayReverse", "Stop", "Pause", "SetTime"
+    float? time = null,              // Target time for SetTime
+    float? timeScale = null,         // GlobalTimeScale multiplier
+    bool? loop = null                // Enable/disable looping
+)
+```
+
+**Returns:** Action performed + current state (time, playing).
+
+### timeflow-configure-tween -- Configure Tween
+
+Configures a Tween behavior on a GameObject. All params optional.
+
+```csharp
+string ConfigureTween(
+    string gameObjectName,                   // GameObject with Tween
+    string? interpolation = null,            // "EaseIn", "EaseOut", "EaseInOut", "Linear", etc.
+    string? repeatMode = null,               // "Forever", "Every", "None"
+    float? minValue = null, float? maxValue = null,  // Float range
+    float? minX = null, float? minY = null, float? minZ = null,  // Vector min
+    float? maxX = null, float? maxY = null, float? maxZ = null,  // Vector max
+    float? amount = null,                    // Strength multiplier
+    bool? pingPong = null,                   // Alternate direction
+    bool? invertInterpolation = null,
+    bool? allowTrigger = null,               // External trigger
+    bool? triggerIsToggle = null,
+    float? timeOffset = null,                // Time offset (seconds)
+    float? timeScale = null                  // Time scale multiplier
+)
+```
+
+**Returns:** List of changes applied.
+
+### timeflow-configure-event -- Configure Event
+
+Configures a TimeflowEvent trigger on a GameObject.
+
+```csharp
+string ConfigureEvent(
+    string gameObjectName,           // GameObject with TimeflowEvent
+    float? triggerTime = null,       // Time when event fires (seconds)
+    string? targetName = null,       // Target GO for SendMessage
+    string? function = null,         // Method name to call
+    string? parameter = null,        // String parameter
+    int? triggerLimit = null,        // Max triggers (0 = unlimited)
+    bool? lockTime = null,           // Lock time in editor
+    bool? logEnabled = null          // Console logging
+)
+```
+
+**Returns:** List of changes applied.
+
+---
+
 **End of Document**
