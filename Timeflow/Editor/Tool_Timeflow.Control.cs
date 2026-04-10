@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.ComponentModel;
+using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
