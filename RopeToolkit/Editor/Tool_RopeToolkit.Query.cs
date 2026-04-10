@@ -91,7 +91,7 @@ Returns simulation settings (stiffness, energyLoss, gravity, substeps), collisio
                 // RopeConnection components
                 if (RopeConnectionType != null)
                 {
-                    var ropeGo = (rope as Component)!.gameObject;
+                    var ropeGo = (rope as UnityEngine.Component)!.gameObject;
                     var connections = ropeGo.GetComponents(RopeConnectionType);
                     sb.AppendLine($"\n-- Connections ({connections.Length}) --");
                     foreach (var c in connections)

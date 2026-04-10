@@ -122,18 +122,18 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
                         && m.GetParameters().Length == 1
                         && m.GetParameters()[0].ParameterType == typeof(FindObjectsSortMode));
 
-                Component[] iks;
+                UnityEngine.Component[] iks;
                 if (findMethod != null)
                 {
                     var generic = findMethod.MakeGenericMethod(IKType);
                     var result = generic.Invoke(null, new object[] { FindObjectsSortMode.None });
-                    iks = ((Array)result!).Cast<Component>().ToArray();
+                    iks = ((Array)result!).Cast<UnityEngine.Component>().ToArray();
                 }
                 else
                 {
                     // Fallback for older Unity
 #pragma warning disable CS0618
-                    iks = UnityEngine.Object.FindObjectsOfType(IKType).Cast<Component>().ToArray();
+                    iks = UnityEngine.Object.FindObjectsOfType(IKType).Cast<UnityEngine.Component>().ToArray();
 #pragma warning restore CS0618
                 }
 

@@ -120,12 +120,12 @@ namespace TecVooDoo.MCPTools.Editor
         /// <summary>
         /// Find a specific ChuckMainInstance by GameObject name.
         /// </summary>
-        private static Component? FindInstance(string name)
+        private static UnityEngine.Component? FindInstance(string name)
         {
             var all = FindAllInstances();
             foreach (var obj in all)
             {
-                var comp = obj as Component;
+                var comp = obj as UnityEngine.Component;
                 if (comp != null && comp.gameObject.name == name)
                     return comp;
             }
