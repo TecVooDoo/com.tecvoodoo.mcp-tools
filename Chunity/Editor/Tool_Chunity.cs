@@ -148,7 +148,7 @@ Use the GameObject name as 'instanceName' in other chuck-* tools.")]
 
                 for (int i = 0; i < instances.Length; i++)
                 {
-                    var comp = (Component)instances.GetValue(i)!;
+                    UnityEngine.Component comp = (UnityEngine.Component)instances.GetValue(i)!;
                     sb.AppendLine($"  [{i}] \"{comp.gameObject.name}\"  Active: {comp.gameObject.activeInHierarchy}");
                 }
 
