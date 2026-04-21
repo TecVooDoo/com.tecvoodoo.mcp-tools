@@ -32,7 +32,7 @@ applyToMaterials: pushes the rendered texture to all linked materials (default t
                 int w = width ?? (int)(Get(map, "width") ?? 512);
                 int h = height ?? (int)(Get(map, "height") ?? 512);
 
-                Call(map, "CreateMapTexture", w, h);
+                Call(map, "CreateMapTexture", w, h, false, false);
                 Call(map, "UpdateTexture");
                 sb.AppendLine($"OK: CompositeMap '{assetName}' rendered at {w}x{h}.");
 

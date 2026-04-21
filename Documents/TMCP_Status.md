@@ -1,10 +1,10 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.7.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.9.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** April 9, 2026 (TecVooDoo Session 1)
+**Last Updated:** April 21, 2026 (TecVooDoo Session 3)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -13,7 +13,7 @@
 
 ## Current State
 
-**~219 tools** across 49 asset groups. All compiling.
+**~240 tools** across 54 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -66,6 +66,11 @@
 | **Lumen** | **2** | `HAS_LUMEN` | None (`#if` only) | **New TVD2** |
 | **Timeflow** | **4** | `HAS_TIMEFLOW` | None (`#if` only) | **New TVD2** |
 | **uLipSync** | **3** | `HAS_ULIPSYNC` | None (`#if` only) | **New M3 S2** |
+| **Technie Collider Creator 2** | **6** | `HAS_TCC` | `MCPTools.TCC.Editor` | **New TVD3** |
+| **MK Edge Detection** | **4** | `HAS_MK_EDGE` | `MCPTools.MKEdge.Editor` | **New TVD3** |
+| **Real Time Weather Pro** | **3** | `HAS_RTW` | `MCPTools.RTW.Editor` (reflection) | **New TVD3** |
+| **Ultimate Terrain** | **3** | `HAS_ULTIMATE_TERRAIN` | `MCPTools.UltimateTerrain.Editor` | **New TVD3** |
+| **PressE PRO 2** | **4** | `HAS_PRESSE` | `MCPTools.PressE.Editor` (reflection) | **New TVD3** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -118,6 +123,51 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 3 (Apr 21, 2026) -- 5 new tool groups (21 tools)
+
+**New tool groups:**
+
+- **Technie Collider Creator 2 (6 tools):** `HAS_TCC`, `MCPTools.TCC.Editor` (asmdef + direct refs to `TechniePhysicsCreator`/`TechniePhysicsCreatorEditor`).
+  - `tcc-create` -- attach RigidColliderCreator + generate PaintingData/HullData assets from MeshFilter
+  - `tcc-add-hull` -- add hull (Box/ConvexHull/Sphere/Face/FaceAsBox/Auto/Capsule), assign material, optional PaintAllFaces
+  - `tcc-generate` -- trigger GenerateColliders coroutine (VHACD for Auto hulls)
+  - `tcc-configure-vhacd` -- set autoHullPreset (Low/Medium/High/Placebo/Custom) + 12 VhacdParameters
+  - `tcc-bulk` -- SetAllTypes/Materials/AsChild/AsTrigger + maxPlanes
+  - `tcc-query` -- list hulls, generated children, VHACD config, IsGeneratingColliders status
+  - `tcc-delete-generated` -- DeleteGenerated() while preserving PaintingData
+
+- **MK Edge Detection (4 tools):** `HAS_MK_EDGE`, `MCPTools.MKEdge.Editor` (asmdef + direct refs to MK URP volume + renderer feature assemblies).
+  - `mkedge-query` -- read all 36 parameters + variant detection (Volume vs RendererFeature)
+  - `mkedge-configure` -- set any subset of 36 parameters; auto-detects target flavor; handles RangeProperty/MinMaxRangeProperty/ColorProperty/EnumProperty/BitmaskProperty wrappers
+  - `mkedge-preset` -- apply named presets (subtle-outline, comic, blueprint, sketch, ink-wash, souls-like, toon, noir)
+  - `mkedge-toggle` -- enable/disable Volume.active or RendererFeature.SetActive
+
+- **Real Time Weather Pro (3 tools):** `HAS_RTW`, `MCPTools.RTW.Editor` (asmdef + reflection — RTW is in Assembly-CSharp).
+  - `rtw-query` -- location, active weather/water systems, request modes, auto-update settings
+  - `rtw-configure` -- set lat/lon, weather/water systems, request modes, ActivateXSimulation/DeactivateXSimulation/DeactivateAllWeather/DeactivateAllWater
+  - `rtw-request` -- RequestWeatherByCityAndCountry / ByCityAndState / ByGeoCoordinates (coroutine kicked via StartCoroutine)
+
+- **Ultimate Terrain (3 tools):** `HAS_ULTIMATE_TERRAIN`, `MCPTools.UltimateTerrain.Editor` (asmdef + direct refs to `PG.UltimateTerrain`).
+  - `ut-query` -- list active instances or single, status, position/scale, module/layer counts, IsExecuting/IsPaused
+  - `ut-configure` -- set position, scale, duration, enableAnimation, delaySync, multiTerrainActive
+  - `ut-execute` -- trigger Execute/ExecuteInstant/ExecuteHeight/ExecuteTextures + Pause/Resume/Stop + Bake + Reset[Terrain|Height|Texture|Details|Trees|Prefabs]
+
+- **PressE PRO 2 (4 tools):** `HAS_PRESSE`, `MCPTools.PressE.Editor` (asmdef + reflection — PressE in Assembly-CSharp).
+  - `pe-query` -- list Interactable + Key components, InteractionManager singleton state
+  - `pe-configure-interactable` -- set interactMode, HasSensor, SensorRadius, UseConditions, OverrideInteractionKey, CanInteract, GrabId, maxInteractions
+  - `pe-configure-key` -- set KeyName, AddKeyWhenInteract, RemoveKeyWhenUsed, DisableObjectWhenInteract
+  - `pe-trigger` -- programmatically call Interactable.Interact() (mostly play mode)
+
+**Detection entries added (5):** `HAS_TCC`, `HAS_MK_EDGE`, `HAS_ULTIMATE_TERRAIN`, `HAS_PRESSE`, `HAS_RTW`.
+
+**Tool count:** 49 -> 54 groups, ~219 -> ~240 tools.
+
+**Pattern split this session:**
+- Direct refs (3 groups): TCC, MK Edge, Ultimate Terrain — assets ship asmdefs.
+- Reflection (2 groups): RTW, PressE — assets in Assembly-CSharp.
+
+---
 
 ### TecVooDoo Session 1 (Apr 9, 2026) -- 4 new tool groups + infrastructure fixes
 
