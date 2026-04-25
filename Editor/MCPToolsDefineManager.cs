@@ -89,11 +89,13 @@ namespace MCPTools.Editor
             // M3AnimatedSeries additions
             ("HAS_ULIPSYNC",           "uLipSync.uLipSync, uLipSync.Runtime"),
             // TecVooDoo Session 3 additions (Apr 21)
-            ("HAS_TCC",                "Technie.PhysicsCreator.Rigid.RigidColliderCreator, TechniePhysicsCreator"),
+            ("HAS_TCC",                "Technie.PhysicsCreator.RigidColliderCreator, TechniePhysicsCreator"),
             ("HAS_MK_EDGE",            "MK.EdgeDetection.UniversalVolumeComponents.MKEdgeDetection, MKEdgeDetectionUniversalVolumeComponent"),
             ("HAS_ULTIMATE_TERRAIN",   "PampelGames.UltimateTerrain.UltimateTerrain, PG.UltimateTerrain"),
             ("HAS_PRESSE",             "FastStudios.Interactable, Assembly-CSharp"),
             ("HAS_RTW",                "RealTimeWeather.Managers.RealTimeWeatherManager, Assembly-CSharp"),
+            // TecVooDoo Session 4 additions (Apr 25)
+            ("HAS_COZY",               "DistantLands.Cozy.CozyWeather, DistantLands.Cozy.Runtime"),
         };
 
         static MCPToolsDefineManager()

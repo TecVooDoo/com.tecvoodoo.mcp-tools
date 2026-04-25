@@ -1913,4 +1913,114 @@ string ConfigureEvent(
 
 ---
 
+## COZY 3 Stylized Weather (Distant Lands) (5 Tools)
+
+**Files:** `Cozy/Editor/Tool_Cozy.cs`, `.Query.cs`, `.SetWeather.cs`, `.SetTime.cs`, `.ConfigureModule.cs`, `.SetBiome.cs`
+**Define:** `HAS_COZY`
+**Pattern:** Asmdef + direct refs (`MCPTools.Cozy.Editor`)
+**Asset assembly:** `DistantLands.Cozy.Runtime`
+**Detection type:** `DistantLands.Cozy.CozyWeather, DistantLands.Cozy.Runtime`
+
+**Project requirements (one-time per project):**
+- `com.unity.modules.wind: 1.0.0` in `Packages/manifest.json` (Unity 2022.3+ made Wind optional; CozyWindModule needs it).
+- `COZY_URP` (or `COZY_HDRP`) in the active build target's scripting defines so Cozy's pipeline-gated paths take the correct branch.
+- Do NOT add `UNITY_POST_PROCESSING_STACK_V2` unless `com.unity.postprocessing` is actually installed -- VisualFX.cs assumes the package exists when the define is set.
+
+### cozy-query -- Query Weather Sphere
+
+Reports the runtime state of a CozyWeather sphere. If `gameObjectName` is omitted, queries `CozyWeather.instance` (first sphere in scene).
+
+```csharp
+string Query(
+    string? gameObjectName = null  // Optional. Omit to use CozyWeather.instance.
+)
+```
+
+**Returns:** sky/cloud/fog style, time-of-day + day/year, current WeatherProfile + active weighted profiles, forecast preview (up to 6), cloud snapshot (cumulus/cirrus/altocumulus/nimbus/fogDensity), climate (temp/precip/snow/groundwater + profile), wind (speed/changeSpeed/amount/gusting + override flags + knots), attached modules, registered systems count.
+
+### cozy-set-weather -- Set Weather Profile
+
+Switches the active WeatherProfile via `CozyEcosystem.SetWeather(prof, transitionTime)`. In play mode, kicks the transition coroutine (cross-fade). In edit mode, falls back to direct assignment + `RaiseOnWeatherChange` (no fade -- coroutines can't run).
+
+```csharp
+string SetWeather(
+    string? gameObjectName = null,
+    string? profile = null,         // WeatherProfile asset name OR full path
+    float? transitionTime = null,   // Override ecosystem.weatherTransitionTime
+    bool listProfiles = false       // List all WeatherProfile assets in project
+)
+```
+
+**Returns:** "OK: Weather coroutine started: 'X' -> 'Y' over Ns" (play mode) or "OK (edit mode): Weather set: ..." (edit mode), or a profile list when `listProfiles=true`.
+
+### cozy-set-time -- Set Time of Day
+
+Multiple mutually-exclusive ways to set time:
+- `hour + minute` (24h clock)
+- `dayPercentage` (0..1 where 0=midnight, 0.5=noon)
+- `skipHours` / `skipMinutes` (relative skip via `CozyTimeModule.SkipTime`, raises events)
+- `transitionToHour + transitionToMinute + transitionSeconds` (smooth play-mode transition via `TransitionTime`)
+
+```csharp
+string SetTime(
+    string? gameObjectName = null,
+    int? hour = null, int? minute = null,
+    float? dayPercentage = null,
+    float? skipHours = null, float? skipMinutes = null,
+    int? transitionToHour = null, int? transitionToMinute = null, float? transitionSeconds = null,
+    int? day = null, int? year = null,
+    bool? freezeTimeInEdit = null   // Toggles CozyWeather.FreezeUpdateInEditMode
+)
+```
+
+**Returns:** Per-change list + final time/day/year. Transition path requires play mode (warning otherwise).
+
+### cozy-configure-module -- Configure Module
+
+Lists, queries, adds, removes, resets, enables, disables, or sets fields on any `CozyModule` subclass.
+
+```csharp
+string ConfigureModule(
+    string action,             // 'list' | 'query' | 'add' | 'remove' | 'reset' | 'enable' | 'disable' | 'set'
+    string? gameObjectName = null,
+    string? moduleType = null, // Short name: 'Climate', 'Wind', 'Time', 'Atmosphere', 'Ambience', 'Weather',
+                               //             'Reflections', 'Satellite', 'Interactions', 'Event',
+                               //             'SaveLoad', 'Debug', 'Microsplat', 'PureNature', 'TVE', 'Buto',
+                               //             'Transit', 'SystemTime'
+                               // OR full type name like 'DistantLands.Cozy.CozyClimateModule'
+                               // OR any CozyModule subclass short name
+    string? fieldAssignments = null  // For action='set': comma-separated 'field=value' pairs
+)
+```
+
+`fieldAssignments` supports bool, int, float, string, enum (case-insensitive), Color (`#RRGGBB`), Vector2 (`x,y`), and Vector3 (`x,y,z`).
+
+Example: `'snowMeltSpeed=0.2,dryingSpeed=0.6,useWindzone=false'`
+
+**Returns:** action-specific report. `list` shows all CozyModule subclasses with attach state.
+
+### cozy-set-biome -- Configure Biome
+
+Lists, configures, isolates, or resets `CozyBiome` instances in the scene.
+
+```csharp
+string SetBiome(
+    string action,                  // 'list' | 'set' | 'isolate' | 'reset'
+    string? gameObjectName = null,  // Required for 'set' and 'isolate'
+    string? mode = null,            // 'Global' or 'Local'
+    string? transitionMode = null,  // 'Distance' or 'Time'
+    float? maxWeight = null,        // 0..1
+    float? transitionDistance = null,
+    float? transitionTime = null,
+    string? triggerObject = null    // Name of child GO with Collider (Local mode)
+)
+```
+
+- `isolate` sets the named biome's `maxWeight=1` and zeroes all other CozyBiomes -- handy for testing one biome in isolation.
+- `reset` restores all biomes to `maxWeight=1`.
+
+**Returns:** Per-action summary. `list` shows mode/transitionMode/maxWeight/weight/targetWeight per biome.
+
+---
+
 **End of Document**

@@ -1,10 +1,10 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.9.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.10.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** April 21, 2026 (TecVooDoo Session 3)
+**Last Updated:** April 25, 2026 (TecVooDoo Session 4 -- COZY 3 tool group)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -13,7 +13,7 @@
 
 ## Current State
 
-**~240 tools** across 54 asset groups. All compiling.
+**~245 tools** across 55 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -71,6 +71,7 @@
 | **Real Time Weather Pro** | **3** | `HAS_RTW` | `MCPTools.RTW.Editor` (reflection) | **New TVD3** |
 | **Ultimate Terrain** | **3** | `HAS_ULTIMATE_TERRAIN` | `MCPTools.UltimateTerrain.Editor` | **New TVD3** |
 | **PressE PRO 2** | **4** | `HAS_PRESSE` | `MCPTools.PressE.Editor` (reflection) | **New TVD3** |
+| **COZY 3 Stylized Weather** | **5** | `HAS_COZY` | `MCPTools.Cozy.Editor` | **New TVD4** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -124,6 +125,29 @@ All 33 groups built directly in the package folder. No separate source location.
 
 ## Session Log
 
+### TecVooDoo Session 4 (Apr 25, 2026) -- 1 new tool group (5 tools)
+
+**New tool group:**
+
+- **COZY 3 Stylized Weather (5 tools):** `HAS_COZY`, `MCPTools.Cozy.Editor` (asmdef + direct refs to `DistantLands.Cozy.Runtime`).
+  - `cozy-query` -- runtime snapshot of CozyWeather sphere: cloud/sky/fog style, time, weather profile, attached modules, climate/wind values, biome/system count
+  - `cozy-set-weather` -- swap the active WeatherProfile via `CozyEcosystem.SetWeather(prof, transitionTime)`. In edit mode falls back to direct assignment + `RaiseOnWeatherChange`. Includes `listProfiles` mode to enumerate available profiles.
+  - `cozy-set-time` -- set hour/minute, dayPercentage (0..1), or relative skip (`SkipTime`). Smooth play-mode transition via `TransitionTime`. Also sets day/year and toggles `FreezeUpdateInEditMode`.
+  - `cozy-configure-module` -- list / query / add / remove / reset / enable / disable / set fields on any `CozyModule` subclass (Climate, Wind, Time, Atmosphere, Ambience, Weather, Reflections, Satellite, Interactions, Event, SaveLoad, Debug, Microsplat, PureNature, TVE, Buto, Transit, SystemTime). Field assignment supports bool/int/float/string/enum/Color/Vector2/Vector3.
+  - `cozy-set-biome` -- list / set / isolate / reset CozyBiome instances. Mode (Global/Local), TransitionMode (Distance/Time), maxWeight, transitionDistance/Time, trigger collider. `isolate` zeroes other biomes for testing one in isolation.
+
+**Detection entry added:** `HAS_COZY` -> `DistantLands.Cozy.CozyWeather, DistantLands.Cozy.Runtime`.
+
+**Project setup applied (TecVooDoo this session):**
+- Added `com.unity.modules.wind: 1.0.0` to `Packages/manifest.json` -- resolves CozyWindModule's `UnityEngine.WindZone` reference (Unity 2022.3+ made Wind an optional module).
+- Added `COZY_URP` to Standalone scripting defines so Cozy's pipeline-gated `#if COZY_URP || COZY_HDRP` paths take the URP branch (matches the project's URP install).
+
+These two fixes mirror the Sandbox setup documented in ENTRY-337 of `Sandbox_AssetLog.md`.
+
+**Tool count:** 54 -> 55 groups, ~240 -> ~245 tools.
+
+---
+
 ### TecVooDoo Session 3 (Apr 21, 2026) -- 5 new tool groups (21 tools)
 
 **New tool groups:**
@@ -166,6 +190,8 @@ All 33 groups built directly in the package folder. No separate source location.
 **Pattern split this session:**
 - Direct refs (3 groups): TCC, MK Edge, Ultimate Terrain — assets ship asmdefs.
 - Reflection (2 groups): RTW, PressE — assets in Assembly-CSharp.
+
+**Bugfix (AQS verification, same day):** `HAS_TCC` was never firing when TCC was installed, so `MCPTools.TCC.Editor.asmdef` never compiled and no `tcc-*` tools registered. Detect-type string in `MCPToolsDefineManager.cs` pointed at `Technie.PhysicsCreator.Rigid.RigidColliderCreator` (based on folder layout), but the class is declared in namespace `Technie.PhysicsCreator` — the `Rigid` sub-namespace exists (e.g. `Hull`, `HullType`) but `RigidColliderCreator` itself is not in it. Fixed by changing the entry to `Technie.PhysicsCreator.RigidColliderCreator, TechniePhysicsCreator`. Lesson: folder structure is not namespace structure — verify the actual `namespace` declaration on the detect-type class when adding a new `HAS_*` entry.
 
 ---
 
