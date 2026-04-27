@@ -26,7 +26,7 @@ Requires Play mode (ORK runtime data is only initialized in play mode).")]
         {
             return MainThread.Instance.Run(() =>
             {
-                RequireORK();
+                RequireORKInitialized();
                 var sb = new StringBuilder();
 
                 if (string.IsNullOrEmpty(combatantName))

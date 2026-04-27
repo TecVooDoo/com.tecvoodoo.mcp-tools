@@ -33,7 +33,7 @@ Requires Play mode.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                RequireORK();
+                RequireORKInitialized();
                 action = (action ?? "").Trim().ToLowerInvariant();
 
                 object? inv;

@@ -168,6 +168,8 @@ All 33 groups built directly in the package folder. No separate source location.
 **Notes for ORK + CityGen3D builds:**
 - Both groups are reflection-heavy because their assets ship as DLLs. Tools degrade to clear error messages when method/field signatures differ rather than failing to compile.
 - The Unity APIUpdater raised `Error = 131` on Makinom and CityGen3D DLLs during initial import; once that resolved the asset types loaded correctly. If recurrence: right-click each affected DLL → enable "Override the API Updater" → reimport.
+- **ORK tools require Play mode.** ORK reads from `ORK.Instance.*` (combatants/items/quests/etc.), which is null until `ORK.Initialize(projectAsset)` runs. The TMCP tools call `RequireORKInitialized()` and return a clear message out of Play mode (instead of throwing a NullReferenceException). Open a scene with an `ORK Game Starter` component and enter Play mode before invoking ORK tools.
+- **CityGen3D tools work in edit mode.** `Map.Instance` returns null when no map is loaded; `cg-query-map` reports that gracefully. Use `cg-generate` to populate the map (after a Generator is in scene + configured).
 
 ---
 

@@ -2112,6 +2112,8 @@ string CreateControl(
 **Pattern:** Asmdef + reflection (`MCPTools.ORK.Editor`) — ORK ships as DLLs (`ORKFramework3.dll`, `ORKFramework3Editor.dll`, `Makinom2.dll`, `Makinom2Editor.dll`) under `Assets/Gaming Is Love/Makinom 2/DLL/` with `.pdb` symbols. Reflection avoids version-coupling on a tightly evolving SDK.
 **Detection type:** `GamingIsLove.ORKFramework.ORK, ORKFramework3`
 
+> **Play-mode required for all ORK tools.** ORK reads from `ORK.Instance.*` which is null until `ORK.Initialize(projectAsset)` runs (typically through an `ORK Game Starter` component when entering Play mode). Tools call `RequireORKInitialized()` at the top of every operation; out of Play mode they return `"ORK is not initialized..."` rather than throwing a NullReferenceException. Open a scene with the ORK Game Starter and enter Play mode before invoking these tools.
+
 ### ork-database-query -- Database Query
 
 Lists project DB definitions across `combatants | items | abilities | classes | quests | equipment | status` (or `all` for counts only). Optional name filter + limit.

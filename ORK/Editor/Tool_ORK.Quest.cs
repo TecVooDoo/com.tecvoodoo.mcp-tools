@@ -31,7 +31,7 @@ Requires Play mode for add/remove/has/status.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                RequireORK();
+                RequireORKInitialized();
                 action = (action ?? "").Trim().ToLowerInvariant();
 
                 if (action == "list")

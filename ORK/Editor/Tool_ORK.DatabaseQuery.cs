@@ -35,7 +35,7 @@ limit caps per-category list size (default 25).")]
         {
             return MainThread.Instance.Run(() =>
             {
-                RequireORK();
+                RequireORKInitialized();
                 var sb = new StringBuilder();
                 category = (category ?? "").Trim().ToLowerInvariant();
 

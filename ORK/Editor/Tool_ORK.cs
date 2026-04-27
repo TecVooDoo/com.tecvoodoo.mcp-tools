@@ -50,6 +50,29 @@ namespace MCPTools.ORK.Editor
                 throw new Exception("GamingIsLove.ORKFramework.ORK type not found. Is ORK Framework installed?");
         }
 
+        /// <summary>
+        /// True when ORK has been initialized with a project asset (ORK.Initialize). Settings/handler
+        /// access throws a NullReferenceException when this is false because ORK.Instance.* fields are null.
+        /// </summary>
+        static bool ORKInitialized()
+        {
+            if (ORKType == null) return false;
+            try
+            {
+                var prop = ORKType.GetProperty("Initialized", BindingFlags.Public | BindingFlags.Static);
+                if (prop != null) return prop.GetValue(null) is bool b && b;
+            }
+            catch { /* fall through */ }
+            return false;
+        }
+
+        static void RequireORKInitialized()
+        {
+            RequireORK();
+            if (!ORKInitialized())
+                throw new Exception("ORK is not initialized. ORK reads settings from ORK.Instance.* which is only populated after ORK.Initialize(projectAsset) has run -- typically in a Play-mode game start. Open a scene with an ORK Game Starter and enter Play mode before calling this tool.");
+        }
+
         static object? GetStatic(Type type, string memberName)
         {
             var prop = type.GetProperty(memberName, BindingFlags.Public | BindingFlags.Static);

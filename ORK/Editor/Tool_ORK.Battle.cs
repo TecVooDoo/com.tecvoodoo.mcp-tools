@@ -25,7 +25,7 @@ Requires Play mode + an active battle for end/flee.")]
         {
             return MainThread.Instance.Run(() =>
             {
-                RequireORK();
+                RequireORKInitialized();
                 action = (action ?? "query").Trim().ToLowerInvariant();
                 var battle = BattleHandler();
 
