@@ -1,10 +1,10 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.10.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.12.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** April 25, 2026 (TecVooDoo Session 4 -- COZY 3 tool group)
+**Last Updated:** April 27, 2026 (TecVooDoo Session 5 -- M3DText + ORK Framework + CityGen3D tool groups)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -13,7 +13,7 @@
 
 ## Current State
 
-**~245 tools** across 55 asset groups. All compiling.
+**~264 tools** across 58 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -72,6 +72,9 @@
 | **Ultimate Terrain** | **3** | `HAS_ULTIMATE_TERRAIN` | `MCPTools.UltimateTerrain.Editor` | **New TVD3** |
 | **PressE PRO 2** | **4** | `HAS_PRESSE` | `MCPTools.PressE.Editor` (reflection) | **New TVD3** |
 | **COZY 3 Stylized Weather** | **5** | `HAS_COZY` | `MCPTools.Cozy.Editor` | **New TVD4** |
+| **Modular 3D Text** | **6** | `HAS_M3DT` | `MCPTools.M3DText.Editor` (reflection) | **New TVD5** |
+| **ORK Framework + Makinom** | **7** | `HAS_ORK` | `MCPTools.ORK.Editor` (reflection) | **New TVD5** |
+| **CityGen3D** | **6** | `HAS_CITYGEN3D` | `MCPTools.CityGen3D.Editor` (reflection) | **New TVD5** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -124,6 +127,49 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 5 (Apr 27, 2026) -- 3 new tool groups (19 tools)
+
+**New tool groups:**
+
+- **Modular 3D Text (6 tools):** `HAS_M3DT`, `MCPTools.M3DText.Editor` (asmdef + reflection — TGS scripts compile into `Assembly-CSharp-firstpass` because they live under `Assets/Plugins/Tiny Giant Studio/`).
+  - `m3dt-query` -- list scene-level Modular3DText components or full config snapshot for one (text, font, material, FontSize, WordSpacing, Capitalize/LowerCase/AutoLetterSize, modules, characterObjectList count, autoFontSize, etc.)
+  - `m3dt-set-text` -- assign `Text` (triggers end-of-frame mesh rebuild). `forceUpdate` clears `oldText` for full character recreate.
+  - `m3dt-configure` -- font / material / FontSize (Vector3 components) / WordSpacing / Capitalize / LowerCase / AutoLetterSize / autoFontSize + min/max / module flags / combineMesh flags / hideLetters flags
+  - `m3dt-add-module` -- list / list-attached / add / clear; adds a Module asset to the addingModules or deletingModules list (constructs a ModuleContainer and calls UpdateVariableHolders())
+  - `m3dt-find-fonts` -- enumerate `TinyGiantStudio.Text.Font` assets in project (with optional name filter)
+  - `m3dt-create-control` -- create new GameObject with Modular3DText (and optionally Button/Slider/InputField/Toggle/HorizontalSelector/List), attach under parent, set initial text + font + material
+
+**Detection entry added:** `HAS_M3DT` -> `TinyGiantStudio.Text.Modular3DText, Assembly-CSharp-firstpass`.
+
+- **ORK Framework + Makinom (7 tools):** `HAS_ORK`, `MCPTools.ORK.Editor` (asmdef + reflection — ORK ships as DLLs under `Assets/Gaming Is Love/Makinom 2/DLL/` with `.pdb` symbols).
+  - `ork-database-query` -- list combatants / items / abilities / classes / quests / equipment / status from project DB with filter + limit
+  - `ork-query-combatant` -- list active group, or report deep status for a named combatant (level, class, all StatusValue base/current/max, inventory + equipment count). Play mode required.
+  - `ork-modify-combatant` -- set/add a StatusValue (HP/MP/etc.), set Level, heal-to-max, revive, fire-changed
+  - `ork-inventory` -- list / add / remove / count items in a combatant or group inventory
+  - `ork-quest` -- list / add / remove / has / status on quests via `QuestHandler.AddQuest/RemoveQuest/GetQuest`
+  - `ork-battle` -- query / end / flee the current battle (Battle handler)
+  - `ork-schematic-run` -- list / run / stop a `MakinomSchematicAsset` via `Maki.MachineHandler`
+
+**Detection entry added:** `HAS_ORK` -> `GamingIsLove.ORKFramework.ORK, ORKFramework3`.
+
+- **CityGen3D (6 tools):** `HAS_CITYGEN3D`, `MCPTools.CityGen3D.Editor` (asmdef + reflection — CityGen3D ships as `CityGen3D.dll` + `CityGen3D.EditorExtension.dll` with `.pdb` symbols under `Assets/CityGen3D/Plugins/`).
+  - `cg-query-map` -- `Map.Instance` snapshot: roads / buildings / features / surfaces / trees / entities counts, origin coord, scene Generator presence
+  - `cg-find-road-at` -- `mapRoads.GetMapRoadAtWorldPosition(x,z,radius)` (mode='at') or `mapRoads.GetNearestRoad(Vector2, ref Vector3)` (mode='nearest')
+  - `cg-find-feature-at` -- enumerate buildings / surfaces / features / entities / trees within radius via best-effort position introspection
+  - `cg-add-blueprint` -- list project Blueprint prefabs or attach a named Blueprint to the active Generator's `blueprints` list
+  - `cg-generator-configure` -- list every public field on the Generator with current value, or apply `field=value` assignments (bool/int/float/string/enum)
+  - `cg-generate` -- trigger Generate / Clear / Cancel on the active Generator (best-effort method-name match)
+
+**Detection entry added:** `HAS_CITYGEN3D` -> `CityGen3D.Map, CityGen3D`.
+
+**Tool count:** 55 -> 58 groups, ~245 -> ~264 tools.
+
+**Notes for ORK + CityGen3D builds:**
+- Both groups are reflection-heavy because their assets ship as DLLs. Tools degrade to clear error messages when method/field signatures differ rather than failing to compile.
+- The Unity APIUpdater raised `Error = 131` on Makinom and CityGen3D DLLs during initial import; once that resolved the asset types loaded correctly. If recurrence: right-click each affected DLL → enable "Override the API Updater" → reimport.
+
+---
 
 ### TecVooDoo Session 4 (Apr 25, 2026) -- 1 new tool group (5 tools)
 

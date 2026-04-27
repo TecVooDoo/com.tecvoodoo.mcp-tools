@@ -2023,4 +2023,208 @@ string SetBiome(
 
 ---
 
+## Modular 3D Text (Tiny Giant Studio) (6 Tools)
+
+**Files:** `M3DText/Editor/Tool_M3DText.cs`, `.Query.cs`, `.SetText.cs`, `.Configure.cs`, `.AddModule.cs`, `.FindFonts.cs`, `.CreateControl.cs`
+**Define:** `HAS_M3DT`
+**Pattern:** Asmdef + reflection (`MCPTools.M3DText.Editor`) — Modular 3D Text scripts compile into `Assembly-CSharp-firstpass` because they ship under `Assets/Plugins/Tiny Giant Studio/`, so the asmdef cannot reference them by name.
+**Detection type:** `TinyGiantStudio.Text.Modular3DText, Assembly-CSharp-firstpass`
+
+### m3dt-query -- Query Modular 3D Text Components
+
+Reports Modular3DText components in the active scene. With `gameObjectName` returns full config (text, font, material, FontSize, modules, etc.). Without it lists every Modular3DText with text/font/size summary.
+
+```csharp
+string Query(string? gameObjectName = null)
+```
+
+### m3dt-set-text -- Set Text
+
+Sets `Text` on a Modular3DText (mesh updates batched per frame). `forceUpdate=true` clears `oldText` and recreates every character.
+
+```csharp
+string SetText(string gameObjectName, string text, bool forceUpdate = false)
+```
+
+### m3dt-configure -- Configure Common Properties
+
+Sets font, material, FontSize (per-component), WordSpacing, Capitalize / LowerCase / AutoLetterSize, autoFontSize + min/max, module-system flags, combine-mesh flags, hide-letters flags. All parameters optional — only provided values are applied.
+
+```csharp
+string Configure(
+    string gameObjectName,
+    string? font = null, string? material = null,
+    float? fontSize = null, float? fontSizeY = null, float? fontSizeZ = null,
+    float? wordSpacing = null,
+    bool? capitalize = null, bool? lowerCase = null, bool? autoLetterSize = null,
+    bool? autoFontSize = null, float? minSize = null, float? maxSize = null,
+    bool? useModules = null, bool? applyModulesOnStart = null,
+    bool? applyModulesOnEnable = null, bool? applyModuleOnNewCharacter = null,
+    bool? combineMeshInEditor = null, bool? combineMeshDuringRuntime = null,
+    bool? hideLettersInPlayMode = null, bool? hideLettersInEditMode = null
+)
+```
+
+### m3dt-add-module -- Add or List Module
+
+Adds a `TinyGiantStudio.Modules.Module` asset to a text component's adding-effects or deleting-effects list. Constructs a `ModuleContainer` and calls `UpdateVariableHolders()` so default variable holders are populated.
+
+```csharp
+string AddModule(
+    string action,                  // 'list' | 'list-attached' | 'add' | 'clear'
+    string? gameObjectName = null,
+    string? moduleName = null,
+    string list = "adding"          // 'adding' or 'deleting'
+)
+```
+
+### m3dt-find-fonts -- Find Font Assets
+
+Lists `TinyGiantStudio.Text.Font` ScriptableObject assets in the project. Optional `filter` substring narrows by filename.
+
+```csharp
+string FindFonts(string? filter = null)
+```
+
+### m3dt-create-control -- Create UI Control
+
+Creates a new GameObject with Modular3DText and (optionally) one of the bundled UI control components attached. Sets initial text / font / material on the underlying Modular3DText. Useful for kit-building chapter cards, shop signs, dialog framing, etc.
+
+```csharp
+string CreateControl(
+    string controlType,             // Text | Button | Slider | InputField | Toggle | HorizontalSelector | List
+    string? gameObjectName = null,
+    string? parentName = null,
+    string? initialText = null,
+    string? font = null,
+    string? material = null
+)
+```
+
+**Returns:** Created GameObject name + components attached.
+
+---
+
+## ORK Framework + Makinom (Gaming Is Love) (7 Tools)
+
+**Files:** `ORK/Editor/Tool_ORK.cs`, `.DatabaseQuery.cs`, `.QueryCombatant.cs`, `.ModifyCombatant.cs`, `.Inventory.cs`, `.Quest.cs`, `.Battle.cs`, `.SchematicRun.cs`
+**Define:** `HAS_ORK`
+**Pattern:** Asmdef + reflection (`MCPTools.ORK.Editor`) — ORK ships as DLLs (`ORKFramework3.dll`, `ORKFramework3Editor.dll`, `Makinom2.dll`, `Makinom2Editor.dll`) under `Assets/Gaming Is Love/Makinom 2/DLL/` with `.pdb` symbols. Reflection avoids version-coupling on a tightly evolving SDK.
+**Detection type:** `GamingIsLove.ORKFramework.ORK, ORKFramework3`
+
+### ork-database-query -- Database Query
+
+Lists project DB definitions across `combatants | items | abilities | classes | quests | equipment | status` (or `all` for counts only). Optional name filter + limit.
+
+```csharp
+string DatabaseQuery(string category, string? filter = null, int limit = 25)
+```
+
+### ork-query-combatant -- Query Combatant
+
+Lists active group combatants or returns deep state for a named combatant (level, class, all StatusValues, inventory + equipment count). Play mode required.
+
+```csharp
+string QueryCombatant(string? combatantName = null)
+```
+
+### ork-modify-combatant -- Modify Combatant
+
+`set-status` / `add-status` (StatusValue base value), `set-level`, `heal` (set status to display max), `revive`, `fire-changed`. Play mode required.
+
+```csharp
+string ModifyCombatant(string action, string combatantName, string? statusName = null, int? value = null)
+```
+
+### ork-inventory -- Inventory
+
+`list | add | remove | count` items on a combatant or active group inventory. Item names resolve through `ORK.Items` DB.
+
+```csharp
+string Inventory(string action, string? itemName = null, string? combatantName = null, int quantity = 1)
+```
+
+### ork-quest -- Quest
+
+`list | add | remove | has | status`. Wraps `ORK.Game.Quests.AddQuest / RemoveQuest / HasQuest / GetQuest`. Play mode required for player-log actions.
+
+```csharp
+string Quest(string action, string? questName = null, bool ignoreRequirements = false)
+```
+
+### ork-battle -- Battle State
+
+`query | end | flee` on the current `ORK.Battle`.
+
+```csharp
+string Battle(string action = "query")
+```
+
+### ork-schematic-run -- Schematic Run
+
+`list | run | stop` a `MakinomSchematicAsset`. Lists all schematics in the project, or invokes `Maki.MachineHandler` to run/stop a named asset. Play mode required for run/stop.
+
+```csharp
+string SchematicRun(string action, string? schematicName = null)
+```
+
+---
+
+## CityGen3D (Citygen Technologies) (6 Tools)
+
+**Files:** `CityGen3D/Editor/Tool_CityGen3D.cs`, `.QueryMap.cs`, `.FindRoad.cs`, `.FindFeature.cs`, `.AddBlueprint.cs`, `.GeneratorConfigure.cs`, `.Generate.cs`
+**Define:** `HAS_CITYGEN3D`
+**Pattern:** Asmdef + reflection (`MCPTools.CityGen3D.Editor`) — CityGen3D ships as `CityGen3D.dll` (runtime) + `CityGen3D.EditorExtension.dll` (editor) with `.pdb` symbols under `Assets/CityGen3D/Plugins/`. The user-facing scripts (`RoadInfo.cs`, `ShowNearestRoad.cs`, `CreateBuilding.cs`) confirm public type names.
+**Detection type:** `CityGen3D.Map, CityGen3D`
+
+### cg-query-map -- Query Map
+
+Reports `Map.Instance` state: counts of roads / buildings / features / surfaces / trees / entities, origin coord, and the active Generator GameObject if present.
+
+```csharp
+string QueryMap()
+```
+
+### cg-find-road-at -- Find Road At Position
+
+Mode `at` calls `mapRoads.GetMapRoadAtWorldPosition(x, z, radius)`; mode `nearest` calls `mapRoads.GetNearestRoad(Vector2, ref Vector3)` and reports the closest world position.
+
+```csharp
+string FindRoadAt(float x, float z, string mode = "at", float radius = 5f)
+```
+
+### cg-find-feature-at -- Find Feature At Position
+
+Enumerates `buildings | surfaces | features | entities | trees` within `radius` of `(x, z)`, returning up to `maxResults` ranked by distance.
+
+```csharp
+string FindFeatureAt(float x, float z, string category, float radius = 50f, int maxResults = 5)
+```
+
+### cg-add-blueprint -- Add Blueprint
+
+`list` enumerates project Blueprint prefabs (under `Assets/CityGen3D/Blueprints/`); `add` attaches a named Blueprint component to the active Generator's `blueprints` list.
+
+```csharp
+string AddBlueprint(string action, string? blueprintName = null)
+```
+
+### cg-generator-configure -- Generator Configure
+
+`list` dumps every public field on the Generator with current value (great for discovering field names per CityGen3D version); `set` applies `field=value` assignments. Supports bool / int / float / string / enum.
+
+```csharp
+string GeneratorConfigure(string action, string? fieldAssignments = null)
+```
+
+### cg-generate -- Generate
+
+Triggers `generate | clear | cancel` on the active Generator. Method names are best-effort matched (`Generate / GenerateMap / GenerateAll` for generate; `Clear / ClearMap / Reset` for clear; `Cancel / Stop / Abort` for cancel).
+
+```csharp
+string Generate(string action = "generate")
+```
+
+---
+
 **End of Document**

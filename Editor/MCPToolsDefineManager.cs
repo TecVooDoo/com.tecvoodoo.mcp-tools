@@ -96,6 +96,10 @@ namespace MCPTools.Editor
             ("HAS_RTW",                "RealTimeWeather.Managers.RealTimeWeatherManager, Assembly-CSharp"),
             // TecVooDoo Session 4 additions (Apr 25)
             ("HAS_COZY",               "DistantLands.Cozy.CozyWeather, DistantLands.Cozy.Runtime"),
+            // TecVooDoo Session 5 additions (Apr 27)
+            ("HAS_M3DT",               "TinyGiantStudio.Text.Modular3DText, Assembly-CSharp-firstpass"),
+            ("HAS_ORK",                "GamingIsLove.ORKFramework.ORK, ORKFramework3"),
+            ("HAS_CITYGEN3D",          "CityGen3D.Map, CityGen3D"),
         };
 
         static MCPToolsDefineManager()
