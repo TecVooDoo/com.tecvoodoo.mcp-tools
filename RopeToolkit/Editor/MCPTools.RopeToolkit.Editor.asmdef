@@ -1,4 +1,4 @@
-{
+﻿{
     "name": "MCPTools.RopeToolkit.Editor",
     "rootNamespace": "",
     "references": ["com.IvanMurzak.Unity.MCP.Editor", "com.IvanMurzak.Unity.MCP.Runtime"],
@@ -6,7 +6,7 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": ["McpPlugin.dll", "McpPlugin.Common.dll", "ReflectorNet.dll"],
+    "precompiledReferences": ["McpPlugin.6.2.1.dll", "McpPlugin.Common.6.2.1.dll", "ReflectorNet.5.1.1.dll"],
     "autoReferenced": true,
     "defineConstraints": ["HAS_ROPE_TOOLKIT"],
     "versionDefines": [],

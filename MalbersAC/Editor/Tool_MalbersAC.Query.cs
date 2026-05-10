@@ -6,7 +6,11 @@ using System.Text;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using com.IvanMurzak.Unity.MCP.Editor.Utils;
+#if MCP_HAS_AIGD
+using AIGD;
+#else
 using com.IvanMurzak.Unity.MCP.Runtime.Data;
+#endif
 using com.IvanMurzak.Unity.MCP.Runtime.Extensions;
 using MalbersAnimations.Controller;
 using UnityEngine;

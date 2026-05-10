@@ -1,4 +1,4 @@
-{
+﻿{
     "name": "MCPTools.RayFire.Editor",
     "rootNamespace": "",
     "references": [
@@ -13,14 +13,14 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "McpPlugin.dll",
-        "McpPlugin.Common.dll",
-        "ReflectorNet.dll"
+        "McpPlugin.6.2.1.dll",
+        "McpPlugin.Common.6.2.1.dll",
+        "ReflectorNet.5.1.1.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [
         "HAS_RAYFIRE"
     ],
-    "versionDefines": [],
+    "versionDefines": [ { "name": "com.ivanmurzak.unity.mcp", "expression": "0.69.0", "define": "MCP_HAS_AIGD" } ],
     "noEngineReferences": false
 }

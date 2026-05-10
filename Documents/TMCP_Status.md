@@ -4,7 +4,8 @@
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**Last Updated:** April 27, 2026 (TecVooDoo Session 5 -- M3DText + ORK Framework + CityGen3D tool groups)
+**MCP Compatibility:** **Compatible with `com.ivanmurzak.unity.mcp` 0.69.0+ (incl. 0.71.0).** asmdefs reference versioned NuGet DLLs (`McpPlugin.6.2.1.dll`, `McpPlugin.Common.6.2.1.dll`, `ReflectorNet.5.1.1.dll`) per the convention shipped from MCP 0.69.0 onward. **Projects on MCP 0.66.1 must upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
+**Last Updated:** May 10, 2026 (TecVooDoo session -- MCP 0.71.0 / 6.2.1 / 5.1.1 versioned-DLL refs + May 4 MCP_HAS_AIGD versionDefine catch-up)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -127,6 +128,27 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 6 (May 10, 2026) -- MCP cross-version compatibility cleanup
+
+Catch-up commit covering uncommitted prior-session work + today's MCP 0.71.0 fix. No new tool groups.
+
+**Today's work (MCP 0.71.0 / NuGet 6.2.1 / 5.1.1):**
+- All **46 tool-group asmdefs** updated to reference versioned NuGet DLL filenames (`McpPlugin.6.2.1.dll`, `McpPlugin.Common.6.2.1.dll`, `ReflectorNet.5.1.1.dll`) matching MCP 0.69.0+ flat-file convention. Pre-fix, only `UnityEntities` and `UnityPhysics` errored visibly because their `HAS_*` defines fire by default; the other 44 were silently broken behind unmet defines.
+- Verified clean compile + ~140 tools registered in TecVooDoo (MCP 0.71.0).
+- 8 PlayMode test failures observed in `MagicPigGames.JuicyActions.*` — third-party defects, not caused by Unity bump or this fix; details in `Documents/TVD_Status.md` Known Issues.
+
+**May 4 catch-up (MCP_HAS_AIGD versionDefine for namespace move at MCP 0.69.0):**
+- 6 asmdefs (FinalIK, Flexalon, MagicaCloth2, MalbersAC, PrefabWorldBuilder, RayFire) declare `versionDefines: { "name": "com.ivanmurzak.unity.mcp", "expression": "0.69.0", "define": "MCP_HAS_AIGD" }`.
+- 23 .cs files wrap the `Data` namespace import in `#if MCP_HAS_AIGD using AIGD; #else using com.IvanMurzak.Unity.MCP.Runtime.Data; #endif` to keep both 0.66.x and 0.69.0+ projects compiling.
+
+**Other housekeeping:**
+- AssetInventory tool group **removed** (10 files deleted): no longer carried in TMCP.
+- ORK + CityGen3D `.meta` files that were untracked from Session 5's tool-group additions are now committed.
+
+**Cross-version status:** TMCP source now expects MCP 0.69.0+. Projects on MCP 0.66.1 must run the per-project upgrade recipe before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md).
+
+**Open hardening item:** migrate the 46 asmdef `precompiledReferences` from filename-based to GUID-based, so future MCP version bumps don't require touching TMCP source.
 
 ### TecVooDoo Session 5 (Apr 27, 2026) -- 3 new tool groups (19 tools)
 

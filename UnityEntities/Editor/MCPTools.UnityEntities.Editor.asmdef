@@ -1,4 +1,4 @@
-{
+﻿{
     "name": "MCPTools.UnityEntities.Editor",
     "rootNamespace": "MCPTools.UnityEntities.Editor",
     "references": [
@@ -14,9 +14,9 @@
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-        "McpPlugin.dll",
-        "McpPlugin.Common.dll",
-        "ReflectorNet.dll"
+        "McpPlugin.6.2.1.dll",
+        "McpPlugin.Common.6.2.1.dll",
+        "ReflectorNet.5.1.1.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

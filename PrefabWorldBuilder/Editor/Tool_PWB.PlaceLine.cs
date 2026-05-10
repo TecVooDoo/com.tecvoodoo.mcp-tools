@@ -5,7 +5,11 @@ using System.ComponentModel;
 using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
+#if MCP_HAS_AIGD
+using AIGD;
+#else
 using com.IvanMurzak.Unity.MCP.Runtime.Data;
+#endif
 using com.IvanMurzak.Unity.MCP.Runtime.Extensions;
 using UnityEditor;
 using UnityEngine;
