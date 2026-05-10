@@ -6,7 +6,14 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": ["McpPlugin.6.2.1.dll", "McpPlugin.Common.6.2.1.dll", "ReflectorNet.5.1.1.dll"],
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.6.2.1.dll",
+        "McpPlugin.Common.dll",
+        "McpPlugin.Common.6.2.1.dll",
+        "ReflectorNet.dll",
+        "ReflectorNet.5.1.1.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": ["HAS_ROPE_TOOLKIT"],
     "versionDefines": [],

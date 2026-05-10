@@ -14,10 +14,12 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "McpPlugin.dll",
         "McpPlugin.6.2.1.dll",
+        "McpPlugin.Common.dll",
         "McpPlugin.Common.6.2.1.dll",
-        "ReflectorNet.5.1.1.dll",
-        "Naninovel.Common.dll"
+        "ReflectorNet.dll",
+        "ReflectorNet.5.1.1.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [

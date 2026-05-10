@@ -4,8 +4,8 @@
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
-**MCP Compatibility:** **Compatible with `com.ivanmurzak.unity.mcp` 0.69.0+ (incl. 0.71.0).** asmdefs reference versioned NuGet DLLs (`McpPlugin.6.2.1.dll`, `McpPlugin.Common.6.2.1.dll`, `ReflectorNet.5.1.1.dll`) per the convention shipped from MCP 0.69.0 onward. **Projects on MCP 0.66.1 must upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** May 10, 2026 (TecVooDoo session -- MCP 0.71.0 / 6.2.1 / 5.1.1 versioned-DLL refs + May 4 MCP_HAS_AIGD versionDefine catch-up)
+**MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
+**Last Updated:** May 10, 2026 (TecVooDoo Session 7 -- self-syncing asmdef refs for future MCP versions)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -128,6 +128,26 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 7 (May 10, 2026) -- Self-syncing asmdef refs
+
+Follow-on the same day. MCP 0.72.0 dropped mid-recovery and reverted to **unversioned** DLL filenames (`McpPlugin.dll`, `McpPlugin.Common.dll`, `ReflectorNet.dll`) flat at the top of `Assets/Plugins/NuGet/` — opposite of 0.71.0's versioned-filename convention. Blood Miner hit `CS0246` errors after upgrading because the asmdefs from Session 6 only listed the 0.71.0 versioned filenames.
+
+User feedback: "MCP releases drop almost every other day. I don't plan to go backwards in version, but it does need to handle upgraded future MCP versions."
+
+**Fix shipped this session:**
+
+1. **Static dual-filename fallback** in all 46 tool-group asmdefs: `precompiledReferences` now lists both unversioned and 0.71.0 versioned filenames for `McpPlugin`, `McpPlugin.Common`, `ReflectorNet`. Unity links whichever file exists and ignores the missing one. Covers MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 cleanly.
+
+2. **`Editor/MCPToolsAsmdefSync.cs`** -- new `[InitializeOnLoad]` editor script. On every domain reload it:
+   - Scans `Assets/Plugins/NuGet/` for `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames.
+   - Rewrites each tool-group asmdef's `precompiledReferences` to match the discovered filenames (preserving any non-managed entries).
+   - No-ops if already in sync (no infinite recompile loop).
+   - Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**.
+
+   This makes the asmdefs a function of the project's current NuGet folder rather than a hard-coded list. Future MCP version bumps that change DLL filenames self-heal on first compile, no TMCP source edit required.
+
+**Trade-off accepted:** the auto-sync writes to TMCP's own asmdefs at runtime. Fine for the file-ref'd dev environment (and read-only registry installs would just no-op since the script can't write to read-only files — Unity logs a warning, project still compiles via the static fallback list).
 
 ### TecVooDoo Session 6 (May 10, 2026) -- MCP cross-version compatibility cleanup
 
