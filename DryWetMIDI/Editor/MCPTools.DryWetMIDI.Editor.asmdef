@@ -1,4 +1,4 @@
-﻿{
+{
     "name": "MCPTools.DryWetMIDI.Editor",
     "rootNamespace": "",
     "references": [
@@ -13,11 +13,9 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "McpPlugin.dll",
-        "McpPlugin.6.2.1.dll",
         "McpPlugin.Common.dll",
-        "McpPlugin.Common.6.2.1.dll",
         "ReflectorNet.dll",
-        "ReflectorNet.5.1.1.dll"
+        "Melanchall.DryWetMidi.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [

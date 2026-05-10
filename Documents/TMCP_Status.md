@@ -5,7 +5,7 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** May 10, 2026 (TecVooDoo Session 7 -- self-syncing asmdef refs for future MCP versions)
+**Last Updated:** May 10, 2026 (TecVooDoo Session 8 -- DryWetMIDI + Koreographer asmdef third-party DLL refs)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -128,6 +128,28 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 8 (May 10, 2026) -- DryWetMIDI + Koreographer asmdef refs
+
+Hot-fix follow-on to Session 7. AudioProject reported two `CS0246` errors after reinstalling DryWetMIDI and Koreographer:
+
+```
+DryWetMIDI/Editor/Tool_DryWetMIDI.cs(8,7): error CS0246: ... 'Melanchall' could not be found ...
+Koreographer/Editor/Tool_Koreographer.cs(7,7): error CS0246: ... 'SonicBloom' could not be found ...
+```
+
+**Root cause:** Both tool asmdefs had `overrideReferences: true` but `precompiledReferences` listed only the McpPlugin / ReflectorNet DLLs — never the third-party assemblies the tool source actually `using`-imports. So as soon as `HAS_DRYWETMIDI` / `HAS_KOREOGRAPHER` fired (i.e. the asset was installed) the asmdef started compiling and the namespace lookups failed.
+
+A prior session had "fixed" this by deleting both `DryWetMIDI/` and `Koreographer/` folders entirely from the working tree (they were uncommitted deletes against HEAD), rather than adding the missing references.
+
+**Fix shipped this session:**
+
+1. Restored both folders via `git restore -- DryWetMIDI Koreographer DryWetMIDI.meta Koreographer.meta`.
+2. Added `"Melanchall.DryWetMidi.dll"` to [MCPTools.DryWetMIDI.Editor.asmdef](../DryWetMIDI/Editor/MCPTools.DryWetMIDI.Editor.asmdef) `precompiledReferences`.
+3. Added `"SonicBloom.Koreo.dll"` to [MCPTools.Koreographer.Editor.asmdef](../Koreographer/Editor/MCPTools.Koreographer.Editor.asmdef) `precompiledReferences`.
+4. Verified clean compile in TecVooDoo with both assets installed; asmdef-sync correctly preserves third-party DLL refs (it only rewrites `McpPlugin*` / `ReflectorNet*` entries).
+
+**General rule (added to `feedback_tmcp_asmdef_rules.md`):** When a tool .cs uses a third-party namespace, the asmdef MUST also reference the third-party assembly — either as an asmdef NAME in `references` (e.g. `"BroAudio"`, `"MidiPlayer.Run"`) or a DLL FILENAME in `precompiledReferences` (e.g. `"Melanchall.DryWetMidi.dll"`, `"SonicBloom.Koreo.dll"`). When CS0246 hits, **add the missing reference — never delete the tool folder.**
 
 ### TecVooDoo Session 7 (May 10, 2026) -- Self-syncing asmdef refs
 
