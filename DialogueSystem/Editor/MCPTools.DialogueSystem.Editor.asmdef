@@ -1,4 +1,4 @@
-﻿{
+{
     "name": "MCPTools.DialogueSystem.Editor",
     "rootNamespace": "",
     "references": ["com.IvanMurzak.Unity.MCP.Editor", "com.IvanMurzak.Unity.MCP.Runtime"],
@@ -8,11 +8,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "McpPlugin.dll",
-        "McpPlugin.6.2.1.dll",
         "McpPlugin.Common.dll",
-        "McpPlugin.Common.6.2.1.dll",
-        "ReflectorNet.dll",
-        "ReflectorNet.5.1.1.dll"
+        "ReflectorNet.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": ["HAS_DIALOGUE_SYSTEM"],
