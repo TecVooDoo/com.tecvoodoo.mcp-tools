@@ -13,21 +13,7 @@ namespace MCPTools.UMotionPro.Editor
     public partial class Tool_UMotionPro
     {
         [McpPluginTool("umotion-export", Title = "UMotion Pro / Export Clip(s) to AnimationClip Assets")]
-        [Description(@"Export the current clip OR all clips of the loaded UMotion project to AnimationClip assets.
-mode:
-  - 'current':  exports only the clip currently selected in the Clip Editor (ClipEditor.ExportCurrentClip).
-  - 'all':      exports every clip in the project (ClipEditor.ExportAllClips).
-  - 'variants': iterates a list of layer-mute presets, exporting once per preset. Requires variants[].
-                Each variant entry has form 'variantName:layerA=mute,layerB=unmute' where each layer is
-                marked 'mute' or 'unmute'. The tool snapshots current layer mute states, applies the
-                variant, sets the temporary clip name to '<originalSelectedClip>_<variantName>',
-                exports, then restores both the layer mutes and the original clip name.
-
-All three modes block until export is finished (per UMotion API). The output location is configured by
-the UMotion project settings (see ClipEditor manual / project settings) -- this tool does not override
-the destination path.
-
-Requires the Clip Editor window open and a project loaded.")]
+        [Description(@"Export clips of the loaded UMotion project to AnimationClip assets. mode = 'current' (selected clip only, via ClipEditor.ExportCurrentClip) | 'all' (every clip, via ExportAllClips) | 'variants' (iterates variants[] presets, exporting once per preset). variants[] format: 'variantName:layerA=mute,layerB=unmute' — tool snapshots layer mute state, applies each preset, renames clip to '<original>_<variantName>' pre-export, exports, restores everything via try/finally. clipName optional for 'variants' to pre-select. Requires ClipEditor window open + project loaded. Blocks until export finishes. Output path set by the UMotion project's own settings.")]
         public string Export(
             [Description("Export mode: 'current', 'all', or 'variants'.")]
             string mode,
