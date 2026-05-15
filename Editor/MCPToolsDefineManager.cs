@@ -100,6 +100,8 @@ namespace MCPTools.Editor
             ("HAS_M3DT",               "TinyGiantStudio.Text.Modular3DText, Assembly-CSharp-firstpass"),
             ("HAS_ORK",                "GamingIsLove.ORKFramework.ORK, ORKFramework3"),
             ("HAS_CITYGEN3D",          "CityGen3D.Map, CityGen3D"),
+            // TecVooDoo Session 10 additions (May 15)
+            ("HAS_UMOTION_PRO",        "UMotionEditor.API.ClipEditor, UMotionEditor"),
         };
 
         static MCPToolsDefineManager()

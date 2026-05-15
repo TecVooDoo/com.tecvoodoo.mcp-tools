@@ -14,25 +14,7 @@ namespace MCPTools.Cozy.Editor
     public partial class Tool_Cozy
     {
         [McpPluginTool("cozy-configure-module", Title = "Cozy / Configure Module")]
-        [Description(@"Adds, removes, enables, disables, or sets fields on a CozyModule (or any subclass) on a CozyWeather sphere.
-
-moduleType accepts: 'Climate' | 'Wind' | 'Time' | 'Atmosphere' | 'Ambience' | 'Weather' | 'Reflections' | 'Satellite' |
-'Interactions' | 'Event' | 'SaveLoad' | 'Debug' | 'Microsplat' | 'PureNature' | 'TVE' | 'Buto' | 'Transit' | 'SystemTime'
-(or any full type name like 'DistantLands.Cozy.CozyClimateModule', or a CozyModule subclass short name).
-
-action options:
-  list     -- list all CozyModule subclasses available + which are attached
-  query    -- read serialized fields from the named module
-  add      -- AddComponent + InitializeModule on the weather sphere's module holder
-  remove   -- DeintitializeModule (calls CheckIfModuleCanBeRemoved first)
-  reset    -- DeintitializeModule + re-add
-  enable   -- set .enabled = true
-  disable  -- set .enabled = false
-  set      -- assign field=value pairs (see fieldAssignments)
-
-fieldAssignments format: comma-separated 'field=value' pairs, e.g.
-  'snowMeltSpeed=0.2,dryingSpeed=0.6,useWindzone=false'.
-Booleans, ints, floats, strings, and enum values (case-insensitive) are supported.")]
+        [Description(@"Add/remove/enable/disable/configure a CozyModule on a CozyWeather sphere. action = list | query | add | remove | reset | enable | disable | set. moduleType: short name (Climate, Wind, Time, Atmosphere, Ambience, Weather, Reflections, Satellite, Interactions, Event, SaveLoad, Debug, Microsplat, PureNature, TVE, Buto, Transit, SystemTime) OR full type name (e.g. 'DistantLands.Cozy.CozyClimateModule'). fieldAssignments (for action='set') is comma-separated 'field=value' pairs supporting bool/int/float/string/enum (case-insensitive), e.g. 'snowMeltSpeed=0.2,dryingSpeed=0.6,useWindzone=false'. gameObjectName optional — defaults to active scene's CozyWeather instance; ignored when action='list'.")]
         public string ConfigureModule(
             [Description("'list' | 'query' | 'add' | 'remove' | 'reset' | 'enable' | 'disable' | 'set'.")]
             string action,

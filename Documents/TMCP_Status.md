@@ -5,7 +5,7 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** May 10, 2026 (TecVooDoo Session 8 -- DryWetMIDI + Koreographer asmdef third-party DLL refs)
+**Last Updated:** May 15, 2026 (TecVooDoo Session 10 -- UMotion Pro tool group)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -14,7 +14,7 @@
 
 ## Current State
 
-**~264 tools** across 58 asset groups. All compiling.
+**~268 tools** across 59 asset groups. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -76,6 +76,7 @@
 | **Modular 3D Text** | **6** | `HAS_M3DT` | `MCPTools.M3DText.Editor` (reflection) | **New TVD5** |
 | **ORK Framework + Makinom** | **7** | `HAS_ORK` | `MCPTools.ORK.Editor` (reflection) | **New TVD5** |
 | **CityGen3D** | **6** | `HAS_CITYGEN3D` | `MCPTools.CityGen3D.Editor` (reflection) | **New TVD5** |
+| **UMotion Pro** | **4** | `HAS_UMOTION_PRO` | `MCPTools.UMotionPro.Editor` (DLL refs `UMotionApplication.dll` + `UMotionEditor.dll`; editor-only static API in `UMotionEditor.API`) | **New TVD10** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -128,6 +129,38 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 10 (May 15, 2026) -- UMotion Pro tool group
+
+BloodMiner is about to use UMotion Pro v1.29p04 (Soxware Interactive) for character animation authoring. The asset was loaded into TecVooDoo this session; a fresh asset re-eval landed in [Sandbox_AssetLog.md](../../../Sandbox/Documents/Sandbox_AssetLog.md) as ENTRY-364 (re-eval of the pre-system summary-only ENTRY-091). Verdict for MCP candidacy was downgraded from "Deferred — script-execute adequate" to **Built** once BloodMiner adoption triggered the build.
+
+**Asset shape:** Editor-only. Both shipped asmdefs (`UMotionSourceApplication`, `UMotionSourceEditor`) are `includePlatforms: ["Editor"]`. Main code lives in 2 obfuscated managed DLLs (`UMotionApplication.dll`, `UMotionEditor.dll`) + 2 native FBX SDK bundles. Zero user-facing runtime MonoBehaviour components — `component-add/get/modify` is N/A. Public API is the static `UMotionEditor.API.ClipEditor` (23 methods + 2 properties + 2 nested types) and `UMotionEditor.API.PoseEditor` (23 methods + 3 properties + 3 nested types). Documented at `Assets/UMotionEditor/Manual/UMotionAPI.html` and verified live via reflection — every advertised method resolves cleanly. Heavy DLL obfuscation (~756 types in `UMotionEditor.dll`), but the API namespace + `UMotionProjectFileV01_*` SO file-format types have stable names; everything else internal is unsafe to touch.
+
+**4 tools built ([UMotionPro/Editor/](../UMotionPro/Editor/)):**
+
+| Tool | Surface | Purpose |
+|------|---------|---------|
+| `umotion-query` | Reads ClipEditor + PoseEditor state (window-open flags, loaded project path, all clip names + selected clip, layer names with mute/weight, frame cursor + last keyframe, pose-editor assigned GameObject + pivot mode, optional bone hierarchy + mirror table) | Discovery — always call first to confirm `IsWindowOpened` + `IsProjectLoaded` before chaining. |
+| `umotion-project` | Multi-op control: `open-windows`, `load`, `close`, `select-clip`, `rename-clip`, `delete-clip`, `set-frame`, `set-layer-blend`, `assign-pose-go`, `clear-pose-go` | Project + clip + cursor + layer-blend + pose-GO lifecycle. Single tool with `operation` param for compactness. |
+| `umotion-import` | Wraps `ClipEditor.ImportClips(IEnumerable<AnimationClip>, ImportClipSettings)`. Accepts `clipPaths[]`, `fbxPaths[]` (pulls every AnimationClip sub-asset from each FBX), `clipNames[]` (AssetDatabase.FindAssets). All 6 `ImportClipSettings` flags are optional overrides on `ImportClipSettings.Default`. | Batch FBX → UMotion project clip import. Blocks until done. |
+| `umotion-export` | `mode='current'` → `ExportCurrentClip()`. `mode='all'` → `ExportAllClips()`. `mode='variants'` → snapshots layer state, applies each `variantName:layerA=mute,layerB=unmute` preset, temporarily renames the clip to `<original>_<variantName>`, exports, restores everything. | Export to AnimationClip assets, with optional per-layer-mute variant generation in one call. Useful for "no-bow / with-bow" style animation set exports. |
+
+**Architecture choices:**
+
+- **Asmdef + DLL refs** rather than `#if HAS_*`-only. [MCPTools.UMotionPro.Editor.asmdef](../UMotionPro/Editor/MCPTools.UMotionPro.Editor.asmdef) explicitly references `"UMotionApplication.dll"` + `"UMotionEditor.dll"` in `precompiledReferences`, plus the source asmdefs `"UMotionSourceApplication"` + `"UMotionSourceEditor"` in `references`. Pattern matches DryWetMIDI (which has the same "third-party DLL filename in precompiledReferences" shape).
+- **Direct API calls** with `using UMotionEditor.API;` — no reflection wrapper. The two public API classes are documented and stable; reflection would just add overhead and a future-rename hazard.
+- **Window-state guards** in `Tool_UMotionPro.cs` root partial: `RequireClipEditorWindow()` throws with an actionable error pointing the caller at `umotion-project operation='open-windows'`. `RequireProjectLoaded()` chains that check + `ClipEditor.IsProjectLoaded`.
+- **`umotion-export variants` preserves state.** Snapshots all layer mute/weight before the variant loop, restores in a `try/finally`. Also snapshots and restores the original clip name (the variants pattern temporarily renames the clip pre-export to control the exported AnimationClip's name).
+
+**Define manager:** `("HAS_UMOTION_PRO", "UMotionEditor.API.ClipEditor, UMotionEditor")` added to [MCPToolsDefineManager.cs](../Editor/MCPToolsDefineManager.cs) (TecVooDoo Session 10 block). Confirmed firing — define present in PlayerSettings post-install.
+
+**Gotcha hit this session — `MonoScript.GetClass()` returns null when files were added to a package source folder before the asmdef.** Symptom: file on disk with `.meta` and the right partial-class declaration, Unity recognizes it as a `MonoScript` via `assets-find`, but `CompilationPipeline.GetAssemblies(...).First(a.name=="MCPTools.UMotionPro.Editor").sourceFiles` only lists *some* of the files in the folder (4 of 5 in my case — `Tool_UMotionPro.Export.cs` was missing while `Tool_UMotionPro.Project.cs` was present). `AssetDatabase.Refresh(ForceUpdate)` + `CompilationPipeline.RequestScriptCompilation(CleanBuildCache)` did NOT recover it. Deleting the `.meta` and re-refreshing did NOT recover it either (Unity restored the meta from cache). **Fix that worked:** rename the file (e.g. `Tool_UMotionPro.Export.cs` → `Tool_UMotionPro.ExportV2.cs`). Filename change forced Unity to treat it as a brand-new asset and add it to the asmdef's source list. Took ~4.5 minutes for the rebuild to flush through (then McpPlugin's `SkillFileGenerator` re-runs for another ~30s — the "running backend" lag the user sees after the compile-progress bar finishes is the skill regeneration, not the compile itself). **General rule:** if a fresh tool file refuses to compile into its asmdef even though the file/.meta/class shape look right, rename it.
+
+**File layout shipped:** `Tool_UMotionPro.cs` (root partial + state-guard helpers), `Tool_UMotionPro.Query.cs`, `Tool_UMotionPro.Project.cs`, `Tool_UMotionPro.Import.cs`, `Tool_UMotionPro.ExportV2.cs` (the renamed-and-stuck filename — leave alone until next session has time to rename it back through `AssetDatabase.MoveAsset`).
+
+**SKILL.md YAML cap (1024 chars) warnings:** trimmed `umotion-project` (1409 → ~700 chars) and `umotion-import` (1045 → ~700 chars) descriptions in this session. Pre-existing over-cap descriptions on `cozy-configure-module` (1147 chars) and the upstream McpPlugin `unity-skill-create` (6678 chars) remain to be addressed.
+
+**Smoke test:** verified `umotion-query` and `umotion-project operation='open-windows'` both return success. `umotion-query` after the open-windows call shows `PoseEditor.IsWindowOpened: True` — the API is alive.
 
 ### TecVooDoo Session 8 (May 10, 2026) -- DryWetMIDI + Koreographer asmdef refs
 
