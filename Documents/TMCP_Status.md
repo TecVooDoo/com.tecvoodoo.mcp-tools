@@ -5,7 +5,7 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** May 23, 2026 (TecVooDoo Session 11 -- stale-define recovery + asmdef-less-folder fragility finding)
+**Last Updated:** June 4, 2026 (TecVooDoo Session 16 -- Cinemachine tool group retired, superseded by official `com.ivanmurzak.unity.mcp.cinemachine` Extension)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -14,7 +14,7 @@
 
 ## Current State
 
-**~268 tools** across 59 asset groups. All compiling.
+**~263 tools** across 58 asset groups (Cinemachine retired Session 16 2026-06-04, superseded by Ivan-Murzak's official `com.ivanmurzak.unity.mcp.cinemachine` MCP Extension; 5 `cm-*` tools removed). All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -32,7 +32,6 @@
 | Heathen Ballistics | 5 | `HAS_HEATHEN_BALLISTICS` | `MCPTools.HeathenBallistics.Editor` | Stable |
 | Feel | 4 | `HAS_FEEL` | None (`#if` only) | Stable |
 | Damage Numbers Pro | 4 | `HAS_DAMAGE_NUMBERS_PRO` | `MCPTools.DamageNumbersPro.Editor` | Stable |
-| Cinemachine | 5 | `HAS_CINEMACHINE` | `MCPTools.Cinemachine.Editor` | Stable |
 | Animation Rigging | 5 | `HAS_ANIMATION_RIGGING` | `MCPTools.AnimationRigging.Editor` | Stable |
 | ALINE | 4 | `HAS_ALINE` | `MCPTools.ALINE.Editor` | Stable |
 | **Master Audio** | **6** | `HAS_MASTERAUDIO` | `MCPTools.MasterAudio.Editor` | **New S4, Updated TVD1** |
@@ -87,7 +86,7 @@
 All 33 groups built directly in the package folder. No separate source location.
 
 **Edit process:** Edit directly in `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`. Three compilation patterns:
-1. **Asmdef with direct refs** -- asset has its own assembly (e.g., Cinemachine, AnimationRigging, Animancer, Feel, DOTween, Terrain25D, BridgeBuilder25D, BehaviorDesigner). Asmdef references asset assembly + MCP assemblies, uses `defineConstraints`.
+1. **Asmdef with direct refs** -- asset has its own assembly (e.g., AnimationRigging, Animancer, Feel, DOTween, Terrain25D, BridgeBuilder25D, BehaviorDesigner). Asmdef references asset assembly + MCP assemblies, uses `defineConstraints`.
 2. **Asmdef with reflection** -- asset is in Assembly-CSharp (no asmdef). Asmdef references only MCP assemblies, all asset type access via reflection (e.g., DecalCollider, TextureStudio, MasterAudio, DialogueSystem, RopeToolkit, FinalIK, PWB, QuestForge, PMG, Chunity).
 3. **`#if HAS_*` guards** -- legacy pattern, still used by Feel, DOTween, Terrain25D, BridgeBuilder25D, BehaviorDesigner as belt-and-suspenders alongside their asmdefs. Works in local UPM packages. `MainThread` is in `com.IvanMurzak.ReflectorNet.Utils` (ReflectorNet.dll), NOT `com.IvanMurzak.Unity.MCP.Editor.Utils`.
 
@@ -131,6 +130,26 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 16 (June 4, 2026) -- Cinemachine tool group retired
+
+Ivan-Murzak published an official MCP Extension for Cinemachine — `com.ivanmurzak.unity.mcp.cinemachine` 1.0.0 — alongside MCP 0.78.0 (2026-06-03 Sandbox / 2026-06-04 TVD). The official extension ships 14 tools (`cinemachine-brain-ensure`, `cinemachine-camera-create/get/list`, `cinemachine-modify`, `cinemachine-set-aim/-body/-default-blend/-lens/-noise/-priority/-targets`, `cinemachine-add-extension`, `cinemachine-get`) — broader and more granular than TMCP's 5-tool group (`cm-configure-brain`, `cm-configure-camera`, `cm-configure-follow`, `cm-configure-noise`, `cm-query`). Decision: **retire TMCP's Cinemachine group and defer to the upstream extension.**
+
+**Strategic precedent set this session:** TMCP's value going forward is third-party Asset Store integrations Ivan won't cover (Master Audio, Behavior Designer, FinalIK, Animancer, etc.). Anything Ivan publishes as an official MCP Extension (Cinemachine today; possibly Animation Rigging, additional ProBuilder/Particle/Animation feature surfaces, etc. later) — TMCP retires its corresponding tool group and defers to upstream. Keeps TMCP focused on its unique value (asset-store-asset MCP coverage) and lowers maintenance surface as Ivan's catalog grows.
+
+**Retirement footprint:**
+- Deleted `Cinemachine/` folder + `Cinemachine.meta` (4 `.cs` + 4 `.cs.meta` + 1 `.asmdef` + 1 `.asmdef.meta` + 1 folder `.meta` + 1 root `.meta` = 11 files).
+- Removed `("HAS_CINEMACHINE", "Unity.Cinemachine.CinemachineCamera, Unity.Cinemachine")` from [MCPToolsDefineManager.cs](../Editor/MCPToolsDefineManager.cs) `Entries[]`. (Was line 50.)
+- Removed Cinemachine row from this doc's tool-group table; tool count adjusted from ~268/59 to ~263/58.
+- Removed Cinemachine from the "Asmdef with direct refs" example list in § Package vs Source Sync.
+
+**Stale-define cleanup note:** removing the `Entries[]` line does NOT auto-strip `HAS_CINEMACHINE` from any project's `PlayerSettings` — `UpdateDefines` only iterates the current `Entries[]`, so already-set defines for symbols no longer in the table persist as orphaned. This is harmless (no asmdef exists to gate on the define) but cosmetic cruft. Per-project cleanup is optional — run `Tools > TecVooDoo > Rescan MCP Defines` after pulling TMCP, or strip manually from `PlayerSettings > Scripting Define Symbols`. **TVD did NOT clean up the stale `HAS_CINEMACHINE` define this session — left as orphaned cosmetic.**
+
+**Migration confirmed safe for all current fleet projects:** no project's workflows depend on `cm-*` tool names specifically. The official `cinemachine-*` tools are immediately usable. Both naming conventions coexist trivially because they don't collide — but the `cm-*` set is now gone.
+
+**Open follow-ups not done this session:**
+- Consider similar audits for other TMCP tool groups whenever Ivan publishes an official Extension. Currently no other overlaps.
+- Long-term: when MCP publishes an `animation-rigging` or `animation-rigging-helpers` Extension (hypothetical), retire TMCP's AnimationRigging group similarly.
 
 ### TecVooDoo Session 11 (May 23, 2026) -- Stale `HAS_*` define recovery after MCP 0.75.1 bump + asmdef-less folder fragility finding
 
