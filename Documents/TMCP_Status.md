@@ -14,7 +14,7 @@
 
 ## Current State
 
-**~263 tools** across 58 asset groups (Cinemachine retired Session 16 2026-06-04, superseded by Ivan-Murzak's official `com.ivanmurzak.unity.mcp.cinemachine` MCP Extension; 5 `cm-*` tools removed). All compiling.
+**~259 tools** across 57 asset groups (AI Navigation retired Session 17 2026-06-04, superseded by Ivan-Murzak's official `navigation-*` 10-tool Extension; 4 `nav-*` tools removed. Prior: Cinemachine retired Session 16 2026-06-04, superseded by official `cinemachine-*` Extension; 5 `cm-*` tools removed). All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -58,7 +58,6 @@
 | **2.5D Bridge Builder** | **4** | `HAS_BRIDGEBUILDER25D` | None (`#if` only) | **New S63** |
 | **Decal Collider** | **3** | `HAS_DECAL_COLLIDER` | `MCPTools.DecalCollider.Editor` | **New TVD1** |
 | **Texture Studio** | **3** | `HAS_TEXTURE_STUDIO` | `MCPTools.TextureStudio.Editor` | **New TVD1** |
-| **AI Navigation** | **4** | `HAS_AI_NAVIGATION` | `MCPTools.AINavigation.Editor` | **New TVD1** |
 | **Animancer Pro** | **4** | `HAS_ANIMANCER` | `MCPTools.Animancer.Editor` | **New TVD1** |
 | **Juicy Actions** | **2** | `HAS_JUICY_ACTIONS` | None (`#if` only) | **New TVD2** |
 | **Boing Kit** | **2** | `HAS_BOINGKIT` | None (`#if` only) | **New TVD2** |
@@ -130,6 +129,33 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### TecVooDoo Session 17 (June 4, 2026) -- AI Navigation tool group retired + MCPToolsAssetPostprocessor hardening
+
+Same-day follow-on to Session 16's Cinemachine retirement. Ivan-Murzak shipped a wave of 6 NEW MCP Extensions in a release that landed shortly after the Cinemachine drop: `inputsystem-*` (13 tools), `navigation-*` (10 tools), `splines-*` (13 tools), `terrain-*` (15 tools), `tilemap-*` (13 tools), `timeline-*` (12 tools). MCP Extension count: 4 → **10** in one cycle.
+
+**Mapping against TMCP for the retire-on-publish precedent:** only `navigation-*` overlaps an existing TMCP tool group (`MCPTools.AINavigation.Editor` / `HAS_AI_NAVIGATION` / 4 `nav-*` tools). The other 5 new Extensions cover Unity built-ins that TMCP never integrated (InputSystem / Splines / built-in Terrain / Tilemap / Timeline) — no TMCP-side action needed for those.
+
+**Decision: retire TMCP's AI Navigation group**, same call as Cinemachine for the same reasons. Ivan's `navigation-*` is 10 tools (`navigation-agent-add/set-destination`, `-get`, `-link-add`, `-list`, `-modifier-add/-volume-add`, `-modify`, `-set-bake-settings`, `-surface-add/bake`) — broader and more granular than TMCP's 4-tool surface (`nav-query`, `nav-configure-surface`, `nav-bake`, `nav-configure-link`). Updates the precedent's first application: **two TMCP tool groups retired same day via the same procedure**, validating the 8-step template captured in memory [[project-tmcp-retire-when-ivan-publishes]].
+
+**Retirement footprint:**
+- Deleted `AINavigation/` folder + `AINavigation.meta` (4 `.cs` + 4 `.cs.meta` + 1 `.asmdef` + 1 `.asmdef.meta` + 1 folder `.meta` + 1 root `.meta` = 12 files).
+- Removed `("HAS_AI_NAVIGATION", "Unity.AI.Navigation.NavMeshSurface, Unity.AI.Navigation")` from [MCPToolsDefineManager.cs](../Editor/MCPToolsDefineManager.cs) `Entries[]`. (Was line 82 post-Cinemachine.)
+- Removed AI Navigation row from this doc's tool-group table; tool count adjusted from ~263/58 to ~259/57.
+- Historical Session TVD1 entry referencing AI Navigation's original addition (this doc § Session 4 area) intentionally LEFT INTACT — historical record stays.
+
+**Per-project stale-define caveat** (same as Cinemachine): removing the `Entries[]` line doesn't auto-strip `HAS_AI_NAVIGATION` from `PlayerSettings`. Optional cleanup via `Tools > TecVooDoo > Rescan MCP Defines` or manual strip.
+
+**MCPToolsAssetPostprocessor hardening also addressed this session — see Session 17 entry in TVD_Status.md for full context.** The hardening makes UPM-style asset removals reliably strip stale `HAS_*` defines, closing the recurring failure mode that triggered manual `script-execute` recoveries during Session 11 (Koreographer / UltimateTerrain / COZY / etc. bulk removal) and Session 11 follow-on (Animancer). Two changes:
+1. **`deletedAssets[]`-driven extraction:** the postprocessor now extracts deleted asmdef names directly from the `deletedAssets[]` array passed to `OnPostprocessAllAssets`, bypassing the `AssetDatabase.FindAssets("t:AssemblyDefinitionAsset")` rescan that could be stale during the postprocessor window.
+2. **DLL-named-detection fix:** entries whose detection-type targets a DLL filename (HAS_DOTWEEN → DOTweenPro.dll, HAS_MAGICACLOTH2 → MagicaClothV2.dll, HAS_RAYFIRE → RayFireAssembly.dll, HAS_BROAUDIO → BroAudio.dll) were being spuriously flipped to "should remove" by `RemoveStaleDefines` because `presentAssemblies` (built from asmdef enumeration) never includes DLL names. Fix: also extract deleted `.dll` paths from `deletedAssets[]` and use that set to confirm DLL-based detections genuinely went away.
+
+**Strategic precedent now validated twice (Cinemachine + AI Navigation):** the retire-on-publish rule is settled doctrine, not a one-off experiment. Future Ivan Extensions covering TMCP targets → retirement. The 8-step procedure in the memory template applies cleanly.
+
+**Open follow-ups not done this session:**
+- Other TMCP tool groups currently have no Ivan-Extension overlap (post-Session 17). Long-term watch list: AnimationRigging, ProBuilder (Ivan already has a partial extension; TMCP doesn't have a competing group), Particle System (Ivan already has it). No active conflicts.
+
+---
 
 ### TecVooDoo Session 16 (June 4, 2026) -- Cinemachine tool group retired
 

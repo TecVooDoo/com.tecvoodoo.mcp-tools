@@ -79,7 +79,6 @@ namespace MCPTools.Editor
             ("HAS_DECAL_COLLIDER",     "DecalCollider.Runtime.DecalCollider, Assembly-CSharp"),
             ("HAS_TEXTURE_STUDIO",     "TextureStudio.CompositeMap, Assembly-CSharp"),
             ("HAS_BOINGKIT",           "BoingKit.BoingBones, BoingKit"),
-            ("HAS_AI_NAVIGATION",      "Unity.AI.Navigation.NavMeshSurface, Unity.AI.Navigation"),
             // TecVooDoo Session 2 additions
             ("HAS_JUICY_ACTIONS",      "MagicPigGames.JuicyActions.ActionExecutor, MagicPigGames.JuicyActions.Runtime"),
             ("HAS_MUDBUN",             "MudBun.MudRenderer, MudBun"),
@@ -177,11 +176,33 @@ namespace MCPTools.Editor
         }
 
         /// <summary>
-        /// Checks ONLY for defines that should be REMOVED (asset no longer present).
-        /// Uses asmdef file existence instead of Type.GetType(), which is unreliable
-        /// during asset import (old assemblies may still be loaded in memory).
+        /// Menu-rescan entry: enumerates current asmdef + DLL state from the project
+        /// and removes defines whose target assembly is absent. Used by the manual
+        /// "Rescan MCP Defines" menu item.
         /// </summary>
-        public static void RemoveStaleDefines()
+        public static void RemoveStaleDefines() => RemoveStaleDefines(null);
+
+        /// <summary>
+        /// Postprocessor-driven entry: when called with deletedAssetPaths from
+        /// OnPostprocessAllAssets, extracts deleted asmdef + DLL filenames directly
+        /// from that array as the AUTHORITATIVE signal of what just disappeared.
+        /// Bypasses the AssetDatabase-rescan-stale-during-postprocessor-window race
+        /// that previously caused stale HAS_* defines to persist after UPM-style
+        /// asset removals (the failure mode behind the Session 11 Koreographer /
+        /// UltimateTerrain / COZY / Behavior Designer / etc. bulk-removal cascade
+        /// + Session 11 follow-on Animancer recovery via inline-mirror
+        /// script-execute).
+        ///
+        /// Also fixes a DLL-based-detection bug: entries whose assembly is a DLL
+        /// filename (HAS_DOTWEEN → DOTweenPro.dll, HAS_MAGICACLOTH2 →
+        /// MagicaClothV2.dll, HAS_RAYFIRE → RayFireAssembly.dll, HAS_BROAUDIO →
+        /// BroAudio.dll) were being spuriously flipped to "should remove" by the
+        /// prior version because `presentAssemblies` (built from asmdef
+        /// enumeration only) never contained DLL names. Now also enumerates
+        /// `presentDlls` via filesystem scan so DLL-based detections only fire
+        /// when the DLL is genuinely absent.
+        /// </summary>
+        public static void RemoveStaleDefines(string[]? deletedAssetPaths)
         {
             var target = EditorUserBuildSettings.selectedBuildTargetGroup;
             if (target == BuildTargetGroup.Unknown)
@@ -192,14 +213,49 @@ namespace MCPTools.Editor
             var defines = new HashSet<string>(current.Split(';', StringSplitOptions.RemoveEmptyEntries));
             bool changed = false;
 
-            // Build a set of all asmdef names currently in the project
+            // AUTHORITATIVE deletion signal (postprocessor path): extract deleted
+            // asmdef + DLL filenames directly from the deletedAssets[] array.
+            // Postprocessor passes this from OnPostprocessAllAssets, where Unity
+            // has already committed the deletion list. Bypasses any
+            // AssetDatabase-race during the deletion window.
+            HashSet<string> deletedAsmdefNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            HashSet<string> deletedDllNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (deletedAssetPaths != null)
+            {
+                foreach (string path in deletedAssetPaths)
+                {
+                    if (path.EndsWith(".asmdef", StringComparison.OrdinalIgnoreCase))
+                        deletedAsmdefNames.Add(System.IO.Path.GetFileNameWithoutExtension(path));
+                    else if (path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                        deletedDllNames.Add(System.IO.Path.GetFileNameWithoutExtension(path));
+                }
+            }
+
+            // CURRENT-STATE signal (fallback for menu rescan + DLL confirmation):
+            // enumerate all asmdef filenames currently in the project.
             HashSet<string> presentAssemblies = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             string[] asmdefGuids = AssetDatabase.FindAssets("t:AssemblyDefinitionAsset");
             foreach (string guid in asmdefGuids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
-                string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
-                presentAssemblies.Add(fileName);
+                presentAssemblies.Add(System.IO.Path.GetFileNameWithoutExtension(path));
+            }
+
+            // DLL enumeration via filesystem (AssetDatabase doesn't surface .dll under
+            // t:AssemblyDefinitionAsset). Required to correctly handle DLL-based
+            // detection entries — without this, presentAssemblies.Contains("DOTweenPro")
+            // is always false and HAS_DOTWEEN flickers off in every postprocessor run.
+            HashSet<string> presentDlls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string root in new[] { "Assets", "Packages" })
+            {
+                if (!System.IO.Directory.Exists(root)) continue;
+                try
+                {
+                    foreach (string dllPath in System.IO.Directory.EnumerateFiles(root, "*.dll", System.IO.SearchOption.AllDirectories))
+                        presentDlls.Add(System.IO.Path.GetFileNameWithoutExtension(dllPath));
+                }
+                catch (System.IO.IOException) { /* ignore transient enumeration errors */ }
+                catch (System.UnauthorizedAccessException) { /* ignore permission failures */ }
             }
 
             foreach (var (symbol, detectType) in Entries)
@@ -222,9 +278,21 @@ namespace MCPTools.Editor
                         : typeName;
                     shouldRemove = AssetDatabase.FindAssets(className + " t:MonoScript").Length == 0;
                 }
+                else if (deletedAsmdefNames.Contains(assemblyName) || deletedDllNames.Contains(assemblyName))
+                {
+                    // Postprocessor path: this assembly's asmdef or DLL was JUST deleted.
+                    // Trust the deletedAssets[] signal absolutely; don't second-guess
+                    // via AssetDatabase reads that could be stale during this window.
+                    shouldRemove = true;
+                }
                 else
                 {
-                    shouldRemove = !presentAssemblies.Contains(assemblyName);
+                    // Fallback path: confirm the assembly is absent from the project's
+                    // current state. Check BOTH asmdef names AND DLL filenames — without
+                    // the DLL check, DLL-based-detection entries (HAS_DOTWEEN etc.) would
+                    // spuriously flag for removal because presentAssemblies only holds
+                    // asmdef names.
+                    shouldRemove = !presentAssemblies.Contains(assemblyName) && !presentDlls.Contains(assemblyName);
                 }
 
                 if (shouldRemove)
@@ -282,7 +350,13 @@ namespace MCPTools.Editor
 
             if (relevantDeletion)
             {
-                MCPToolsDefineManager.RemoveStaleDefines();
+                // Pass deletedAssets through so RemoveStaleDefines treats the array
+                // as the authoritative deletion signal instead of relying on
+                // AssetDatabase reads that may be stale during the postprocessor
+                // window. Closes the recurring stale-HAS_*-define failure mode
+                // behind Session 11 (Koreographer/UltimateTerrain/COZY/Behavior
+                // Designer bulk removal cascade) + follow-on Animancer recovery.
+                MCPToolsDefineManager.RemoveStaleDefines(deletedAssets);
             }
         }
     }
