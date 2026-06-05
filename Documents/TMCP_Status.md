@@ -5,7 +5,7 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** June 4, 2026 (TecVooDoo Session 16 -- Cinemachine tool group retired, superseded by official `com.ivanmurzak.unity.mcp.cinemachine` Extension)
+**Last Updated:** June 4, 2026 (TecVooDoo Session 17 -- AI Navigation tool group retired + postprocessor hardened; doc-vs-code audit reconciled tool/group counts and dropped the stale Asset Inventory row -- see `TVD_DocAudit.md`)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -14,7 +14,7 @@
 
 ## Current State
 
-**~259 tools** across 57 asset groups (AI Navigation retired Session 17 2026-06-04, superseded by Ivan-Murzak's official `navigation-*` 10-tool Extension; 4 `nav-*` tools removed. Prior: Cinemachine retired Session 16 2026-06-04, superseded by official `cinemachine-*` Extension; 5 `cm-*` tools removed). All compiling.
+**245 tools across 56 asset groups** — grep-verified ground truth as of 2026-06-04 (`[McpPluginTool(` attributes = 245; `[McpPluginToolType]` markers = 56, one per group folder). This supersedes the prior "~259" running tally, which had drifted ~14 high over many sessions. Recent retirements reflected here: AI Navigation retired Session 17 2026-06-04 (superseded by Ivan-Murzak's official `navigation-*` 10-tool Extension; 4 `nav-*` tools removed); Cinemachine retired Session 16 2026-06-04 (superseded by official `cinemachine-*` Extension; 5 `cm-*` tools removed). Asset Inventory was removed back in Session 6 but lingered as a stale table row + orphaned `HAS_ASSETINVENTORY` define until the 2026-06-04 audit dropped both. All compiling.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -23,7 +23,6 @@
 | RayFire | 8 | `HAS_RAYFIRE` | `MCPTools.RayFire.Editor` | Stable |
 | MagicaCloth 2 | 7 | `HAS_MAGICACLOTH2` | `MCPTools.MagicaCloth2.Editor` | Stable |
 | Final IK | 5 | `HAS_FINALIK` | `MCPTools.FinalIK.Editor` | **Updated TVD1** |
-| Asset Inventory | 4 | `HAS_ASSETINVENTORY` | `MCPTools.AssetInventory.Editor` | Stable |
 | Malbers AC | 8 | `HAS_MALBERS_AC` | `MCPTools.MalbersAC.Editor` | Stable |
 | Quest Forge | 5 | `HAS_MALBERS_QUESTFORGE` | `MCPTools.QuestForge.Editor` | **Updated TVD1** |
 | Retarget Pro | 4 | `HAS_RETARGETPRO` | `MCPTools.RetargetPro.Editor` | Stable |
