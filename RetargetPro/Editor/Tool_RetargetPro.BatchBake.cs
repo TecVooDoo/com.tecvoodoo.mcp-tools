@@ -7,6 +7,7 @@ using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using KINEMATION.RetargetPro.Editor;
+using KINEMATION.RetargetPro.Editor.Scripts.Bakers;
 using KINEMATION.RetargetPro.Runtime;
 using UnityEditor;
 using UnityEngine;
@@ -64,8 +65,14 @@ Use this for retargeting animations between different character skeletons (e.g. 
                 SetPrivateField(baker, "_frameRate", frameRate);
                 SetPrivateField(baker, "_copyClipSettings", copyClipSettings);
                 SetPrivateField(baker, "_useRootMotion", useRootMotion);
-                SetPrivateField(baker, "_keyframeAll", keyframeAll);
-                SetPrivateStaticField(typeof(RetargetAnimBaker), "_savePath", outputFolder);
+
+                // Retarget Pro V5: the static `_savePath` field was removed; the bake now reads
+                // its output folder from the profile's serialized `saveFolderPath`. Override it for
+                // this run and restore afterwards so we don't permanently mutate the user's profile.
+                // V5 also removed the `_keyframeAll` option entirely - the `keyframeAll` parameter
+                // is retained for signature stability but is a no-op against V5.
+                string originalSaveFolder = profile.saveFolderPath;
+                profile.saveFolderPath = outputFolder;
 
                 int processed = 0;
                 int failed = 0;
@@ -105,6 +112,9 @@ Use this for retargeting animations between different character skeletons (e.g. 
                     }
                 }
 
+                // Restore the profile's original save folder (overridden above for this run).
+                profile.saveFolderPath = originalSaveFolder;
+
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
@@ -126,13 +136,6 @@ Use this for retargeting animations between different character skeletons (e.g. 
             FieldInfo field = obj.GetType().GetField(fieldName,
                 BindingFlags.NonPublic | BindingFlags.Instance);
             if (field != null) field.SetValue(obj, value);
-        }
-
-        private static void SetPrivateStaticField(System.Type type, string fieldName, object value)
-        {
-            FieldInfo field = type.GetField(fieldName,
-                BindingFlags.NonPublic | BindingFlags.Static);
-            if (field != null) field.SetValue(null, value);
         }
 
         public class BatchBakeResponse
