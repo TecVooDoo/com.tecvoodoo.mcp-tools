@@ -5,7 +5,7 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** June 4, 2026 (TecVooDoo Session 17 -- AI Navigation tool group retired + postprocessor hardened; doc-vs-code audit reconciled tool/group counts and dropped the stale Asset Inventory row -- see `TVD_DocAudit.md`)
+**Last Updated:** June 18, 2026 (Retarget Pro V5 batch-bake API-break fix -- TMCP commit `990c230`; driven by Sandbox eval ENTRY-376. Prior: June 4 Session 17 -- AI Navigation tool group retired + postprocessor hardened; doc-vs-code audit reconciled tool/group counts and dropped the stale Asset Inventory row -- see `TVD_DocAudit.md`)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -128,6 +128,23 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### Retarget Pro V5 batch-bake fix (June 18, 2026) -- API-break recovery (Sandbox eval ENTRY-376)
+
+Driven by a Sandbox-session re-eval of Retarget Pro (Kinemation) at **V5**, logged as `Sandbox_AssetLog.md` ENTRY-376 (re-eval of ENTRY-243's 4.2.1; 243 stays). V5 is API-breaking against the `retarget-batch-bake` tool, and the break took the **entire MCP plugin offline**, not just the Retarget Pro group: a `CS0246` in [Tool_RetargetPro.BatchBake.cs](../RetargetPro/Editor/Tool_RetargetPro.BatchBake.cs) failed the `MCPTools.RetargetPro.Editor` assembly, cascading to all tools.
+
+**Three V5 API changes:**
+- `RetargetAnimBaker` moved namespace `KINEMATION.RetargetPro.Editor` -> `KINEMATION.RetargetPro.Editor.Scripts.Bakers`.
+- The static `_savePath` field was removed; bake output now reads from the serialized `RetargetProfile.saveFolderPath`.
+- The `_keyframeAll` baker option was removed entirely.
+
+**Fix (TMCP commit `990c230`):**
+- Added `using KINEMATION.RetargetPro.Editor.Scripts.Bakers;`.
+- Output folder now overrides `profile.saveFolderPath` for the run and restores the original afterward (no permanent profile mutation).
+- Dropped the dead `_keyframeAll` reflection; the `keyframeAll` param is retained for signature stability but is now a documented no-op against V5.
+- Removed the now-unused `SetPrivateStaticField` helper.
+
+Tool count unchanged -- Retarget Pro stays 4 tools, table row stays Stable. **Live-verified V5 resident in TVD:** `RetargetAnimBaker` resolves in the V5 `...Editor.Scripts.Bakers` namespace (assembly `RetargetPro.Editor`), `RetargetProfile.saveFolderPath` present, old V4 namespace gone, `MCPTools.RetargetPro.Editor.Tool_RetargetPro` compiles. Batch-bake functional test PASSED per the Sandbox carryover. Cross-project ownership: the eval + AssetLog entry are Sandbox-owned; this source fix + status entry are TMCP-repo-owned.
 
 ### TecVooDoo Session 17 (June 4, 2026) -- AI Navigation tool group retired + MCPToolsAssetPostprocessor hardening
 

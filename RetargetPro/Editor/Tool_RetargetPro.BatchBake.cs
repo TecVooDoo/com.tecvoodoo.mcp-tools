@@ -34,7 +34,7 @@ Use this for retargeting animations between different character skeletons (e.g. 
             bool copyClipSettings = true,
             [Description("Bake root motion curves. Default true.")]
             bool useRootMotion = true,
-            [Description("Keyframe all bones (true) or optimize curves (false). Default true.")]
+            [Description("No-op in Retarget Pro V5 (the underlying _keyframeAll option was removed); param retained for signature stability. Default true.")]
             bool keyframeAll = true,
             [Description("Max clips to process (0 = all). Useful for testing with a few clips first. Default 0.")]
             int maxClips = 0
