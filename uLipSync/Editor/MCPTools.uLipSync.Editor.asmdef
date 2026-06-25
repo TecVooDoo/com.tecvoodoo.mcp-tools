@@ -1,0 +1,25 @@
+{
+    "name": "MCPTools.uLipSync.Editor",
+    "rootNamespace": "",
+    "references": [
+        "com.IvanMurzak.Unity.MCP.Editor",
+        "com.IvanMurzak.Unity.MCP.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "McpPlugin.dll",
+        "McpPlugin.Common.dll",
+        "ReflectorNet.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HAS_ULIPSYNC"
+    ],
+    "versionDefines": [ { "name": "com.ivanmurzak.unity.mcp", "expression": "0.69.0", "define": "MCP_HAS_AIGD" } ],
+    "noEngineReferences": false
+}

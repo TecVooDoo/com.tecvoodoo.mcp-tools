@@ -5,7 +5,7 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** June 18, 2026 (Retarget Pro V5 batch-bake API-break fix -- TMCP commit `990c230`; driven by Sandbox eval ENTRY-376. Prior: June 4 Session 17 -- AI Navigation tool group retired + postprocessor hardened; doc-vs-code audit reconciled tool/group counts and dropped the stale Asset Inventory row -- see `TVD_DocAudit.md`)
+**Last Updated:** June 25, 2026 (**Leaky-folder hardening (TVD Session 24): all 11 tool groups that shipped without an asmdef now have one** -- `MCPTools.{DOTween,BehaviorDesigner,BoingKit,BridgeBuilder25D,Feel,JuicyActions,Lumen,MudBun,Terrain25D,Timeflow,uLipSync}.Editor`. They previously compiled into the global `Assembly-CSharp-Editor` via global `HAS_*` defines, so a stale define while the asset was absent would have failed every editor script project-wide. Now each is define-constraint-isolated like the other 45 groups. DOTween was the only one with its asset installed in TVD (compile-verified clean; `Tool_DOTween` confirmed moved to `MCPTools.DOTween.Editor`, no `Tool_*` left in `Assembly-CSharp-Editor`); the other 10 are define-excluded in TVD's lean set and validate downstream. **Every tool group now carries an asmdef -- the "leaky folders" class is closed.** Prior: June 18 -- Retarget Pro V5 batch-bake API-break fix, TMCP commit `990c230`, driven by Sandbox eval ENTRY-376)
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -29,7 +29,7 @@
 | Rope Toolkit | 5 | `HAS_ROPE_TOOLKIT` | `MCPTools.RopeToolkit.Editor` | **Updated TVD1** |
 | Heathen Physics | 5 | `HAS_HEATHEN_PHYSICS` | `MCPTools.HeathenPhysics.Editor` | Stable |
 | Heathen Ballistics | 5 | `HAS_HEATHEN_BALLISTICS` | `MCPTools.HeathenBallistics.Editor` | Stable |
-| Feel | 4 | `HAS_FEEL` | None (`#if` only) | Stable |
+| Feel | 4 | `HAS_FEEL` | `MCPTools.Feel.Editor` | Stable, asmdef-ified S24 |
 | Damage Numbers Pro | 4 | `HAS_DAMAGE_NUMBERS_PRO` | `MCPTools.DamageNumbersPro.Editor` | Stable |
 | Animation Rigging | 5 | `HAS_ANIMATION_RIGGING` | `MCPTools.AnimationRigging.Editor` | Stable |
 | ALINE | 4 | `HAS_ALINE` | `MCPTools.ALINE.Editor` | Stable |
@@ -38,8 +38,8 @@
 | **Dialogue System** | **6** | `HAS_DIALOGUE_SYSTEM` | `MCPTools.DialogueSystem.Editor` | **New S4, Updated TVD1** |
 | **SensorToolkit 2** | **5** | `HAS_SENSORTOOLKIT` | `MCPTools.SensorToolkit.Editor` | **New S4** |
 | **UCC (Opsive)** | **5** | `HAS_UCC` | `MCPTools.UCC.Editor` | **New S4** |
-| **Behavior Designer** | **5** | `HAS_BEHAVIOR_DESIGNER` | None (`#if` only) | **Updated SS1** |
-| **DOTween Pro** | **4** | `HAS_DOTWEEN` | None (`#if` only) | **New S4** |
+| **Behavior Designer** | **5** | `HAS_BEHAVIOR_DESIGNER` | `MCPTools.BehaviorDesigner.Editor` | Updated SS1, asmdef-ified S24 |
+| **DOTween Pro** | **4** | `HAS_DOTWEEN` | `MCPTools.DOTween.Editor` | New S4, asmdef-ified S24 |
 | **Unity Entities** | **5** | `HAS_UNITY_ENTITIES` | `MCPTools.UnityEntities.Editor` | **New S4b** |
 | **Unity Physics** | **4** | `HAS_UNITY_PHYSICS` | `MCPTools.UnityPhysics.Editor` | **New S4b** |
 | **Bro Audio** | **4** | `HAS_BROAUDIO` | `MCPTools.BroAudio.Editor` | **New S5** |
@@ -53,17 +53,17 @@
 | **Adventure Creator** | **5** | `HAS_ADVENTURE_CREATOR` | `MCPTools.AdventureCreator.Editor` | **New VNPC** |
 | **Text Animator** | **4** | `HAS_TEXT_ANIMATOR` | `MCPTools.TextAnimator.Editor` | **New VNPC** |
 | **Ink Integration** | **3** | `HAS_INK` | `MCPTools.InkIntegration.Editor` | **New VNPC** |
-| **2.5D Terrain** | **3** | `HAS_TERRAIN25D` | None (`#if` only) | **New S63** |
-| **2.5D Bridge Builder** | **4** | `HAS_BRIDGEBUILDER25D` | None (`#if` only) | **New S63** |
+| **2.5D Terrain** | **3** | `HAS_TERRAIN25D` | `MCPTools.Terrain25D.Editor` | New S63, asmdef-ified S24 |
+| **2.5D Bridge Builder** | **4** | `HAS_BRIDGEBUILDER25D` | `MCPTools.BridgeBuilder25D.Editor` | New S63, asmdef-ified S24 |
 | **Decal Collider** | **3** | `HAS_DECAL_COLLIDER` | `MCPTools.DecalCollider.Editor` | **New TVD1** |
 | **Texture Studio** | **3** | `HAS_TEXTURE_STUDIO` | `MCPTools.TextureStudio.Editor` | **New TVD1** |
 | **Animancer Pro** | **4** | `HAS_ANIMANCER` | `MCPTools.Animancer.Editor` | **New TVD1** |
-| **Juicy Actions** | **2** | `HAS_JUICY_ACTIONS` | None (`#if` only) | **New TVD2** |
-| **Boing Kit** | **2** | `HAS_BOINGKIT` | None (`#if` only) | **New TVD2** |
-| **MudBun** | **3** | `HAS_MUDBUN` | None (`#if` only) | **New TVD2** |
-| **Lumen** | **2** | `HAS_LUMEN` | None (`#if` only) | **New TVD2** |
-| **Timeflow** | **4** | `HAS_TIMEFLOW` | None (`#if` only) | **New TVD2** |
-| **uLipSync** | **3** | `HAS_ULIPSYNC` | None (`#if` only) | **New M3 S2** |
+| **Juicy Actions** | **2** | `HAS_JUICY_ACTIONS` | `MCPTools.JuicyActions.Editor` | New TVD2, asmdef-ified S24 |
+| **Boing Kit** | **2** | `HAS_BOINGKIT` | `MCPTools.BoingKit.Editor` | New TVD2, asmdef-ified S24 |
+| **MudBun** | **3** | `HAS_MUDBUN` | `MCPTools.MudBun.Editor` | New TVD2, asmdef-ified S24 |
+| **Lumen** | **2** | `HAS_LUMEN` | `MCPTools.Lumen.Editor` | New TVD2, asmdef-ified S24 |
+| **Timeflow** | **4** | `HAS_TIMEFLOW` | `MCPTools.Timeflow.Editor` | New TVD2, asmdef-ified S24 |
+| **uLipSync** | **3** | `HAS_ULIPSYNC` | `MCPTools.uLipSync.Editor` | New M3 S2, asmdef-ified S24 |
 | **Technie Collider Creator 2** | **6** | `HAS_TCC` | `MCPTools.TCC.Editor` | **New TVD3** |
 | **MK Edge Detection** | **4** | `HAS_MK_EDGE` | `MCPTools.MKEdge.Editor` | **New TVD3** |
 | **Real Time Weather Pro** | **3** | `HAS_RTW` | `MCPTools.RTW.Editor` (reflection) | **New TVD3** |
