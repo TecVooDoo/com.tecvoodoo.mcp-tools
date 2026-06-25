@@ -14,7 +14,7 @@ namespace MCPTools.Cozy.Editor
     public partial class Tool_Cozy
     {
         [McpPluginTool("cozy-configure-module", Title = "Cozy / Configure Module")]
-        [Description(@"Add/remove/enable/disable/configure a CozyModule on a CozyWeather sphere. action = list | query | add | remove | reset | enable | disable | set. moduleType: short name (Climate, Wind, Time, Atmosphere, Ambience, Weather, Reflections, Satellite, Interactions, Event, SaveLoad, Debug, Microsplat, PureNature, TVE, Buto, Transit, SystemTime) OR full type name (e.g. 'DistantLands.Cozy.CozyClimateModule'). fieldAssignments (for action='set') is comma-separated 'field=value' pairs supporting bool/int/float/string/enum (case-insensitive), e.g. 'snowMeltSpeed=0.2,dryingSpeed=0.6,useWindzone=false'. gameObjectName optional — defaults to active scene's CozyWeather instance; ignored when action='list'.")]
+        [Description(@"Add/remove/enable/disable/query/configure a CozyModule on a CozyWeather sphere. moduleType accepts a short name (Climate, Wind, Time, Atmosphere, Ambience, Weather, Reflections, Satellite, Interactions, Event, SaveLoad, Debug, Microsplat, PureNature, TVE, Buto, Transit, SystemTime) or a full type name. Use action='list' to see all module types and which are attached.")]
         public string ConfigureModule(
             [Description("'list' | 'query' | 'add' | 'remove' | 'reset' | 'enable' | 'disable' | 'set'.")]
             string action,
