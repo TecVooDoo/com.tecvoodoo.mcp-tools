@@ -237,6 +237,14 @@ namespace MCPTools.Editor
             foreach (string guid in asmdefGuids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (string.IsNullOrEmpty(path)) continue;
+                // Defeat AssetDatabase staleness during the postprocessor window: a
+                // just-deleted asmdef (e.g. from a folder removal) can stay indexed for
+                // a beat, which would make an asmdef-based detection look still-present
+                // and the stale HAS_* survive. Trust the filesystem -- if the asmdef
+                // file is gone from disk, the assembly is gone. (AssetDatabase is still
+                // the source for PackageCache/registry asmdefs that File.Exists confirms.)
+                if (!System.IO.File.Exists(path)) continue;
                 presentAssemblies.Add(System.IO.Path.GetFileNameWithoutExtension(path));
             }
 
@@ -335,12 +343,28 @@ namespace MCPTools.Editor
         {
             if (deletedAssets.Length == 0) return;
 
-            // Check if any deleted asset looks like it could be an asmdef or
-            // a folder containing scripts (heuristic: .cs, .asmdef, or folder deletion)
+            // A removal is "relevant" if it could drop an asset whose HAS_* define we
+            // manage. Catch two shapes:
+            //   * a tool-relevant file directly (.asmdef / .cs / .dll), OR
+            //   * a folder deletion (path has no file extension) -- the COMMON shape
+            //     when an Asset Store / UPM-style asset is removed wholesale. Unity
+            //     frequently reports only the folder path here and none of its former
+            //     files, so the old extension-only heuristic skipped these entirely:
+            //     RemoveStaleDefines never ran and the HAS_* define stuck until a
+            //     manual rescan. Folder deletions were the gap behind the recurring
+            //     stale-define friction during MCP-bump asset pruning.
+            // Over-triggering is safe: RemoveStaleDefines only REMOVES defines whose
+            // asset is genuinely absent, so an unrelated folder deletion just costs one
+            // extra scan and changes nothing.
             bool relevantDeletion = false;
             foreach (string path in deletedAssets)
             {
-                if (path.EndsWith(".asmdef") || path.EndsWith(".cs") || path.EndsWith(".dll"))
+                string ext = System.IO.Path.GetExtension(path);
+                bool isCodeFile = ext.Equals(".asmdef", StringComparison.OrdinalIgnoreCase)
+                    || ext.Equals(".cs", StringComparison.OrdinalIgnoreCase)
+                    || ext.Equals(".dll", StringComparison.OrdinalIgnoreCase);
+                bool isFolderDeletion = string.IsNullOrEmpty(ext);
+                if (isCodeFile || isFolderDeletion)
                 {
                     relevantDeletion = true;
                     break;
