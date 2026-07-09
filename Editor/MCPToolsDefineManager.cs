@@ -99,6 +99,8 @@ namespace MCPTools.Editor
             ("HAS_CITYGEN3D",          "CityGen3D.Map, CityGen3D"),
             // TecVooDoo Session 10 additions (May 15)
             ("HAS_UMOTION_PRO",        "UMotionEditor.API.ClipEditor, UMotionEditor"),
+            // TecVooDoo Maintainer addition (Jul 09) -- editor-only, asmdef-isolated (ENTRY-390)
+            ("HAS_MAINTAINER",         "CodeStage.Maintainer.Issues.IssuesFinder, CodeStage.Maintainer.Editor"),
         };
 
         static MCPToolsDefineManager()
