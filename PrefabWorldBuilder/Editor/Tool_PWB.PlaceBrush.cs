@@ -132,7 +132,7 @@ Specify the palette and brush by index, or search by brush name.")]
                 return new PlaceBrushResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     prefabName = selectedPrefab.name,
                     brushName = Get(brush, "name")?.ToString() ?? "",
                     paletteName = paletteName,
@@ -146,7 +146,7 @@ Specify the palette and brush by index, or search by brush name.")]
             [Description("Name of the placed GameObject")]
             public string gameObjectName = "";
             [Description("Instance ID")]
-            public int instanceId;
+            public string instanceId = "";
             [Description("Prefab name used")]
             public string prefabName = "";
             [Description("Brush name it came from")]

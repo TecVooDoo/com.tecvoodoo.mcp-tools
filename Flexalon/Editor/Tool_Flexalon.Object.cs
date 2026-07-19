@@ -51,7 +51,7 @@ Add this to a layout container to define total layout size, or to a child to ove
                 return new SetSizeResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     width = fObj.Width,
                     height = fObj.Height,
                     depth = fObj.Depth
@@ -71,7 +71,7 @@ Add this to a layout container to define total layout size, or to a child to ove
                 {
                     var l = layouts[i];
                     var typeName = l.GetType().Name.Replace("Flexalon", "");
-                    entries[i] = $"[{l.gameObject.GetInstanceID()}] {l.gameObject.name} ({typeName}) - {l.transform.childCount} children";
+                    entries[i] = $"[{InstanceIdOf(l.gameObject)}] {l.gameObject.name} ({typeName}) - {l.transform.childCount} children";
                 }
 
                 return new ListLayoutsResponse
@@ -87,7 +87,7 @@ Add this to a layout container to define total layout size, or to a child to ove
             [Description("Name of the GameObject")]
             public string gameObjectName = "";
             [Description("Instance ID")]
-            public int instanceId;
+            public string instanceId = "";
             [Description("Current width")]
             public float width;
             [Description("Current height")]

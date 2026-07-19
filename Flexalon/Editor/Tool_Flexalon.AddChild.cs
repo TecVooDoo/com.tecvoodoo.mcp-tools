@@ -88,7 +88,7 @@ The layout will automatically arrange the child.")]
                         return new AddChildResponse
                         {
                             gameObjectName = child.name,
-                            instanceId = child.GetInstanceID(),
+                            instanceId = InstanceIdOf(child),
                             childType = typeUsed,
                             layoutName = layoutGo.name,
                             childCount = layoutGo.transform.childCount
@@ -120,7 +120,7 @@ The layout will automatically arrange the child.")]
                 return new AddChildResponse
                 {
                     gameObjectName = child.name,
-                    instanceId = child.GetInstanceID(),
+                    instanceId = InstanceIdOf(child),
                     childType = typeUsed,
                     layoutName = layoutGo.name,
                     childCount = layoutGo.transform.childCount
@@ -181,7 +181,7 @@ Useful for quickly populating a grid or circle with identical objects.")]
             [Description("Name of the child GameObject")]
             public string gameObjectName = "";
             [Description("Instance ID of the child")]
-            public int instanceId;
+            public string instanceId = "";
             [Description("Type of child added")]
             public string childType = "";
             [Description("Name of the layout it was added to")]

@@ -82,7 +82,7 @@ Modes: GlobalDirection (whole scene), SphereDirection, BoxDirection, SphereRadia
                 return new AddWindResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     windMode = wind.mode.ToString(),
                     strength = wind.main,
                     turbulence = wind.turbulence
@@ -93,7 +93,7 @@ Modes: GlobalDirection (whole scene), SphereDirection, BoxDirection, SphereRadia
         public class AddWindResponse
         {
             [Description("Name of the wind zone GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Wind mode")] public string windMode = "";
             [Description("Wind strength (m/s)")] public float strength;
             [Description("Turbulence rate")] public float turbulence;

@@ -75,7 +75,7 @@ Supports wrapping. Use 'flexalon-add-child' to populate it with objects.")]
                 return new FlexibleLayoutResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     direction = flex.Direction.ToString(),
                     gap = flex.Gap,
                     wrap = flex.Wrap,
@@ -113,7 +113,7 @@ Supports wrapping. Use 'flexalon-add-child' to populate it with objects.")]
             [Description("Name of the created GameObject")]
             public string gameObjectName = "";
             [Description("Instance ID of the created GameObject")]
-            public int instanceId;
+            public string instanceId = "";
             [Description("Direction children are laid out")]
             public string direction = "";
             [Description("Gap between children")]

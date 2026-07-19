@@ -56,7 +56,7 @@ Use this before configuring stats to see current values.")]
                 return new QueryStatsResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     statCount = count,
                     details = sb.ToString()
                 };
@@ -137,7 +137,7 @@ Use 'ac-query-stats' first to see available stats.")]
                 return new ConfigureStatResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     statName = foundName,
                     active = found.Active,
                     value = found.Value,
@@ -151,7 +151,7 @@ Use 'ac-query-stats' first to see available stats.")]
         public class QueryStatsResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Number of stats configured")] public int statCount;
             [Description("Detailed stat breakdown")] public string details = "";
         }
@@ -159,7 +159,7 @@ Use 'ac-query-stats' first to see available stats.")]
         public class ConfigureStatResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Stat name that was configured")] public string statName = "";
             [Description("Stat active status")] public bool active;
             [Description("Current value")] public float value;

@@ -87,7 +87,7 @@ Use 'ac-query-animal' first to see available modes.")]
                 return new ConfigureModeResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     modeName = foundName,
                     active = found.Active,
                     coolDown = found.CoolDown,
@@ -101,7 +101,7 @@ Use 'ac-query-animal' first to see available modes.")]
         public class ConfigureModeResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Mode name that was configured")] public string modeName = "";
             [Description("Mode active status")] public bool active;
             [Description("Cooldown time in seconds")] public float coolDown;

@@ -60,7 +60,7 @@ For 2.5D top-down: lock Y axis (LockY=true) so movement stays on the XZ plane.")
                 return new LockAxisResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     lockX = lockAxis.LockX,
                     lockY = lockAxis.LockY,
                     lockZ = lockAxis.LockZ,
@@ -72,7 +72,7 @@ For 2.5D top-down: lock Y axis (LockY=true) so movement stays on the XZ plane.")
         public class LockAxisResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("X axis locked")] public bool lockX;
             [Description("Y axis locked")] public bool lockY;
             [Description("Z axis locked")] public bool lockZ;

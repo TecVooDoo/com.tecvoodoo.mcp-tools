@@ -144,7 +144,7 @@ Objects are evenly spaced along the line. Great for fences, walls, paths, etc.")
                 return new PlaceLineResponse
                 {
                     containerName = container.name,
-                    containerInstanceId = container.GetInstanceID(),
+                    containerInstanceId = InstanceIdOf(container),
                     brushName = brushNameStr,
                     placedCount = placed,
                     startPosition = FormatVector3(startPosition),
@@ -234,7 +234,7 @@ The prefab is specified by its asset path. Use this to populate palettes program
             [Description("Name of the container GameObject")]
             public string containerName = "";
             [Description("Instance ID of the container")]
-            public int containerInstanceId;
+            public string containerInstanceId = "";
             [Description("Brush name used")]
             public string brushName = "";
             [Description("Number of instances placed")]

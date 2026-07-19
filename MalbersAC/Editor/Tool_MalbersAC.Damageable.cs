@@ -52,7 +52,7 @@ Only provided parameters are changed; others are left as-is.")]
                 return new ConfigureDamageableResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     multiplier = damageable.multiplier.Value,
                     alignToDamage = damageable.AlignToDamage.Value,
                     alignTime = damageable.AlignTime.Value
@@ -63,7 +63,7 @@ Only provided parameters are changed; others are left as-is.")]
         public class ConfigureDamageableResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Damage multiplier")] public float multiplier;
             [Description("Align to damage source")] public bool alignToDamage;
             [Description("Alignment time in seconds")] public float alignTime;

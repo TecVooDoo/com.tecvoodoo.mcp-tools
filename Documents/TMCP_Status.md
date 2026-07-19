@@ -5,7 +5,9 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** July 9, 2026 (**Maintainer (Code Stage) tool group added** — 3 editor-only tools wrapping Maintainer 2.3.3's public static API: `maintainer-scan-issues` (`IssuesFinder.SearchAndReport`), `maintainer-find-references` (`ReferencesFinder.FindAssetReferences` — "what references asset X?"), `maintainer-scan-unused` (`ProjectCleaner`, **report-only**, no delete). `MCPTools.Maintainer.Editor` asmdef references `CodeStage.Maintainer.Editor` directly (compile-checked) plus a belt-and-suspenders `#if HAS_MAINTAINER` guard; define added to `MCPToolsDefineManager` (detects `CodeStage.Maintainer.Issues.IssuesFinder`). All three **live-verified end-to-end** via `unity-mcp-cli run-tool` in TVD (Unity 6000.3.19f1, MCP 0.82.4), console clean. Note: `scan-unused` deliberately calls `ProjectCleaner.StartSearch(false)` + formats records itself rather than `SearchAndReport()` — the latter NREs headless in Maintainer 2.3.3 (`AssetRecord.ConstructHeader` derefs a null `assetType` for unresolved-type unreferenced assets). `find-references` filters its output to the queried asset — Maintainer merges consecutive searches into one accumulated result set, so an unfiltered read leaks prior-query targets. Source eval: Sandbox ENTRY-390. Prior: June 25, 2026 (**DOTween asmdef REVERTED (Session 24 follow-up, SetDesign canary): DOTween is the one tool group that cannot be cleanly asmdef'd** — DOTween Pro's `DOTweenAnimation` compiles into the predefined `Assembly-CSharp` in projects where DOTween's "Create ASMDEF" option is off (SetDesign), and an asmdef cannot reference `Assembly-CSharp`, so `MCPTools.DOTween.Editor` failed there with CS0246. Reverted to `#if HAS_DOTWEEN` in `Assembly-CSharp-Editor` (which CAN see `Assembly-CSharp`); the hardened postprocessor keeps this lone leaky group safe. 10 of the 11 leaky folders remain asmdef-isolated. Proper future fix: reflection-based `DOTweenAnimation` access so DOTween can be isolated too. **Prior same-session: Postprocessor hardening: `MCPToolsAssetPostprocessor.OnPostprocessAllAssets` now treats folder deletions (extension-less paths) as relevant -- the common Asset-Store/UPM removal shape Unity reports as a bare folder path, which the old `.asmdef`/`.cs`/`.dll`-only gate skipped, so `RemoveStaleDefines` never ran and the `HAS_*` define stuck. Also added a `File.Exists` guard in the asmdef presence scan to defeat AssetDatabase staleness during the postprocessor window. Functionally verified: folder-path input runs clean, no valid define stripped. This closes the second half of the stale-`HAS_*`-define hardening; together with the asmdef-ification it ends the leaky-folder/stale-define friction class.** **Prior same-session: leaky-folder hardening -- all 11 tool groups that shipped without an asmdef now have one -- `MCPTools.{DOTween,BehaviorDesigner,BoingKit,BridgeBuilder25D,Feel,JuicyActions,Lumen,MudBun,Terrain25D,Timeflow,uLipSync}.Editor`. They previously compiled into the global `Assembly-CSharp-Editor` via global `HAS_*` defines, so a stale define while the asset was absent would have failed every editor script project-wide. Now each is define-constraint-isolated like the other 45 groups. DOTween was the only one with its asset installed in TVD (compile-verified clean; `Tool_DOTween` confirmed moved to `MCPTools.DOTween.Editor`, no `Tool_*` left in `Assembly-CSharp-Editor`); the other 10 are define-excluded in TVD's lean set and validate downstream. **Every tool group now carries an asmdef -- the "leaky folders" class is closed.** Prior: June 18 -- Retarget Pro V5 batch-bake API-break fix, TMCP commit `990c230`, driven by Sandbox eval ENTRY-376)
+**Last Updated:** July 19, 2026 -- **Unity 6000.5 `GetInstanceID` CS0619 fix** across 6 tool groups (Flexalon, FinalIK, PWB, RayFire, MalbersAC, MagicaCloth2); `instanceId` response fields are now **`string`**. See [Session Log](#session-log) for this and all prior entries.
+
+> **Header hygiene (2026-07-19):** this line previously carried ~3,700 chars of accumulated session narrative, violating the ~1,000-char living-doc line rule. Nothing was discarded -- an audit found the June 25 and July 9 narrative had **no other home** (only Retarget Pro V5 and the June 4 postprocessor work had Session Log entries), so it was promoted into proper dated Session Log sections below before this line was compacted.
 
 > **Install:** Add to manifest.json: `"com.tecvoodoo.mcp-tools": "file:../../DefaultUnityPackages/com.tecvoodoo.mcp-tools"`
 > Requires `com.ivanmurzak.unity.mcp` (MCP base) already installed.
@@ -15,6 +17,8 @@
 ## Current State
 
 **248 tools across 57 asset groups** — 2026-07-09: **+1 group, Maintainer (Code Stage), 3 tools** (`maintainer-scan-issues`, `maintainer-find-references`, `maintainer-scan-unused`); editor-only, asmdef-isolated, live-verified end-to-end in TVD. Prior baseline **245 tools across 56 asset groups** — grep-verified ground truth as of 2026-06-04 (`[McpPluginTool(` attributes = 245; `[McpPluginToolType]` markers = 56, one per group folder). This supersedes the prior "~259" running tally, which had drifted ~14 high over many sessions. Recent retirements reflected here: AI Navigation retired Session 17 2026-06-04 (superseded by Ivan-Murzak's official `navigation-*` 10-tool Extension; 4 `nav-*` tools removed); Cinemachine retired Session 16 2026-06-04 (superseded by official `cinemachine-*` Extension; 5 `cm-*` tools removed). Asset Inventory was removed back in Session 6 but lingered as a stale table row + orphaned `HAS_ASSETINVENTORY` define until the 2026-06-04 audit dropped both. All compiling.
+
+**Unity 6000.5 compatibility (2026-07-19):** clean. `Object.GetInstanceID()` became a hard `CS0619` in 6000.5 (and `EntityId` -> `int` with it); all 36 call sites across 6 groups now route through a per-group `InstanceIdOf` helper gated at `UNITY_6000_3_OR_NEWER`. **Response-schema change:** `instanceId` / `containerInstanceId` fields are now **`string`** (decimal digits, matching MCP's `EntityId` wire format) rather than `int`. Remaining `FindObjectsByType(..., FindObjectsSortMode)` / `FindObjectsOfType` uses (~20) are CS0618 **warnings** in 6000.5 -- intentionally left, cleanup only if Unity promotes them to errors.
 
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
@@ -129,6 +133,55 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### Unity 6000.5 `GetInstanceID` CS0619 fix (July 19, 2026) -- 6 tool groups, `instanceId` now `string` (TVD Session 32)
+
+Driven from **AudioProject** (the canary; TVD's lean asset set doesn't install these assets, so TVD never reproduced it). Reported as 8 `CS0619` errors in the Flexalon group after a TMCP reinstall on **Unity 6000.5.4f1**.
+
+**Root cause -- a deprecation that is a hard error, twice over.** Unity 6000.5 marks `UnityEngine.Object.GetInstanceID()` `[Obsolete(..., error: true)]` -> **CS0619**, not the usual CS0618 warning. The obvious one-line fix is a trap: `EntityId`'s `implicit operator int` is **also** obsolete-as-error, so `(int)obj.GetEntityId()` just swaps one CS0619 for another. There is no non-obsolete `EntityId` -> `int` conversion at all. (Both severities verified by decoding the `ObsoleteAttribute` blobs in `UnityEngine.CoreModule.dll` -- `error: true` vs `false` is not visible from the message text.)
+
+**Blast radius was wider than the report.** Unity compiles assemblies one at a time and halts, so only Flexalon surfaced; a package-wide grep found **36 call sites across 6 groups** -- Flexalon, FinalIK, PWB, RayFire, MalbersAC, MagicaCloth2.
+
+**Fix.** A static helper added to each group's root partial class, alongside the existing `FormatVector3` convention -- **no asmdef changes**, so the DLL-ref sync is untouched:
+
+```csharp
+static string InstanceIdOf(UnityEngine.Object obj)
+#if UNITY_6000_3_OR_NEWER
+    => obj.GetEntityId().ToString();
+#else
+    => obj.GetInstanceID().ToString();
+#endif
+```
+
+Gated at **6000.3** (where `GetEntityId` landed) rather than 6000.5, so 6.3/6.4 projects also avoid the deprecation warning; the `#else` branch preserves the package's declared `"unity": "6000.0"` floor.
+
+**BREAKING (minor): 28 `instanceId` / `containerInstanceId` response fields changed `int` -> `string`.** This is deliberate, not a workaround. `int` was no longer reachable, and upstream MCP 0.84.3's `EntityIdConverter` publishes the on-wire `EntityId` format as a **decimal-digit string** (JSON schema `^[0-9]+$`) while accepting string *or* number on read -- so the string form stays round-trippable into MCP's `GameObjectRef` / `ObjectRef` refs. Ivan solved the same problem by forking whole files (`X.cs` / `X.pre-Unity.6.5.cs`) and retyping `ObjectRef.InstanceID` as `EntityId`; the string form buys the same wire compatibility without version-forking every DTO.
+
+**Not fixed (deliberately):** `FindObjectsByType(..., FindObjectsSortMode)`, `FindObjectsOfType`, `FindObjectOfType` are used in ~20 places package-wide but are **CS0618 warnings** in 6000.5, not errors -- confirmed by the same attribute decode, and corroborated by their absence from the reported error list. Left alone; they become a cleanup task only if Unity promotes them to errors.
+
+No version bump, per the precedent that fixes ship unbumped (`990c230`) while new tool groups bump the minor. Verified by Rune: no remaining errors in AudioProject.
+
+### Maintainer (Code Stage) tool group (July 9, 2026)
+
+*(Promoted 2026-07-19 from the header `Last Updated` line, which was this entry's only home.)*
+
+**3 editor-only tools** wrapping Maintainer 2.3.3's public static API: `maintainer-scan-issues` (`IssuesFinder.SearchAndReport`), `maintainer-find-references` (`ReferencesFinder.FindAssetReferences` -- "what references asset X?"), `maintainer-scan-unused` (`ProjectCleaner`, **report-only**, no delete). `MCPTools.Maintainer.Editor` asmdef references `CodeStage.Maintainer.Editor` directly (compile-checked) plus a belt-and-suspenders `#if HAS_MAINTAINER` guard; define added to `MCPToolsDefineManager` (detects `CodeStage.Maintainer.Issues.IssuesFinder`). All three **live-verified end-to-end** via `unity-mcp-cli run-tool` in TVD (Unity 6000.3.19f1, MCP 0.82.4), console clean.
+
+**Two API gotchas worked around:**
+- `scan-unused` deliberately calls `ProjectCleaner.StartSearch(false)` + formats records itself rather than `SearchAndReport()` -- the latter NREs headless in Maintainer 2.3.3 (`AssetRecord.ConstructHeader` derefs a null `assetType` for unresolved-type unreferenced assets).
+- `find-references` filters its output to the queried asset -- Maintainer merges consecutive searches into one accumulated result set, so an unfiltered read leaks prior-query targets.
+
+Source eval: Sandbox ENTRY-390.
+
+### DOTween asmdef revert + postprocessor hardening + leaky-folder asmdef-ification (June 25, 2026) -- Session 24 follow-up
+
+*(Promoted 2026-07-19 from the header `Last Updated` line, which was this entry's only home.)*
+
+**DOTween asmdef REVERTED (SetDesign canary) -- DOTween is the one tool group that cannot be cleanly asmdef'd.** DOTween Pro's `DOTweenAnimation` compiles into the predefined `Assembly-CSharp` in projects where DOTween's "Create ASMDEF" option is off (SetDesign), and an asmdef cannot reference `Assembly-CSharp`, so `MCPTools.DOTween.Editor` failed there with CS0246. Reverted to `#if HAS_DOTWEEN` in `Assembly-CSharp-Editor` (which CAN see `Assembly-CSharp`); the hardened postprocessor keeps this lone leaky group safe. 10 of the 11 leaky folders remain asmdef-isolated. **Proper future fix:** reflection-based `DOTweenAnimation` access so DOTween can be isolated too (still queued).
+
+**Postprocessor hardening.** `MCPToolsAssetPostprocessor.OnPostprocessAllAssets` now treats folder deletions (extension-less paths) as relevant -- the common Asset-Store/UPM removal shape Unity reports as a bare folder path, which the old `.asmdef`/`.cs`/`.dll`-only gate skipped, so `RemoveStaleDefines` never ran and the `HAS_*` define stuck. Also added a `File.Exists` guard in the asmdef presence scan to defeat AssetDatabase staleness during the postprocessor window. Functionally verified: folder-path input runs clean, no valid define stripped. This closes the second half of the stale-`HAS_*`-define hardening.
+
+**Leaky-folder hardening.** All 11 tool groups that shipped without an asmdef got one -- `MCPTools.{DOTween,BehaviorDesigner,BoingKit,BridgeBuilder25D,Feel,JuicyActions,Lumen,MudBun,Terrain25D,Timeflow,uLipSync}.Editor`. They previously compiled into the global `Assembly-CSharp-Editor` via global `HAS_*` defines, so a stale define while the asset was absent would have failed every editor script project-wide. Now each is define-constraint-isolated like the other 45 groups. DOTween was the only one with its asset installed in TVD (compile-verified clean; `Tool_DOTween` confirmed moved, no `Tool_*` left in `Assembly-CSharp-Editor`); the other 10 are define-excluded in TVD's lean set and validate downstream. **Every tool group now carries an asmdef -- the "leaky folders" class is closed** (modulo the DOTween revert above).
 
 ### Retarget Pro V5 batch-bake fix (June 18, 2026) -- API-break recovery (Sandbox eval ENTRY-376)
 

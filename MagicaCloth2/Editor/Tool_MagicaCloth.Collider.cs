@@ -48,7 +48,7 @@ Common usage: add to hand, head, chest, or leg bones.")]
                 return new AddColliderResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     colliderType = "Sphere",
                     size = FormatVector3(col.GetSize())
                 };
@@ -99,7 +99,7 @@ Direction sets the capsule axis: X, Y, or Z.")]
                 return new AddColliderResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     colliderType = "Capsule",
                     size = FormatVector3(col.GetSize())
                 };
@@ -109,7 +109,7 @@ Direction sets the capsule axis: X, Y, or Z.")]
         public class AddColliderResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Collider type added")] public string colliderType = "";
             [Description("Collider size")] public string size = "";
         }

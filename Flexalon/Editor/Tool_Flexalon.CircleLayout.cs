@@ -98,7 +98,7 @@ Use 'flexalon-add-child' to populate the circle with objects.")]
                 return new CircleLayoutResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     radius = circle.Radius,
                     plane = circle.Plane.ToString(),
                     position = FormatVector3(go.transform.position)
@@ -111,7 +111,7 @@ Use 'flexalon-add-child' to populate the circle with objects.")]
             [Description("Name of the created GameObject")]
             public string gameObjectName = "";
             [Description("Instance ID of the created GameObject")]
-            public int instanceId;
+            public string instanceId = "";
             [Description("Radius of the circle")]
             public float radius;
             [Description("Plane the circle is on")]

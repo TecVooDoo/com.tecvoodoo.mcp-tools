@@ -21,7 +21,7 @@ namespace MCPTools.MagicaCloth2.Editor
     {
         [McpPluginTool("magica-add-bone-cloth", Title = "Magica Cloth / Add Bone Cloth")]
         [Description(@"Adds a MagicaCloth component configured as BoneCloth to a GameObject.
-BoneCloth simulates cloth using bone transforms — ideal for capes, hair, tails, skirts.
+BoneCloth simulates cloth using bone transforms -- ideal for capes, hair, tails, skirts.
 Specify root bones that define the cloth chain.")]
         public AddClothResponse AddBoneCloth(
             [Description("Reference to the target GameObject.")]
@@ -75,7 +75,7 @@ Specify root bones that define the cloth chain.")]
                 return new AddClothResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     clothType = "BoneCloth",
                     rootBonesFound = string.Join(", ", foundBones),
                     gravity = sd.gravity
@@ -85,7 +85,7 @@ Specify root bones that define the cloth chain.")]
 
         [McpPluginTool("magica-add-mesh-cloth", Title = "Magica Cloth / Add Mesh Cloth")]
         [Description(@"Adds a MagicaCloth component configured as MeshCloth to a GameObject.
-MeshCloth simulates cloth on mesh vertices — ideal for flags, curtains, tablecloths.
+MeshCloth simulates cloth on mesh vertices -- ideal for flags, curtains, tablecloths.
 The GameObject should have a Renderer (MeshRenderer or SkinnedMeshRenderer).")]
         public AddClothResponse AddMeshCloth(
             [Description("Reference to the target GameObject with a Renderer.")]
@@ -126,7 +126,7 @@ The GameObject should have a Renderer (MeshRenderer or SkinnedMeshRenderer).")]
                 return new AddClothResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     clothType = "MeshCloth",
                     rootBonesFound = renderer.GetType().Name,
                     gravity = sd.gravity
@@ -144,7 +144,7 @@ The GameObject should have a Renderer (MeshRenderer or SkinnedMeshRenderer).")]
                 var lines = cloths.Select(c =>
                 {
                     var sd = c.SerializeData;
-                    return $"[{c.gameObject.GetInstanceID()}] {c.gameObject.name} " +
+                    return $"[{InstanceIdOf(c.gameObject)}] {c.gameObject.name} " +
                            $"(Type:{sd.clothType}, Gravity:{sd.gravity:F1}, Blend:{sd.blendWeight:F2})";
                 }).ToArray();
 
@@ -159,7 +159,7 @@ The GameObject should have a Renderer (MeshRenderer or SkinnedMeshRenderer).")]
         public class AddClothResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Cloth type configured")] public string clothType = "";
             [Description("Root bones or renderer found")] public string rootBonesFound = "";
             [Description("Gravity setting")] public float gravity;

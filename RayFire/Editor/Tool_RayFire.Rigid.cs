@@ -93,7 +93,7 @@ Use 'rayfire-add-shatter' afterward to configure fragmentation.")]
                 return new AddRigidResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     simulationType = rigid.simTp.ToString(),
                     demolitionType = rigid.dmlTp.ToString(),
                     physicsMaterial = rigid.physics.mt.ToString(),
@@ -157,7 +157,7 @@ Only provided parameters are changed; others are left as-is.")]
                 return new ConfigureRigidResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     simulationType = rigid.simTp.ToString(),
                     demolitionType = rigid.dmlTp.ToString(),
                     physicsMaterial = rigid.physics.mt.ToString(),
@@ -178,7 +178,7 @@ Only provided parameters are changed; others are left as-is.")]
         public class AddRigidResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Simulation type set")] public string simulationType = "";
             [Description("Demolition type set")] public string demolitionType = "";
             [Description("Physics material type")] public string physicsMaterial = "";
@@ -189,7 +189,7 @@ Only provided parameters are changed; others are left as-is.")]
         public class ConfigureRigidResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Simulation type")] public string simulationType = "";
             [Description("Demolition type")] public string demolitionType = "";
             [Description("Physics material type")] public string physicsMaterial = "";

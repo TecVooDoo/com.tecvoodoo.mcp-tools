@@ -59,7 +59,7 @@ Great for scattering objects like trees, rocks, debris, etc.")]
                 random.RandomizeRotationY = randomizeRotation;
                 random.RandomizeRotationZ = randomizeRotation;
 
-                // FlexalonLayoutBase auto-adds FlexalonObject via [RequireComponent] — use GetComponent
+                // FlexalonLayoutBase auto-adds FlexalonObject via [RequireComponent] -- use GetComponent
                 var s = size ?? new Vector3(10f, 1f, 10f);
                 var fObj = go.GetComponent<FlexalonObject>();
                 if (fObj != null)
@@ -74,7 +74,7 @@ Great for scattering objects like trees, rocks, debris, etc.")]
                 return new RandomLayoutResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     randomSeed = random.RandomSeed,
                     position = FormatVector3(go.transform.position)
                 };
@@ -86,7 +86,7 @@ Great for scattering objects like trees, rocks, debris, etc.")]
             [Description("Name of the created GameObject")]
             public string gameObjectName = "";
             [Description("Instance ID")]
-            public int instanceId;
+            public string instanceId = "";
             [Description("Random seed used")]
             public int randomSeed;
             [Description("World position")]

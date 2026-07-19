@@ -82,7 +82,7 @@ Use 'ac-query-animal' first to see available states and their current values.")]
                 return new ConfigureStateResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     stateName = foundName,
                     active = found.Active,
                     priority = found.Priority,
@@ -95,7 +95,7 @@ Use 'ac-query-animal' first to see available states and their current values.")]
         public class ConfigureStateResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("State name that was configured")] public string stateName = "";
             [Description("State active status")] public bool active;
             [Description("State priority")] public int priority;

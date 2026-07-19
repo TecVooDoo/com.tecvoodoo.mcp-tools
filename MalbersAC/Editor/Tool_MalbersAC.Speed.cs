@@ -104,7 +104,7 @@ Use 'ac-query-animal' first to see available speed sets and their speeds.")]
                 return new ConfigureSpeedResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     speedSetName = foundSet.name,
                     speedName = speed.name,
                     position = speed.position.Value,
@@ -119,7 +119,7 @@ Use 'ac-query-animal' first to see available speed sets and their speeds.")]
         public class ConfigureSpeedResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Speed set name")] public string speedSetName = "";
             [Description("Speed entry name")] public string speedName = "";
             [Description("Position speed value")] public float position;

@@ -20,7 +20,7 @@ namespace MCPTools.FinalIK.Editor
         [McpPluginTool("finalik-add-fbbik", Title = "Final IK / Add Full Body Biped IK")]
         [Description(@"Adds a FullBodyBipedIK component to a character GameObject and auto-detects biped bone references.
 The character must have an Animator with a humanoid avatar, or a standard biped bone hierarchy.
-This is the main IK component for bipeds — controls hands, feet, body, and shoulders.")]
+This is the main IK component for bipeds -- controls hands, feet, body, and shoulders.")]
         public AddFBBIKResponse AddFullBodyBipedIK(
             [Description("Reference to the character root GameObject.")]
             GameObjectRef targetRef,
@@ -152,7 +152,7 @@ This is the main IK component for bipeds — controls hands, feet, body, and sho
                 return new AddFBBIKResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     referencesDetected = refsFilled,
                     hasError = hasError,
                     errorMessage = errorMsg,
@@ -207,7 +207,7 @@ Set positionWeight to 1 to fully control the effector, 0 to release it.")]
                 return new SetEffectorResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     effectorName = effectorName,
                     position = posStr,
                     positionWeight = pwVal is float pw ? pw : 0f,
@@ -240,7 +240,7 @@ Set positionWeight to 1 to fully control the effector, 0 to release it.")]
         public class AddFBBIKResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Biped references detected")] public bool referencesDetected;
             [Description("Setup has errors")] public bool hasError;
             [Description("Error message if any")] public string errorMessage = "";
@@ -250,7 +250,7 @@ Set positionWeight to 1 to fully control the effector, 0 to release it.")]
         public class SetEffectorResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Effector name")] public string effectorName = "";
             [Description("Effector position")] public string position = "";
             [Description("Position weight")] public float positionWeight;

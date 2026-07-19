@@ -116,7 +116,7 @@ Use this to understand an animal's configuration before making changes.")]
                 return new QueryAnimalResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     activeState = activeStateName,
                     stateCount = animal.states != null ? animal.states.Count : 0,
                     modeCount = animal.modes != null ? animal.modes.Count : 0,
@@ -130,7 +130,7 @@ Use this to understand an animal's configuration before making changes.")]
         public class QueryAnimalResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Currently active state name")] public string activeState = "";
             [Description("Number of states configured")] public int stateCount;
             [Description("Number of modes configured")] public int modeCount;

@@ -79,7 +79,7 @@ After adding, call Fragment() in the editor to generate fragments.")]
                 return new AddShatterResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     fragmentType = shatter.type.ToString(),
                     configured = true
                 };
@@ -113,7 +113,7 @@ The object must have a RayfireShatter component. This is an editor-time operatio
                 return new FragmentResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     fragmentType = shatter.type.ToString(),
                     batchCount = batchCount,
                     hasFragments = shatter.HasBatches
@@ -124,7 +124,7 @@ The object must have a RayfireShatter component. This is an editor-time operatio
         public class AddShatterResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Fragment type configured")] public string fragmentType = "";
             [Description("Configuration applied")] public bool configured;
         }
@@ -132,7 +132,7 @@ The object must have a RayfireShatter component. This is an editor-time operatio
         public class FragmentResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Fragment type used")] public string fragmentType = "";
             [Description("Number of fragment batches")] public int batchCount;
             [Description("Has generated fragments")] public bool hasFragments;

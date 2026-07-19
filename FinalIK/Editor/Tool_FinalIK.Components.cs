@@ -57,7 +57,7 @@ rotate to look at a target. Great for NPC gaze and attention systems.")]
                 return new AddIKResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     ikType = "LookAtIK",
                     targetPosition = tgtPos
                 };
@@ -103,7 +103,7 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
                 return new AddIKResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     ikType = "AimIK",
                     targetPosition = tgtPos
                 };
@@ -146,7 +146,7 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
                     var typeName = ik.GetType().Name;
                     var behaviour = ik as Behaviour;
                     var enabledStr = behaviour != null ? behaviour.enabled.ToString() : "?";
-                    return $"[{ik.gameObject.GetInstanceID()}] {ik.gameObject.name} ({typeName}) enabled={enabledStr}";
+                    return $"[{InstanceIdOf(ik.gameObject)}] {ik.gameObject.name} ({typeName}) enabled={enabledStr}";
                 }).ToArray();
 
                 return new ListIKResponse
@@ -160,7 +160,7 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
         public class AddIKResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("IK type added")] public string ikType = "";
             [Description("Target position")] public string targetPosition = "";
         }

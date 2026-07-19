@@ -76,7 +76,7 @@ Use 'flexalon-add-child' to populate the grid with objects.")]
                 return new GridLayoutResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     columns = (int)grid.Columns,
                     rows = (int)grid.Rows,
                     layers = (int)grid.Layers,
@@ -90,7 +90,7 @@ Use 'flexalon-add-child' to populate the grid with objects.")]
             [Description("Name of the created GameObject")]
             public string gameObjectName = "";
             [Description("Instance ID of the created GameObject")]
-            public int instanceId;
+            public string instanceId = "";
             [Description("Number of columns")]
             public int columns;
             [Description("Number of rows")]

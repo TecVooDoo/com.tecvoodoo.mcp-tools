@@ -25,7 +25,7 @@ namespace MCPTools.RayFire.Editor
             {
                 var rigids = Object.FindObjectsByType<RayfireRigid>(FindObjectsSortMode.None);
                 var lines = rigids.Select(r =>
-                    $"[{r.gameObject.GetInstanceID()}] {r.gameObject.name} " +
+                    $"[{InstanceIdOf(r.gameObject)}] {r.gameObject.name} " +
                     $"(Sim:{r.simTp}, Dml:{r.dmlTp}, Obj:{r.objTp}, " +
                     $"Mat:{r.physics.mt}, Dmg:{(r.damage.en ? $"{r.damage.cur}/{r.damage.max}" : "off")})"
                 ).ToArray();
@@ -63,7 +63,7 @@ The object must have a RayfireRigid component with demolition enabled.")]
                 return new DemolishResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     fragmentCount = fragCount,
                     demolished = true
                 };
@@ -103,7 +103,7 @@ Damage must be enabled on the component.")]
                 return new ApplyDamageResponse
                 {
                     gameObjectName = go.name,
-                    instanceId = go.GetInstanceID(),
+                    instanceId = InstanceIdOf(go),
                     damageApplied = damageAmount,
                     currentDamage = rigid.damage.cur,
                     maxDamage = rigid.damage.max,
@@ -121,7 +121,7 @@ Damage must be enabled on the component.")]
         public class DemolishResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Number of fragments created")] public int fragmentCount;
             [Description("Whether demolition occurred")] public bool demolished;
         }
@@ -129,7 +129,7 @@ Damage must be enabled on the component.")]
         public class ApplyDamageResponse
         {
             [Description("Name of the GameObject")] public string gameObjectName = "";
-            [Description("Instance ID")] public int instanceId;
+            [Description("Instance ID")] public string instanceId = "";
             [Description("Damage applied")] public float damageApplied;
             [Description("Current accumulated damage")] public float currentDamage;
             [Description("Maximum damage threshold")] public float maxDamage;
