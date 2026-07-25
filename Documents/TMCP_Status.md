@@ -5,7 +5,7 @@
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** July 19, 2026 -- **Unity 6000.5 `GetInstanceID` CS0619 fix** across 6 tool groups (Flexalon, FinalIK, PWB, RayFire, MalbersAC, MagicaCloth2); `instanceId` response fields are now **`string`**. See [Session Log](#session-log) for this and all prior entries.
+**Last Updated:** July 25, 2026 -- **2026-07-24 drive-corruption damage found and restored** (TVD S35). TMCP was the 5th re-cloned repo and the only one the recovery never reconciled: 5 deleted tool files, **4 tools lost outright + 2 groups silently unregistered**, all restored from HEAD; tree now byte-identical to `origin/main` at `27be6ee`, no source commit. Group table's Flexalon/RayFire counts corrected (were transposed). Prior: **Unity 6000.5 `GetInstanceID` CS0619 fix** across 6 tool groups (Flexalon, FinalIK, PWB, RayFire, MalbersAC, MagicaCloth2); `instanceId` response fields are now **`string`**. See [Session Log](#session-log) for this and all prior entries.
 
 > **Header hygiene (2026-07-19):** this line previously carried ~3,700 chars of accumulated session narrative, violating the ~1,000-char living-doc line rule. Nothing was discarded -- an audit found the June 25 and July 9 narrative had **no other home** (only Retarget Pro V5 and the June 4 postprocessor work had Session Log entries), so it was promoted into proper dated Session Log sections below before this line was compacted.
 
@@ -20,11 +20,13 @@
 
 **Unity 6000.5 compatibility (2026-07-19):** clean. `Object.GetInstanceID()` became a hard `CS0619` in 6000.5 (and `EntityId` -> `int` with it); all 36 call sites across 6 groups now route through a per-group `InstanceIdOf` helper gated at `UNITY_6000_3_OR_NEWER`. **Response-schema change:** `instanceId` / `containerInstanceId` fields are now **`string`** (decimal digits, matching MCP's `EntityId` wire format) rather than `int`. Remaining `FindObjectsByType(..., FindObjectsSortMode)` / `FindObjectsOfType` uses (~20) are CS0618 **warnings** in 6000.5 -- intentionally left, cleanup only if Unity promotes them to errors.
 
+**Counts re-verified at HEAD 2026-07-25 (TVD S35):** `[McpPluginTool(` = **248**, `[McpPluginToolType]` = **57** -- unchanged, matching the header figure exactly. Two table rows were wrong, though: **Flexalon / RayFire were transposed** (listed 7 / 8; ground truth is **8 / 7**), now corrected. Because `7 + 8 == 8 + 7` the package-wide total stayed right, which is exactly why the grep-verified sum never surfaced the error -- a reminder that a correct total does not validate its parts. Caught while restoring the corruption-deleted files (see Session Log, 2026-07-25).
+
 | Group | Tools | Define | Asmdef | Status |
 |-------|-------|--------|--------|--------|
-| Flexalon | 7 | `HAS_FLEXALON` | `MCPTools.Flexalon.Editor` | Stable |
+| Flexalon | 8 | `HAS_FLEXALON` | `MCPTools.Flexalon.Editor` | Stable |
 | Prefab World Builder | 4 | `HAS_PWB` | `MCPTools.PWB.Editor` | **Updated TVD1** |
-| RayFire | 8 | `HAS_RAYFIRE` | `MCPTools.RayFire.Editor` | Stable |
+| RayFire | 7 | `HAS_RAYFIRE` | `MCPTools.RayFire.Editor` | Stable |
 | MagicaCloth 2 | 7 | `HAS_MAGICACLOTH2` | `MCPTools.MagicaCloth2.Editor` | Stable |
 | Final IK | 5 | `HAS_FINALIK` | `MCPTools.FinalIK.Editor` | **Updated TVD1** |
 | Malbers AC | 8 | `HAS_MALBERS_AC` | `MCPTools.MalbersAC.Editor` | Stable |
@@ -133,6 +135,32 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### Drive-corruption damage found + restored (July 25, 2026) -- 5 files, 4 tools, 2 groups (TVD Session 35)
+
+**TMCP was the 5th re-cloned repo in the 2026-07-24 E:-drive corruption recovery, and the only one never reconciled.** The recovery swept **projects** (Sandbox, TVD, BloodMiner, AudioProject); TMCP is a *package* repo under `DefaultUnityPackages\`, so it fell outside the enumeration. Its corrupt `.git` was swapped for a fresh clone and left at `reset: moving to HEAD` -- **the working tree was never diffed against HEAD**, and sat for a day with 5 deleted tracked files.
+
+**Damage -- 5 files across 4 unrelated groups, every sibling intact in each** (a scatter no refactor produces):
+
+| Lost file | Content | Consequence |
+|---|---|---|
+| `Flexalon/Editor/Tool_Flexalon.cs` | helpers + **`[McpPluginToolType]`** | compiles, registers **0 of 8** tools |
+| `RayFire/Editor/Tool_RayFire.cs` | helpers + **`[McpPluginToolType]`** | **CS0103** in Rigid/Scene/Shatter -- assembly dead, 7 tools |
+| `FinalIK/Editor/Tool_FinalIK.FBBIK.cs` | 260 lines, **2 tools** | 5 -> 3 tools |
+| `Flexalon/Editor/Tool_Flexalon.GridLayout.cs` | 104 lines, **1 tool** | one tool gone |
+| `MalbersAC/Editor/Tool_MalbersAC.Damageable.cs` | 73 lines, **1 tool** | 8 -> 7 tools |
+
+**4 tools lost outright, plus 2 whole groups knocked out** by the loss of their `[McpPluginToolType]` carrier -- 15 more tools unreachable.
+
+**The group-root file is a single point of failure, and that is the durable lesson.** `Tool_<Group>.cs` carries *both* the shared `FormatVector3` / `InstanceIdOf` helpers *and* the `[McpPluginToolType]` marker. Lose it and you get one of two failures depending on whether siblings call the helpers: **RayFire** hard-failed `CS0103` (loud, obvious), while **Flexalon** -- after a partial repair that restored only the helpers -- compiled perfectly green and registered **zero tools**. The silent one is far worse. **When diagnosing a missing tool group, check for `[McpPluginToolType]` before anything else**; a clean console proves nothing about registration.
+
+**The partial repair that preceded this.** A Sandbox-side session hit Flexalon's `CS0103` in AudioProject, correctly deduced the helpers were missing, and authored a **new** `Tool_Flexalon.Helpers.cs` re-implementing them -- but without the `[McpPluginToolType]` attribute, and without checking the other groups. It fixed the compile and left the group toolless.
+
+**Fix: restore, don't re-author.** Git held every casualty intact. `git restore --source=HEAD` for all 5 files + `.meta`, then **deleted** the hand-authored `Tool_Flexalon.Helpers.cs`, which would otherwise have collided with the restored original as **CS0111** duplicate member definitions. Working tree verified **byte-identical to HEAD** (`git diff HEAD` empty); all 4 groups confirmed to carry exactly one `[McpPluginToolType]` and one set of helper defs. **No source commit results from this** -- the correct end state was the last pushed commit, `27be6ee`.
+
+**Lossless.** The corrupt `.git`'s `packed-refs` had `refs/heads/main` at `27be6ee` == `origin/main` == the fresh clone's HEAD. Zero unpushed commits. `.git.corrupt.bak/` (417 files, 1.4MB) held nothing unique and was deleted.
+
+**Verification is downstream.** All 4 affected groups are `HAS_*`-gated and define-excluded in TVD's lean set, so TVD cannot exercise them. **AudioProject** is the only live project with `HAS_FLEXALON` -- the sole project materially affected, and where the restore gets confirmed (expect **8** Flexalon tools registered, up from 0). `HAS_RAYFIRE` / `HAS_FINALIK` / `HAS_MALBERS_AC` are defined in no live project, so those three fixes are **latent** -- the RayFire one being a guaranteed hard compile failure for the first project to install RayFire.
 
 ### Unity 6000.5 `GetInstanceID` CS0619 fix (July 19, 2026) -- 6 tool groups, `instanceId` now `string` (TVD Session 32)
 
