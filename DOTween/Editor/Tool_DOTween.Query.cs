@@ -7,6 +7,8 @@ using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
 using DG.Tweening;
+// System.ComponentModel (imported for [Description]) also defines Component.
+using Component = UnityEngine.Component;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -26,7 +28,7 @@ Reports animation type, id, duration, delay, ease, loops, end values, and play s
             return MainThread.Instance.Run(() =>
             {
                 GameObject go = FindGO(gameObjectName);
-                DOTweenAnimation[] anims = go.GetComponents<DOTweenAnimation>();
+                Component[] anims = GetAnims(go);
 
                 if (anims.Length == 0)
                     return $"No DOTweenAnimation components found on '{gameObjectName}'.";
@@ -36,54 +38,63 @@ Reports animation type, id, duration, delay, ease, loops, end values, and play s
 
                 for (int i = 0; i < anims.Length; i++)
                 {
-                    DOTweenAnimation anim = anims[i];
+                    Component anim = anims[i];
+                    string id = GetField<string>(anim, "id");
+                    string animTypeName = GetAnimationTypeName(anim);
+
                     sb.AppendLine($"\n-- [{i}] --");
-                    sb.AppendLine($"  AnimationType: {anim.animationType}");
-                    sb.AppendLine($"  Id:            {(string.IsNullOrEmpty(anim.id) ? "(none)" : anim.id)}");
-                    sb.AppendLine($"  Duration:      {anim.duration:F2}s");
-                    sb.AppendLine($"  Delay:         {anim.delay:F2}s");
-                    sb.AppendLine($"  Ease:          {anim.easeType}");
-                    sb.AppendLine($"  Loops:         {anim.loops} ({anim.loopType})");
-                    sb.AppendLine($"  AutoPlay:      {anim.autoPlay}");
-                    sb.AppendLine($"  IsRelative:    {anim.isRelative}");
-                    sb.AppendLine($"  IsFrom:        {anim.isFrom}");
-                    sb.AppendLine($"  IsActive:      {anim.isActive}");
-                    sb.AppendLine($"  AutoKill:      {anim.autoKill}");
+                    sb.AppendLine($"  AnimationType: {animTypeName}");
+                    sb.AppendLine($"  Id:            {(string.IsNullOrEmpty(id) ? "(none)" : id)}");
+                    sb.AppendLine($"  Duration:      {GetField<float>(anim, "duration"):F2}s");
+                    sb.AppendLine($"  Delay:         {GetField<float>(anim, "delay"):F2}s");
+                    sb.AppendLine($"  Ease:          {GetField<Ease>(anim, "easeType")}");
+                    sb.AppendLine($"  Loops:         {GetField<int>(anim, "loops")} ({GetField<LoopType>(anim, "loopType")})");
+                    sb.AppendLine($"  AutoPlay:      {GetField<bool>(anim, "autoPlay")}");
+                    sb.AppendLine($"  IsRelative:    {GetField<bool>(anim, "isRelative")}");
+                    sb.AppendLine($"  IsFrom:        {GetField<bool>(anim, "isFrom")}");
+                    sb.AppendLine($"  IsActive:      {GetField<bool>(anim, "isActive")}");
+                    sb.AppendLine($"  AutoKill:      {GetField<bool>(anim, "autoKill")}");
 
-                    // Report end values based on animation type
-                    DOTweenAnimation.AnimationType animType = anim.animationType;
-                    if (animType == DOTweenAnimation.AnimationType.Move
-                        || animType == DOTweenAnimation.AnimationType.LocalMove
-                        || animType == DOTweenAnimation.AnimationType.Rotate
-                        || animType == DOTweenAnimation.AnimationType.LocalRotate
-                        || animType == DOTweenAnimation.AnimationType.Scale
-                        || animType == DOTweenAnimation.AnimationType.PunchPosition
-                        || animType == DOTweenAnimation.AnimationType.PunchRotation
-                        || animType == DOTweenAnimation.AnimationType.PunchScale
-                        || animType == DOTweenAnimation.AnimationType.ShakePosition
-                        || animType == DOTweenAnimation.AnimationType.ShakeRotation
-                        || animType == DOTweenAnimation.AnimationType.ShakeScale
-                        || animType == DOTweenAnimation.AnimationType.UIWidthHeight)
+                    // Report end values based on animation type. Compared by NAME because the
+                    // nested AnimationType enum is not referenceable at compile time.
+                    switch (animTypeName)
                     {
-                        sb.AppendLine($"  EndValueV3:    ({anim.endValueV3.x:F2}, {anim.endValueV3.y:F2}, {anim.endValueV3.z:F2})");
-                    }
-                    else if (animType == DOTweenAnimation.AnimationType.Color)
-                    {
-                        sb.AppendLine($"  EndValueColor: ({anim.endValueColor.r:F2}, {anim.endValueColor.g:F2}, {anim.endValueColor.b:F2}, {anim.endValueColor.a:F2})");
-                    }
-                    else if (animType == DOTweenAnimation.AnimationType.Fade
-                        || animType == DOTweenAnimation.AnimationType.FillAmount
-                        || animType == DOTweenAnimation.AnimationType.CameraFieldOfView)
-                    {
-                        sb.AppendLine($"  EndValueFloat: {anim.endValueFloat:F2}");
+                        case "Move":
+                        case "LocalMove":
+                        case "Rotate":
+                        case "LocalRotate":
+                        case "Scale":
+                        case "PunchPosition":
+                        case "PunchRotation":
+                        case "PunchScale":
+                        case "ShakePosition":
+                        case "ShakeRotation":
+                        case "ShakeScale":
+                        case "UIWidthHeight":
+                        {
+                            Vector3 endV3 = GetField<Vector3>(anim, "endValueV3");
+                            sb.AppendLine($"  EndValueV3:    ({endV3.x:F2}, {endV3.y:F2}, {endV3.z:F2})");
+                            break;
+                        }
+                        case "Color":
+                        {
+                            Color endColor = GetField<Color>(anim, "endValueColor");
+                            sb.AppendLine($"  EndValueColor: ({endColor.r:F2}, {endColor.g:F2}, {endColor.b:F2}, {endColor.a:F2})");
+                            break;
+                        }
+                        case "Fade":
+                        case "FillAmount":
+                        case "CameraFieldOfView":
+                        {
+                            sb.AppendLine($"  EndValueFloat: {GetField<float>(anim, "endValueFloat"):F2}");
+                            break;
+                        }
                     }
 
-                    // Check tween play state
-                    bool isPlaying = anim.tween != null;
-                    if (isPlaying)
-                    {
-                        isPlaying = anim.tween.active;
-                    }
+                    // 'tween' is declared on the ABSAnimationComponent base; its Tween type
+                    // lives in DOTween.dll, which this assembly does reference.
+                    Tween? tween = GetField(anim, "tween") as Tween;
+                    bool isPlaying = tween != null && tween.active;
                     sb.AppendLine($"  TweenActive:   {isPlaying}");
                 }
 

@@ -8,6 +8,8 @@ using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
 using UnityEditor;
 using DG.Tweening;
+// System.ComponentModel (imported for [Description]) also defines Component.
+using Component = UnityEngine.Component;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -19,7 +21,7 @@ Supports Move, Scale, Rotate, Fade, Color, PunchPosition, ShakePosition, and all
         public string AddAnimation(
             [Description("Name of the GameObject to add the animation to.")]
             string gameObjectName,
-            [Description("Animation type: Move, LocalMove, Rotate, LocalRotate, Scale, Color, Fade, Text, PunchPosition, PunchRotation, PunchScale, ShakePosition, ShakeRotation, ShakeScale, CameraFieldOfView, UIWidthHeight, FillAmount.")]
+            [Description("Animation type: Move, LocalMove, Rotate, LocalRotate, Scale, Color, Fade, Text, PunchPosition, PunchRotation, PunchScale, ShakePosition, ShakeRotation, ShakeScale, CameraAspect, CameraBackgroundColor, CameraFieldOfView, CameraOrthoSize, CameraPixelRect, CameraRect, UIWidthHeight, FillAmount. The installed DOTween Pro version is authoritative; an invalid value reports the exact valid set.")]
             string animationType,
             [Description("Duration in seconds. Default 1.0.")]
             float? duration = null,
@@ -54,8 +56,9 @@ Supports Move, Scale, Rotate, Fade, Color, PunchPosition, ShakePosition, and all
             if (string.IsNullOrEmpty(animationType))
                 throw new ArgumentException("animationType cannot be null or empty.", nameof(animationType));
 
-            if (!Enum.TryParse<DOTweenAnimation.AnimationType>(animationType, true, out DOTweenAnimation.AnimationType parsedAnimType))
-                throw new ArgumentException($"Invalid animationType '{animationType}'. Valid values: Move, LocalMove, Rotate, LocalRotate, Scale, Color, Fade, Text, PunchPosition, PunchRotation, PunchScale, ShakePosition, ShakeRotation, ShakeScale, CameraFieldOfView, UIWidthHeight, FillAmount.", nameof(animationType));
+            // Boxed value of DOTweenAnimation.AnimationType -- the nested enum is not
+            // referenceable at compile time (see Tool_DOTween.cs).
+            object parsedAnimType = ParseAnimationType(animationType);
 
             Ease parsedEase = Ease.OutQuad;
             if (!string.IsNullOrEmpty(ease))
@@ -74,49 +77,52 @@ Supports Move, Scale, Rotate, Fade, Color, PunchPosition, ShakePosition, and all
             return MainThread.Instance.Run(() =>
             {
                 GameObject go = FindGO(gameObjectName);
-                DOTweenAnimation anim = go.AddComponent<DOTweenAnimation>();
+                Component anim = AddAnim(go);
 
-                anim.animationType = parsedAnimType;
-                anim.duration = duration ?? 1f;
-                anim.delay = delay ?? 0f;
-                anim.easeType = parsedEase;
-                anim.loops = loops ?? 1;
-                anim.loopType = parsedLoopType;
-                anim.autoPlay = autoPlay ?? true;
-                anim.isRelative = isRelative ?? false;
-                anim.isFrom = isFrom ?? false;
-                anim.autoKill = true;
-                anim.isActive = true;
+                SetField(anim, "animationType", parsedAnimType);
+                SetField(anim, "duration", duration ?? 1f);
+                SetField(anim, "delay", delay ?? 0f);
+                SetField(anim, "easeType", parsedEase);
+                SetField(anim, "loops", loops ?? 1);
+                SetField(anim, "loopType", parsedLoopType);
+                SetField(anim, "autoPlay", autoPlay ?? true);
+                SetField(anim, "isRelative", isRelative ?? false);
+                SetField(anim, "isFrom", isFrom ?? false);
+                SetField(anim, "autoKill", true);
+                SetField(anim, "isActive", true);
 
                 if (!string.IsNullOrEmpty(id))
-                    anim.id = id;
+                    SetField(anim, "id", id!);
 
                 if (endX.HasValue || endY.HasValue || endZ.HasValue)
-                    anim.endValueV3 = new Vector3(endX ?? 0f, endY ?? 0f, endZ ?? 0f);
+                    SetField(anim, "endValueV3", new Vector3(endX ?? 0f, endY ?? 0f, endZ ?? 0f));
 
                 if (endFloat.HasValue)
-                    anim.endValueFloat = endFloat.Value;
+                    SetField(anim, "endValueFloat", endFloat.Value);
 
-                anim.CreateTween(false, false);
+                CallCreateTween(anim, false, false);
 
                 EditorUtility.SetDirty(go);
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"OK: Added DOTweenAnimation to '{gameObjectName}'");
-                sb.AppendLine($"  Type:       {parsedAnimType}");
-                sb.AppendLine($"  Duration:   {anim.duration:F2}s");
-                sb.AppendLine($"  Delay:      {anim.delay:F2}s");
+                sb.AppendLine($"  Type:       {GetAnimationTypeName(anim)}");
+                sb.AppendLine($"  Duration:   {GetField<float>(anim, "duration"):F2}s");
+                sb.AppendLine($"  Delay:      {GetField<float>(anim, "delay"):F2}s");
                 sb.AppendLine($"  Ease:       {parsedEase}");
-                sb.AppendLine($"  Loops:      {anim.loops} ({parsedLoopType})");
-                sb.AppendLine($"  AutoPlay:   {anim.autoPlay}");
-                sb.AppendLine($"  IsRelative: {anim.isRelative}");
-                sb.AppendLine($"  IsFrom:     {anim.isFrom}");
+                sb.AppendLine($"  Loops:      {GetField<int>(anim, "loops")} ({parsedLoopType})");
+                sb.AppendLine($"  AutoPlay:   {GetField<bool>(anim, "autoPlay")}");
+                sb.AppendLine($"  IsRelative: {GetField<bool>(anim, "isRelative")}");
+                sb.AppendLine($"  IsFrom:     {GetField<bool>(anim, "isFrom")}");
                 if (!string.IsNullOrEmpty(id))
                     sb.AppendLine($"  Id:         {id}");
                 if (endX.HasValue || endY.HasValue || endZ.HasValue)
-                    sb.AppendLine($"  EndValueV3: ({anim.endValueV3.x:F2}, {anim.endValueV3.y:F2}, {anim.endValueV3.z:F2})");
+                {
+                    Vector3 endV3 = GetField<Vector3>(anim, "endValueV3");
+                    sb.AppendLine($"  EndValueV3: ({endV3.x:F2}, {endV3.y:F2}, {endV3.z:F2})");
+                }
                 if (endFloat.HasValue)
-                    sb.AppendLine($"  EndFloat:   {anim.endValueFloat:F2}");
+                    sb.AppendLine($"  EndFloat:   {GetField<float>(anim, "endValueFloat"):F2}");
 
                 return sb.ToString();
             });

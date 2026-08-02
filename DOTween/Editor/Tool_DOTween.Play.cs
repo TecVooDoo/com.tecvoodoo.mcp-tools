@@ -5,8 +5,8 @@ using System.ComponentModel;
 using com.IvanMurzak.McpPlugin;
 using com.IvanMurzak.ReflectorNet.Utils;
 using UnityEngine;
-using UnityEditor;
-using DG.Tweening;
+// System.ComponentModel (imported for [Description]) also defines Component.
+using Component = UnityEngine.Component;
 
 namespace TecVooDoo.MCPTools.Editor
 {
@@ -32,10 +32,14 @@ Optionally target a specific tween by id.")]
 
             string normalizedAction = action.Trim().ToLowerInvariant();
 
+            // Resolved up front so an invalid action always errors, rather than only when
+            // the id filter happens to match at least one component.
+            string methodName = ResolvePlayMethod(normalizedAction, action);
+
             return MainThread.Instance.Run(() =>
             {
                 GameObject go = FindGO(gameObjectName);
-                DOTweenAnimation[] anims = go.GetComponents<DOTweenAnimation>();
+                Component[] anims = GetAnims(go);
 
                 if (anims.Length == 0)
                     throw new InvalidOperationException($"No DOTweenAnimation components found on '{gameObjectName}'.");
@@ -44,30 +48,16 @@ Optionally target a specific tween by id.")]
 
                 for (int i = 0; i < anims.Length; i++)
                 {
-                    DOTweenAnimation anim = anims[i];
+                    Component anim = anims[i];
 
                     // Filter by id if provided
                     if (!string.IsNullOrEmpty(id))
                     {
-                        if (!string.Equals(anim.id, id, StringComparison.OrdinalIgnoreCase))
+                        if (!string.Equals(GetField<string>(anim, "id"), id, StringComparison.OrdinalIgnoreCase))
                             continue;
                     }
 
-                    if (normalizedAction == "play")
-                        anim.DOPlay();
-                    else if (normalizedAction == "pause")
-                        anim.DOPause();
-                    else if (normalizedAction == "rewind")
-                        anim.DORewind();
-                    else if (normalizedAction == "restart")
-                        anim.DORestart();
-                    else if (normalizedAction == "complete")
-                        anim.DOComplete();
-                    else if (normalizedAction == "kill")
-                        anim.DOKill();
-                    else
-                        throw new ArgumentException($"Invalid action '{action}'. Valid values: play, pause, rewind, restart, complete, kill.", nameof(action));
-
+                    CallParameterless(anim, methodName);
                     affected++;
                 }
 
@@ -81,6 +71,21 @@ Optionally target a specific tween by id.")]
                 string target = string.IsNullOrEmpty(id) ? "all" : $"id='{id}'";
                 return $"OK: {normalizedAction} executed on {affected} DOTweenAnimation(s) ({target}) on '{gameObjectName}'.";
             });
+        }
+
+        static string ResolvePlayMethod(string normalizedAction, string rawAction)
+        {
+            switch (normalizedAction)
+            {
+                case "play":     return "DOPlay";
+                case "pause":    return "DOPause";
+                case "rewind":   return "DORewind";
+                case "restart":  return "DORestart";
+                case "complete": return "DOComplete";
+                case "kill":     return "DOKill";
+                default:
+                    throw new ArgumentException($"Invalid action '{rawAction}'. Valid values: play, pause, rewind, restart, complete, kill.", "action");
+            }
         }
     }
 }
