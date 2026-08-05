@@ -17,7 +17,7 @@ namespace MCPTools.FinalIK.Editor
 {
     public partial class Tool_FinalIK
     {
-        [McpPluginTool("finalik-add-fbbik", Title = "Final IK / Add Full Body Biped IK")]
+        [AiTool("finalik-add-fbbik", Title = "Final IK / Add Full Body Biped IK")]
         [Description(@"Adds a FullBodyBipedIK component to a character GameObject and auto-detects biped bone references.
 The character must have an Animator with a humanoid avatar, or a standard biped bone hierarchy.
 This is the main IK component for bipeds -- controls hands, feet, body, and shoulders.")]
@@ -161,7 +161,7 @@ This is the main IK component for bipeds -- controls hands, feet, body, and shou
             });
         }
 
-        [McpPluginTool("finalik-set-effector", Title = "Final IK / Set FBBIK Effector")]
+        [AiTool("finalik-set-effector", Title = "Final IK / Set FBBIK Effector")]
         [Description(@"Sets an effector target position and/or weight on a FullBodyBipedIK component.
 Effectors: 'Body', 'LeftHand', 'RightHand', 'LeftFoot', 'RightFoot', 'LeftShoulder', 'RightShoulder'.
 Set positionWeight to 1 to fully control the effector, 0 to release it.")]

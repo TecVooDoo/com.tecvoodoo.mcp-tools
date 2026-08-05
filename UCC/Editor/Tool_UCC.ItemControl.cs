@@ -18,7 +18,7 @@ namespace MCPTools.UCC.Editor
         const string ITEM_SET_MANAGER_TYPE = "Opsive.UltimateCharacterController.Inventory.ItemSetManagerBase";
         const string ITEM_TYPE = "Opsive.UltimateCharacterController.Items.Item";
 
-        [McpPluginTool("uc-item-control", Title = "UCC / Item Control")]
+        [AiTool("uc-item-control", Title = "UCC / Item Control")]
         [Description(@"Query and control inventory and items on a UCC character.
 Actions: 'list' shows all items in inventory, 'equip' equips an item set by index,
 'unequip' unequips the current item set.

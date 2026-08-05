@@ -11,7 +11,7 @@ namespace MCPTools.Timeflow.Editor
 {
     public partial class Tool_Timeflow
     {
-        [McpPluginTool("timeflow-query", Title = "Timeflow / Query Timeline")]
+        [AiTool("timeflow-query", Title = "Timeflow / Query Timeline")]
         [Description(@"Reports the Timeflow timeline state on a GameObject.
 Returns: current time, start/end time, playing state, loop, time scale,
 auto-play settings, child Timeflow count, TimeflowObject count, and behavior list.

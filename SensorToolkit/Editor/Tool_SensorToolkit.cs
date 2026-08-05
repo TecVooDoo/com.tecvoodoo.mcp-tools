@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MCPTools.SensorToolkit.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_SensorToolkit
     {
         static string FormatV3(Vector3 v) => $"({v.x:F2}, {v.y:F2}, {v.z:F2})";

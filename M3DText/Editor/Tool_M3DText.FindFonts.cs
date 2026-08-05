@@ -10,7 +10,7 @@ namespace MCPTools.M3DText.Editor
 {
     public partial class Tool_M3DText
     {
-        [McpPluginTool("m3dt-find-fonts", Title = "Modular 3D Text / Find Fonts")]
+        [AiTool("m3dt-find-fonts", Title = "Modular 3D Text / Find Fonts")]
         [Description(@"Lists Modular 3D Text Font assets (TinyGiantStudio.Text.Font ScriptableObjects) in the project.
 
 Use to discover available fonts before calling m3dt-configure with the font name.

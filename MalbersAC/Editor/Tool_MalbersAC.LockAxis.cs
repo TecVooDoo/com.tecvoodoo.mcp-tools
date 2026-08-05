@@ -18,7 +18,7 @@ namespace MCPTools.MalbersAC.Editor
 {
     public partial class Tool_MalbersAC
     {
-        [McpPluginTool("ac-add-lock-axis", Title = "Malbers AC / Add Lock Axis")]
+        [AiTool("ac-add-lock-axis", Title = "Malbers AC / Add Lock Axis")]
         [Description(@"Adds or configures a LockAxis component on a GameObject for 2.5D gameplay.
 LockAxis constrains the animal's movement to specific axes.
 For 2.5D side-scrolling: lock Z axis (LockZ=true) so movement stays on the XY plane.

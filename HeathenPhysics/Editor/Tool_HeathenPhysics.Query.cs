@@ -11,7 +11,7 @@ namespace MCPTools.HeathenPhysics.Editor
 {
     public partial class Tool_HeathenPhysics
     {
-        [McpPluginTool("hphys-query", Title = "Heathen Physics / Query Components")]
+        [AiTool("hphys-query", Title = "Heathen Physics / Query Components")]
         [Description(@"Lists all Heathen Unity Physics components on a GameObject and their key settings.
 Reports PhysicsData (hull, volume, mass), BuoyantBody (magnitude, mode, submergedRatio),
 ForceEffectField (strength, radius, global), and ForceEffectReceiver (linear, angular, sensitivity).

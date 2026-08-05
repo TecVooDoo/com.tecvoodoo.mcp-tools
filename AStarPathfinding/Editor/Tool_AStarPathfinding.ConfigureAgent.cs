@@ -11,7 +11,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_AStarPathfinding
     {
-        [McpPluginTool("astar-configure-agent", Title = "A* Pathfinding / Configure Agent")]
+        [AiTool("astar-configure-agent", Title = "A* Pathfinding / Configure Agent")]
         [Description(@"Configure an AI movement agent (AIPath, AILerp, or RichAI) on a GameObject.
 Sets speed, rotation, destination threshold, slowdown, waypoint look-ahead, and other movement settings.
 Optionally sets the agent's destination to another GameObject's position via destinationName.")]

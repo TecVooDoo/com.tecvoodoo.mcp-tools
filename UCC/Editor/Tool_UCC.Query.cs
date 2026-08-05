@@ -14,7 +14,7 @@ namespace MCPTools.UCC.Editor
 {
     public partial class Tool_UCC
     {
-        [McpPluginTool("uc-query", Title = "UCC / Query Character")]
+        [AiTool("uc-query", Title = "UCC / Query Character")]
         [Description(@"Reads the full Ultimate Character Controller setup on a GameObject.
 Reports locomotion state (enabled, grounded, active abilities, movement type),
 attributes (health, stamina, etc.), and equipped items.

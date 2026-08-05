@@ -11,7 +11,7 @@ namespace MCPTools.Cozy.Editor
 {
     public partial class Tool_Cozy
     {
-        [McpPluginTool("cozy-set-time", Title = "Cozy / Set Time of Day")]
+        [AiTool("cozy-set-time", Title = "Cozy / Set Time of Day")]
         [Description(@"Sets time-of-day (and optionally day/year) on the scene's CozyTimeModule.
 
 Mutually exclusive ways to set time -- pick ONE:

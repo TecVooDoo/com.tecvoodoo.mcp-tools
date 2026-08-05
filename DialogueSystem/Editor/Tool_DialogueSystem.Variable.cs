@@ -9,7 +9,7 @@ namespace MCPTools.DialogueSystem.Editor
 {
     public partial class Tool_DialogueSystem
     {
-        [McpPluginTool("ds-variable", Title = "Dialogue System / Variable")]
+        [AiTool("ds-variable", Title = "Dialogue System / Variable")]
         [Description(@"Get or set Dialogue System Lua variables.
 For 'get': reads the current value of a variable via Lua.
 For 'set': sets a variable value, auto-detecting type (bool, number, string).

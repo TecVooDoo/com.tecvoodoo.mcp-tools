@@ -11,7 +11,7 @@ namespace MCPTools.CityGen3D.Editor
 {
     public partial class Tool_CityGen3D
     {
-        [McpPluginTool("cg-add-blueprint", Title = "CityGen3D / Add Blueprint")]
+        [AiTool("cg-add-blueprint", Title = "CityGen3D / Add Blueprint")]
         [Description(@"Lists or adds a CityGen3D Blueprint asset to the scene Generator.
 
 action options:

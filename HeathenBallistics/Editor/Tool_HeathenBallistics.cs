@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MCPTools.HeathenBallistics.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_HeathenBallistics
     {
         static string FormatVector3(Vector3 v) => $"({v.x:F3}, {v.y:F3}, {v.z:F3})";

@@ -9,7 +9,7 @@ namespace MCPTools.DecalCollider.Editor
 {
     public partial class Tool_DecalCollider
     {
-        [McpPluginTool("decal-configure", Title = "Decal Collider / Configure")]
+        [AiTool("decal-configure", Title = "Decal Collider / Configure")]
         [Description(@"Sets configuration properties on a DecalCollider component. All parameters optional.
 decalMode: GridProjection or MeshProjection.
 projectionDirection: Up, Down, Forward, Back, Right, Left, ForwardUp, ForwardDown, BackUp, BackDown,

@@ -13,7 +13,7 @@ namespace MCPTools.HeathenBallistics.Editor
 {
     public partial class Tool_HeathenBallistics
     {
-        [McpPluginTool("ballistic-calculate-solution", Title = "Heathen Ballistics / Calculate Aim Solution")]
+        [AiTool("ballistic-calculate-solution", Title = "Heathen Ballistics / Calculate Aim Solution")]
         [Description(@"Calculates the launch angle(s) needed to hit a target position from a source position.
 Returns 0, 1, or 2 solutions (low arc and high arc). Use the rotation to orient a launcher.
 This is a pure math calculation -- no scene objects are modified.
@@ -64,7 +64,7 @@ gravity: downward gravity (default 9.81 -- positive = downward pull).")]
             });
         }
 
-        [McpPluginTool("ballistic-visualize", Title = "Heathen Ballistics / Visualize Trajectory")]
+        [AiTool("ballistic-visualize", Title = "Heathen Ballistics / Visualize Trajectory")]
         [Description(@"Adds (if missing) and configures a BallisticPathLineRender component for trajectory visualization.
 Requires a LineRenderer on the same GameObject (adds one if missing).
 gravityMode: None, Physics (use Physics.gravity), or Custom (use customGravityY).

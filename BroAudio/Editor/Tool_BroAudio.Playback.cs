@@ -27,7 +27,7 @@ namespace TecVooDoo.MCPTools.Editor
             return null;
         }
 
-        [McpPluginTool("bro-play", Title = "Bro Audio / Play Sound")]
+        [AiTool("bro-play", Title = "Bro Audio / Play Sound")]
         [Description(@"Plays a sound by its entity name.
 Use bro-query first to see all registered entity names.
 Optionally pass position as 'x,y,z' for 3D spatialized playback.")]
@@ -69,7 +69,7 @@ Optionally pass position as 'x,y,z' for 3D spatialized playback.")]
             });
         }
 
-        [McpPluginTool("bro-stop", Title = "Bro Audio / Stop Sound")]
+        [AiTool("bro-stop", Title = "Bro Audio / Stop Sound")]
         [Description(@"Stops audio playback.
 Stop by entity name (specific clip) or by audioType ('All', 'BGM', 'SFX', 'Ambience', 'Generic', 'UI').
 Provide either entityName OR audioType, not both. If neither is provided, stops all audio.")]
@@ -116,7 +116,7 @@ Provide either entityName OR audioType, not both. If neither is provided, stops 
             });
         }
 
-        [McpPluginTool("bro-volume", Title = "Bro Audio / Set Volume")]
+        [AiTool("bro-volume", Title = "Bro Audio / Set Volume")]
         [Description(@"Sets volume for all audio, a specific audio type, or a specific sound entity.
 Volume is 0.0 to 1.0. fadeTime is transition duration in seconds.
 Provide entityName OR audioType to scope the change; omit both to set master volume.")]

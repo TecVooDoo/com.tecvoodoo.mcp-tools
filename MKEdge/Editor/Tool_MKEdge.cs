@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace MCPTools.MKEdge.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_MKEdge
     {
         // Returns either the URP VolumeComponent or RendererFeature variant

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.Terrain25D.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Terrain25D
     {
         static global::Kamgam.Terrain25DLib.Terrain25D GetTerrain(string gameObjectName)

@@ -12,7 +12,7 @@ namespace MCPTools.Feel.Editor
 {
     public partial class Tool_Feel
     {
-        [McpPluginTool("feel-add-feedback", Title = "Feel / Add Feedback to Player")]
+        [AiTool("feel-add-feedback", Title = "Feel / Add Feedback to Player")]
         [Description(@"Adds a feedback to an MMF_Player's FeedbacksList and initializes the player.
 feedbackType options (most useful):
   CameraShake, Position, Scale, Rotation, Light, Particles, Flash,
@@ -83,7 +83,7 @@ After adding, use feel-configure-player to re-initialize if needed.")]
             });
         }
 
-        [McpPluginTool("feel-play", Title = "Feel / Play / Stop / Control Feedbacks")]
+        [AiTool("feel-play", Title = "Feel / Play / Stop / Control Feedbacks")]
         [Description(@"Controls MMF_Player playback at runtime.
 action options:
   Play -- play feedbacks at object position with full intensity.

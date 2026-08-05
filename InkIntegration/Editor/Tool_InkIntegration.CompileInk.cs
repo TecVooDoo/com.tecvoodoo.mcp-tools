@@ -10,7 +10,7 @@ namespace MCPTools.InkIntegration.Editor
 {
     public partial class Tool_InkIntegration
     {
-        [McpPluginTool("ink-compile", Title = "Ink / Compile")]
+        [AiTool("ink-compile", Title = "Ink / Compile")]
         [Description(@"Compiles .ink files to JSON. Specify a file name to compile a specific file,
 or leave empty to compile all master files. Returns compilation status.")]
         public string CompileInk(

@@ -15,7 +15,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_DOTween
     {
-        [McpPluginTool("dotween-add-animation", Title = "DOTween / Add Animation")]
+        [AiTool("dotween-add-animation", Title = "DOTween / Add Animation")]
         [Description(@"Adds and configures a DOTweenAnimation component on a GameObject.
 Supports Move, Scale, Rotate, Fade, Color, PunchPosition, ShakePosition, and all other animation types.")]
         public string AddAnimation(

@@ -10,7 +10,7 @@ namespace MCPTools.TextureStudio.Editor
 {
     public partial class Tool_TextureStudio
     {
-        [McpPluginTool("texstudio-query", Title = "Texture Studio / Query CompositeMap")]
+        [AiTool("texstudio-query", Title = "Texture Studio / Query CompositeMap")]
         [Description(@"Inspects a CompositeMap asset: lists all layers with hierarchy, blend mode, active state,
 transform, parameters, and linked materials. Also reports map dimensions, state snapshots, and output settings.
 assetName: name of the CompositeMap ScriptableObject (searched via AssetDatabase).")]

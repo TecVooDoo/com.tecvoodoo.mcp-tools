@@ -8,7 +8,7 @@ namespace MCPTools.RTW.Editor
 {
     public partial class Tool_RTW
     {
-        [McpPluginTool("rtw-query", Title = "Real Time Weather Pro / Query")]
+        [AiTool("rtw-query", Title = "Real Time Weather Pro / Query")]
         [Description(@"Reports the RealTimeWeatherManager state.
 Reports: location (lat/lon), active weather/water systems, request modes, auto-update settings.")]
         public string Query()

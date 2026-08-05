@@ -9,7 +9,7 @@ namespace MCPTools.ORK.Editor
 {
     public partial class Tool_ORK
     {
-        [McpPluginTool("ork-schematic-run", Title = "ORK / Run Schematic")]
+        [AiTool("ork-schematic-run", Title = "ORK / Run Schematic")]
         [Description(@"Loads a Makinom schematic asset by name and starts running it on the Maki.MachineHandler.
 
 action options:

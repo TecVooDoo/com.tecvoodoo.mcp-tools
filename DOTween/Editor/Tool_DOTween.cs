@@ -25,7 +25,7 @@ namespace TecVooDoo.MCPTools.Editor
     /// Tween always ship as the precompiled DOTween.dll regardless of layout, so they are
     /// bound normally via precompiledReferences and stay strongly typed.
     /// </remarks>
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_DOTween
     {
         const string AnimTypeFullName = "DG.Tweening.DOTweenAnimation";

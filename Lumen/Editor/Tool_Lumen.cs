@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MCPTools.Lumen.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Lumen
     {
         static readonly Type? LumenEffectPlayerType = FindType("DistantLands.Lumen.LumenEffectPlayer");

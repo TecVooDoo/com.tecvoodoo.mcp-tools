@@ -11,7 +11,7 @@ namespace MCPTools.TCC.Editor
 {
     public partial class Tool_TCC
     {
-        [McpPluginTool("tcc-generate", Title = "Technie Collider / Generate")]
+        [AiTool("tcc-generate", Title = "Technie Collider / Generate")]
         [Description(@"Triggers GenerateColliders on a TCC setup. Bakes hulls into actual Collider components.
 This kicks off a coroutine — for Auto hulls, VHACD runs in background and may take time (Low: ~1s, High: ~10s, Placebo: ~60s).
 Use tcc-query afterwards to check IsGeneratingColliders status and final collider list.
@@ -46,7 +46,7 @@ Returns immediately; the generation completes asynchronously.")]
             });
         }
 
-        [McpPluginTool("tcc-configure-vhacd", Title = "Technie Collider / Configure VHACD")]
+        [AiTool("tcc-configure-vhacd", Title = "Technie Collider / Configure VHACD")]
         [Description(@"Sets VHACD (Auto hull) parameters on a TCC PaintingData.
 preset: Low (fast, rough), Medium (balanced, default), High (slow, precise), Placebo (very slow), Custom.
 When preset is Custom, the other parameters take effect; otherwise preset values override them.")]
@@ -96,7 +96,7 @@ When preset is Custom, the other parameters take effect; otherwise preset values
             });
         }
 
-        [McpPluginTool("tcc-delete-generated", Title = "Technie Collider / Delete Generated")]
+        [AiTool("tcc-delete-generated", Title = "Technie Collider / Delete Generated")]
         [Description(@"Removes all generated colliders and auto-child GameObjects from a TCC setup.
 Leaves PaintingData and hull definitions intact — you can re-run tcc-generate to rebuild.")]
         public string DeleteGenerated(

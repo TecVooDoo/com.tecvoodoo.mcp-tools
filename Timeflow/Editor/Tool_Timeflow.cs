@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MCPTools.Timeflow.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Timeflow
     {
         static readonly Type? TimeflowType = FindType("AxonGenesis.Timeflow");

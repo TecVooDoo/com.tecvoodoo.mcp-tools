@@ -17,7 +17,7 @@ namespace MCPTools.Flexalon.Editor
 {
     public partial class Tool_Flexalon
     {
-        [McpPluginTool("flexalon-create-grid-layout", Title = "Flexalon / Create Grid Layout")]
+        [AiTool("flexalon-create-grid-layout", Title = "Flexalon / Create Grid Layout")]
         [Description(@"Creates a new GameObject with a Flexalon Grid Layout component.
 Children added to this object will be automatically arranged in a grid pattern.
 Use 'flexalon-add-child' to populate the grid with objects.")]

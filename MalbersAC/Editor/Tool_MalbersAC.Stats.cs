@@ -19,7 +19,7 @@ namespace MCPTools.MalbersAC.Editor
 {
     public partial class Tool_MalbersAC
     {
-        [McpPluginTool("ac-query-stats", Title = "Malbers AC / Query Stats")]
+        [AiTool("ac-query-stats", Title = "Malbers AC / Query Stats")]
         [Description(@"Reads all stats on a Stats component attached to a GameObject.
 Lists each stat's name, ID, value, max, min, regen rate, and degen rate.
 Use this before configuring stats to see current values.")]
@@ -63,7 +63,7 @@ Use this before configuring stats to see current values.")]
             });
         }
 
-        [McpPluginTool("ac-configure-stat", Title = "Malbers AC / Configure Stat")]
+        [AiTool("ac-configure-stat", Title = "Malbers AC / Configure Stat")]
         [Description(@"Configures a specific stat on a Stats component by stat name.
 Only provided parameters are changed; others are left as-is.
 Common stats: Health, Stamina, Energy, Mana.

@@ -17,7 +17,7 @@ namespace MCPTools.Flexalon.Editor
 {
     public partial class Tool_Flexalon
     {
-        [McpPluginTool("flexalon-create-flexible-layout", Title = "Flexalon / Create Flexible Layout")]
+        [AiTool("flexalon-create-flexible-layout", Title = "Flexalon / Create Flexible Layout")]
         [Description(@"Creates a new GameObject with a Flexalon Flexible Layout component.
 This is a linear layout (like CSS flexbox). Children are placed one after another along a direction.
 Supports wrapping. Use 'flexalon-add-child' to populate it with objects.")]

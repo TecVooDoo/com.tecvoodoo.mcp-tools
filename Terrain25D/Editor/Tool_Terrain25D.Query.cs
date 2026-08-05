@@ -11,7 +11,7 @@ namespace MCPTools.Terrain25D.Editor
 {
     public partial class Tool_Terrain25D
     {
-        [McpPluginTool("terrain25d-query", Title = "2.5D Terrain / Query")]
+        [AiTool("terrain25d-query", Title = "2.5D Terrain / Query")]
         [Description(@"Reads the full 2.5D Terrain setup on a GameObject.
 Reports MeshGenerator settings (bevel, middle, erosion, snow, mesh properties),
 Collider2DGenerator presence, FoliageGenerator presence, and SplineController state.

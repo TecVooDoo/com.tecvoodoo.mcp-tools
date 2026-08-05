@@ -17,7 +17,7 @@ namespace MCPTools.RayFire.Editor
 {
     public partial class Tool_RayFire
     {
-        [McpPluginTool("rayfire-add-rigid", Title = "RayFire / Add Rigid")]
+        [AiTool("rayfire-add-rigid", Title = "RayFire / Add Rigid")]
         [Description(@"Adds a RayfireRigid component to a GameObject, making it destructible.
 Configure simulation type, demolition type, physics material, and damage settings.
 Use 'rayfire-add-shatter' afterward to configure fragmentation.")]
@@ -103,7 +103,7 @@ Use 'rayfire-add-shatter' afterward to configure fragmentation.")]
             });
         }
 
-        [McpPluginTool("rayfire-configure-rigid", Title = "RayFire / Configure Rigid")]
+        [AiTool("rayfire-configure-rigid", Title = "RayFire / Configure Rigid")]
         [Description(@"Modifies properties on an existing RayfireRigid component.
 Only provided parameters are changed; others are left as-is.")]
         public ConfigureRigidResponse ConfigureRigid(

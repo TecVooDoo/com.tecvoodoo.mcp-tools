@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MCPTools.BehaviorDesigner.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_BehaviorDesigner
     {
         static GameObject FindGO(string gameObjectName)

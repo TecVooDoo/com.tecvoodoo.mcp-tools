@@ -12,7 +12,7 @@ namespace MCPTools.DamageNumbersPro.Editor
 {
     public partial class Tool_DamageNumbersPro
     {
-        [McpPluginTool("dnp-query", Title = "Damage Numbers Pro / Query Settings")]
+        [AiTool("dnp-query", Title = "Damage Numbers Pro / Query Settings")]
         [Description(@"Reads the DamageNumber (DamageNumberMesh or DamageNumberGUI) configuration.
 Reports display settings (lifetime, number, texts, color), animation settings
 (fade in/out, movement mode), performance settings (pooling, updateDelay), and
@@ -71,7 +71,7 @@ spam control settings (grouping, combination).")]
             });
         }
 
-        [McpPluginTool("dnp-configure-display", Title = "Damage Numbers Pro / Configure Display")]
+        [AiTool("dnp-configure-display", Title = "Damage Numbers Pro / Configure Display")]
         [Description(@"Configures display settings on a DamageNumber component.
 lifetime: seconds before the number fades out and despawns (ignored if permanent=true).
 permanent: if true, number persists until manually faded out.
@@ -139,7 +139,7 @@ colorR/G/B/A: set the number display color (0-1 range).")]
             });
         }
 
-        [McpPluginTool("dnp-configure-animation", Title = "Damage Numbers Pro / Configure Animation")]
+        [AiTool("dnp-configure-animation", Title = "Damage Numbers Pro / Configure Animation")]
         [Description(@"Configures fade and movement animation on a DamageNumber component.
 Fade In/Out: control timing and whether position/scale is animated during fade.
 Movement modes (mutually exclusive -- enable only one):
@@ -196,7 +196,7 @@ fadeOutOffsetX/Y: position offset at end of fade-out (popup animates TO this off
             });
         }
 
-        [McpPluginTool("dnp-configure-performance", Title = "Damage Numbers Pro / Configure Performance")]
+        [AiTool("dnp-configure-performance", Title = "Damage Numbers Pro / Configure Performance")]
         [Description(@"Configures pooling and spam control on a DamageNumber component.
 enablePooling: recycle instances instead of destroy/instantiate (highly recommended for frequent spawning).
 poolSize: max instances kept in pool. Set based on max concurrent numbers expected.

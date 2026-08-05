@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MCPTools.Maintainer.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Maintainer
     {
         // Maintainer's global dialog-suppression flag (CodeStage.Maintainer.Maintainer.SuppressDialogs)

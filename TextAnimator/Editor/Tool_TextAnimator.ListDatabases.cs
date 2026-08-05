@@ -11,7 +11,7 @@ namespace MCPTools.TextAnimator.Editor
 {
     public partial class Tool_TextAnimator
     {
-        [McpPluginTool("ta-list-databases", Title = "Text Animator / List Databases")]
+        [AiTool("ta-list-databases", Title = "Text Animator / List Databases")]
         [Description(@"Lists all AnimationsDatabase assets in the project.
 These databases contain registered Text Animator effects.
 Does not require play mode.")]

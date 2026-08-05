@@ -11,7 +11,7 @@ namespace MCPTools.Timeflow.Editor
 {
     public partial class Tool_Timeflow
     {
-        [McpPluginTool("timeflow-control", Title = "Timeflow / Playback Control")]
+        [AiTool("timeflow-control", Title = "Timeflow / Playback Control")]
         [Description(@"Controls Timeflow playback on a GameObject.
 action options:
   Play -- start playback from current position.

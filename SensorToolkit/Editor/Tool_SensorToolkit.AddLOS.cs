@@ -11,7 +11,7 @@ namespace MCPTools.SensorToolkit.Editor
 {
     public partial class Tool_SensorToolkit
     {
-        [McpPluginTool("sensor-add-los", Title = "SensorToolkit / Add LOS Sensor")]
+        [AiTool("sensor-add-los", Title = "SensorToolkit / Add LOS Sensor")]
         [Description(@"Adds and configures a LOSSensor (Line of Sight) on a GameObject.
 The LOSSensor is a compound sensor that tests line of sight for detections from an input sensor.
 It casts rays at detected objects and calculates the ratio that are unobstructed.

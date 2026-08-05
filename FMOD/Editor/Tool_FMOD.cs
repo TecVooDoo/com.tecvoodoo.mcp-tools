@@ -10,10 +10,10 @@ using UnityEngine;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_FMOD
     {
-        [McpPluginTool("fmod-query", Title = "FMOD / Query State")]
+        [AiTool("fmod-query", Title = "FMOD / Query State")]
         [Description(@"Returns FMOD Studio runtime state: initialization status, bank load status, mute state.
 Lists all loaded banks (Master bank is always loaded).
 Use bank paths from the FMOD Studio project (e.g. 'Master', 'Music', 'SFX').")]
@@ -36,7 +36,7 @@ Use bank paths from the FMOD Studio project (e.g. 'Master', 'Music', 'SFX').")]
             });
         }
 
-        [McpPluginTool("fmod-play", Title = "FMOD / Play One Shot")]
+        [AiTool("fmod-play", Title = "FMOD / Play One Shot")]
         [Description(@"Plays an FMOD Studio event as a one-shot (fire and forget).
 eventPath: FMOD Studio event path, e.g. 'event:/Music/MainTheme' or 'event:/SFX/Explosion'.
 Optionally provide position as 'x,y,z' for 3D spatialized playback.")]
@@ -69,7 +69,7 @@ Optionally provide position as 'x,y,z' for 3D spatialized playback.")]
             });
         }
 
-        [McpPluginTool("fmod-parameter", Title = "FMOD / Set Global Parameter")]
+        [AiTool("fmod-parameter", Title = "FMOD / Set Global Parameter")]
         [Description(@"Sets a global FMOD Studio parameter by name.
 Global parameters affect all event instances. Use this to drive music layers, intensity, wetness, etc.
 parameterName must match the global parameter name in FMOD Studio exactly.")]
@@ -97,7 +97,7 @@ parameterName must match the global parameter name in FMOD Studio exactly.")]
             });
         }
 
-        [McpPluginTool("fmod-vca", Title = "FMOD / Set VCA Volume")]
+        [AiTool("fmod-vca", Title = "FMOD / Set VCA Volume")]
         [Description(@"Sets the volume of an FMOD Studio VCA (Voltage Controlled Amplifier).
 VCAs group buses for high-level volume control (e.g. 'vca:/Master', 'vca:/Music', 'vca:/SFX').
 Volume is 0.0 to 1.0.")]
@@ -124,7 +124,7 @@ Volume is 0.0 to 1.0.")]
             });
         }
 
-        [McpPluginTool("fmod-bus", Title = "FMOD / Set Bus Volume")]
+        [AiTool("fmod-bus", Title = "FMOD / Set Bus Volume")]
         [Description(@"Sets the fader level of an FMOD Studio Bus.
 Bus paths follow FMOD Studio routing: 'bus:/' for master bus, 'bus:/Music' for music bus.
 Volume is 0.0 to 1.0.")]

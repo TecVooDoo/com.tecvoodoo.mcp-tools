@@ -12,7 +12,7 @@ namespace MCPTools.BehaviorDesigner.Editor
 {
     public partial class Tool_BehaviorDesigner
     {
-        [McpPluginTool("bd-list-trees", Title = "Behavior Designer / List All Trees")]
+        [AiTool("bd-list-trees", Title = "Behavior Designer / List All Trees")]
         [Description("Lists all BehaviorTree components in the current scene with their name and status.")]
         public string ListTrees()
         {

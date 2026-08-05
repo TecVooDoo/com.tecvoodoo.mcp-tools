@@ -12,7 +12,7 @@ namespace MCPTools.Timeflow.Editor
 {
     public partial class Tool_Timeflow
     {
-        [McpPluginTool("timeflow-configure-event", Title = "Timeflow / Configure Event")]
+        [AiTool("timeflow-configure-event", Title = "Timeflow / Configure Event")]
         [Description(@"Configures a TimeflowEvent behavior on a GameObject. The GO must have a TimeflowEvent component.
 TimeflowEvents trigger at a specific time during Timeflow playback.
 triggerTime: time in seconds when the event fires.

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MCPTools.ORK.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_ORK
     {
         // Resolve key types lazily via reflection. ORK + Makinom ship as DLLs (with .pdb) under Assets/Gaming Is Love/.

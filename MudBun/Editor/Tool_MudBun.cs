@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MCPTools.MudBun.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_MudBun
     {
         static readonly Type? MudRendererBaseType = FindType("MudBun.MudRendererBase");

@@ -9,7 +9,7 @@ namespace MCPTools.ORK.Editor
 {
     public partial class Tool_ORK
     {
-        [McpPluginTool("ork-battle", Title = "ORK / Battle State")]
+        [AiTool("ork-battle", Title = "ORK / Battle State")]
         [Description(@"Reads or modifies the current battle.
 
 action options:

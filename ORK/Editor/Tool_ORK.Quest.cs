@@ -9,7 +9,7 @@ namespace MCPTools.ORK.Editor
 {
     public partial class Tool_ORK
     {
-        [McpPluginTool("ork-quest", Title = "ORK / Quest")]
+        [AiTool("ork-quest", Title = "ORK / Quest")]
         [Description(@"Reads or modifies the player's quest log.
 
 action options:

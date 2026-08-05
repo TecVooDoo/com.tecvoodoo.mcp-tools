@@ -9,7 +9,7 @@ namespace MCPTools.ORK.Editor
 {
     public partial class Tool_ORK
     {
-        [McpPluginTool("ork-inventory", Title = "ORK / Inventory")]
+        [AiTool("ork-inventory", Title = "ORK / Inventory")]
         [Description(@"Operates on a combatant's (or group's) Inventory.
 
 action options:

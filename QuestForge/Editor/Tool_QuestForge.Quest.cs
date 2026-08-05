@@ -14,7 +14,7 @@ namespace MCPTools.QuestForge.Editor
 {
     public partial class Tool_QuestForge
     {
-        [McpPluginTool("qf-create-quest", Title = "Quest Forge / Create Quest")]
+        [AiTool("qf-create-quest", Title = "Quest Forge / Create Quest")]
         [Description(@"Creates a new Quest ScriptableObject asset.
 The quest is saved to the specified path and can have objectives added via 'qf-add-objective'.
 Quest types: Main, Side, Daily, Repeatable.")]
@@ -75,7 +75,7 @@ Quest types: Main, Side, Daily, Repeatable.")]
             });
         }
 
-        [McpPluginTool("qf-query-quests", Title = "Quest Forge / Query Quests")]
+        [AiTool("qf-query-quests", Title = "Quest Forge / Query Quests")]
         [Description(@"Lists all Quest ScriptableObject assets in the project.
 Shows quest ID, name, type, objective count, and prerequisite count for each quest.
 Use to get an overview of all quests in the project.")]

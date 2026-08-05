@@ -11,7 +11,7 @@ namespace MCPTools.AnimationRigging.Editor
 {
     public partial class Tool_AnimationRigging
     {
-        [McpPluginTool("rig-configure-twoboneik", Title = "Animation Rigging / Configure Two Bone IK")]
+        [AiTool("rig-configure-twoboneik", Title = "Animation Rigging / Configure Two Bone IK")]
         [Description(@"Configures a TwoBoneIKConstraint component.
 Requires a TwoBoneIKConstraint already on the named object (add via GameObject menu or gameobject-component-add first).
 rootBoneName / midBoneName / tipBoneName: the three bones in the IK chain (e.g. UpperArm, Forearm, Hand).
@@ -61,7 +61,7 @@ hintWeight [0-1]: how strongly the pole vector hint influences the mid-joint dir
             });
         }
 
-        [McpPluginTool("rig-configure-aim", Title = "Animation Rigging / Configure Multi Aim Constraint")]
+        [AiTool("rig-configure-aim", Title = "Animation Rigging / Configure Multi Aim Constraint")]
         [Description(@"Configures a MultiAimConstraint component.
 MultiAimConstraint makes a bone (e.g. Head, Spine) aim toward one or more source transforms.
 constrainedObjectName: the bone/transform to be aimed.
@@ -122,7 +122,7 @@ If sources already exist, existing entries are preserved and new ones are append
             });
         }
 
-        [McpPluginTool("rig-configure-weights", Title = "Animation Rigging / Configure Rig Weights")]
+        [AiTool("rig-configure-weights", Title = "Animation Rigging / Configure Rig Weights")]
         [Description(@"Sets weight on a Rig or constraint component.
 Use this to blend a whole rig in/out (Rig component) or a single constraint in/out.
 weight [0-1]: 0 = constraint has no effect, 1 = full effect.

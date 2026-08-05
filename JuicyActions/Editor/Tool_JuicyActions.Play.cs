@@ -10,7 +10,7 @@ namespace MCPTools.JuicyActions.Editor
 {
     public partial class Tool_JuicyActions
     {
-        [McpPluginTool("juicy-play", Title = "Juicy Actions / Play Trigger")]
+        [AiTool("juicy-play", Title = "Juicy Actions / Play Trigger")]
         [Description(@"Triggers execution of a Juicy Actions trigger on a GameObject at runtime.
 Finds all ActionOnEvent-derived triggers on the GameObject and fires the one at the
 specified index. Only works in play mode -- returns an error if the editor is not playing.")]

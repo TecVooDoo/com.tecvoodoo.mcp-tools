@@ -11,7 +11,7 @@ namespace MCPTools.BridgeBuilder25D.Editor
 {
     public partial class Tool_BridgeBuilder25D
     {
-        [McpPluginTool("bridge25d-query", Title = "2.5D Bridge / Query")]
+        [AiTool("bridge25d-query", Title = "2.5D Bridge / Query")]
         [Description(@"Reads the full Bridge25D setup on a GameObject.
 Reports physics settings (mass, drag, gravity, spring), damage threshold,
 part count, edge parts, proximity trigger, and break state.

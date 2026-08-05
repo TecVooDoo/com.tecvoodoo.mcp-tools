@@ -11,7 +11,7 @@ namespace MCPTools.UnityEntities.Editor
 {
     public partial class Tool_UnityEntities
     {
-        [McpPluginTool("ecs-query-entities", Title = "ECS / Query Entities")]
+        [AiTool("ecs-query-entities", Title = "ECS / Query Entities")]
         [Description(@"Queries entities in an ECS World, optionally filtered by component types.
 Returns entity index+version and component type names for each match.
 Output is capped at 50 entities. Requires Play mode.")]

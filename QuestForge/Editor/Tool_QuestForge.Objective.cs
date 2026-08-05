@@ -13,7 +13,7 @@ namespace MCPTools.QuestForge.Editor
 {
     public partial class Tool_QuestForge
     {
-        [McpPluginTool("qf-add-objective", Title = "Quest Forge / Add Objective")]
+        [AiTool("qf-add-objective", Title = "Quest Forge / Add Objective")]
         [Description(@"Adds an objective to an existing Quest ScriptableObject.
 Objective types: Kill, Collect, TalkTo, GoToLocation, Interact.
 Each type has specific parameters. Only parameters relevant to the chosen type are used.")]

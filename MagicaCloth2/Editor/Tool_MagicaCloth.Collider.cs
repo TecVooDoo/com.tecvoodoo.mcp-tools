@@ -17,7 +17,7 @@ namespace MCPTools.MagicaCloth2.Editor
 {
     public partial class Tool_MagicaCloth
     {
-        [McpPluginTool("magica-add-sphere-collider", Title = "Magica Cloth / Add Sphere Collider")]
+        [AiTool("magica-add-sphere-collider", Title = "Magica Cloth / Add Sphere Collider")]
         [Description(@"Adds a MagicaSphereCollider to a GameObject (typically a bone).
 Magica colliders prevent cloth from penetrating character body parts.
 Common usage: add to hand, head, chest, or leg bones.")]
@@ -55,7 +55,7 @@ Common usage: add to hand, head, chest, or leg bones.")]
             });
         }
 
-        [McpPluginTool("magica-add-capsule-collider", Title = "Magica Cloth / Add Capsule Collider")]
+        [AiTool("magica-add-capsule-collider", Title = "Magica Cloth / Add Capsule Collider")]
         [Description(@"Adds a MagicaCapsuleCollider to a GameObject (typically a bone).
 Capsule colliders are best for limbs (arms, legs, torso).
 Direction sets the capsule axis: X, Y, or Z.")]

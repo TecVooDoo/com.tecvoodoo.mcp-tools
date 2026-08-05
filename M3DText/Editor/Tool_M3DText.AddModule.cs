@@ -14,7 +14,7 @@ namespace MCPTools.M3DText.Editor
 {
     public partial class Tool_M3DText
     {
-        [McpPluginTool("m3dt-add-module", Title = "Modular 3D Text / Add or List Module")]
+        [AiTool("m3dt-add-module", Title = "Modular 3D Text / Add or List Module")]
         [Description(@"Adds a module to a Modular3DText component's adding-effects or deleting-effects list.
 
 action options:

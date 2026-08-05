@@ -10,7 +10,7 @@ namespace MCPTools.Animancer.Editor
 {
     public partial class Tool_Animancer
     {
-        [McpPluginTool("animancer-play", Title = "Animancer / Play Animation")]
+        [AiTool("animancer-play", Title = "Animancer / Play Animation")]
         [Description(@"Plays an animation on an AnimancerComponent by clip asset name.
 fadeDuration: cross-fade duration in seconds (0 = instant switch).
 layer: which layer to play on (default 0).
@@ -65,7 +65,7 @@ Requires play mode for runtime playback. In edit mode, sets up the state.")]
             });
         }
 
-        [McpPluginTool("animancer-stop", Title = "Animancer / Stop")]
+        [AiTool("animancer-stop", Title = "Animancer / Stop")]
         [Description(@"Stops animations on an AnimancerComponent.
 clipName: stop a specific clip. Omit to stop all.")]
         public string Stop(
@@ -91,7 +91,7 @@ clipName: stop a specific clip. Omit to stop all.")]
             });
         }
 
-        [McpPluginTool("animancer-configure", Title = "Animancer / Configure State")]
+        [AiTool("animancer-configure", Title = "Animancer / Configure State")]
         [Description(@"Modifies a currently registered animation state's properties.
 Find the clip by name, then set speed, weight, time, or normalized time.
 Useful for fine-tuning playback without restarting the animation.")]

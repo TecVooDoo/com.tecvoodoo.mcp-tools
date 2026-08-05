@@ -12,7 +12,7 @@ namespace MCPTools.BoingKit.Editor
 {
     public partial class Tool_BoingKit
     {
-        [McpPluginTool("boing-query", Title = "Boing Kit / Query Components")]
+        [AiTool("boing-query", Title = "Boing Kit / Query Components")]
         [Description(@"Reports all Boing Kit components on a GameObject and their configuration.
 Checks for: BoingBehavior, BoingBones, BoingEffector, BoingReactorField.
 Returns detailed settings for each found component.")]

@@ -11,7 +11,7 @@ namespace MCPTools.Terrain25D.Editor
 {
     public partial class Tool_Terrain25D
     {
-        [McpPluginTool("terrain25d-generate", Title = "2.5D Terrain / Generate Mesh")]
+        [AiTool("terrain25d-generate", Title = "2.5D Terrain / Generate Mesh")]
         [Description(@"Triggers mesh generation on a Terrain25D's MeshGenerator.
 Also optionally generates 2D colliders and foliage.
 Call after configuring mesh parameters with 'terrain25d-configure-mesh'.")]

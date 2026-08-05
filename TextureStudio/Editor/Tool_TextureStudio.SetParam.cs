@@ -9,7 +9,7 @@ namespace MCPTools.TextureStudio.Editor
 {
     public partial class Tool_TextureStudio
     {
-        [McpPluginTool("texstudio-set-param", Title = "Texture Studio / Set Parameter")]
+        [AiTool("texstudio-set-param", Title = "Texture Studio / Set Parameter")]
         [Description(@"Sets a parameter on a CompositeMap layer (cascades to children).
 paramName values: Active, Angle, Bend, Blend, BlendAmount, BlendMode, FontSize, Map, Mask,
   OutlineWidth, OutlineCol, SpriteIndex, Tint, Text, TextAlign, TextCol, TextStyle, TextObj,

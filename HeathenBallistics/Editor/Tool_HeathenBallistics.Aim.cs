@@ -11,7 +11,7 @@ namespace MCPTools.HeathenBallistics.Editor
 {
     public partial class Tool_HeathenBallistics
     {
-        [McpPluginTool("ballistic-configure-aim", Title = "Heathen Ballistics / Configure Aim")]
+        [AiTool("ballistic-configure-aim", Title = "Heathen Ballistics / Configure Aim")]
         [Description(@"Adds (if missing) and configures a BallisticAim component.
 BallisticAim drives a dual-pivot turret or launcher to aim at a target position.
 initialSpeed: projectile launch speed (m/s).
@@ -76,7 +76,7 @@ gravityY: vertical gravity acceleration (default -9.81).")]
             });
         }
 
-        [McpPluginTool("ballistic-configure-trickshot", Title = "Heathen Ballistics / Configure TrickShot")]
+        [AiTool("ballistic-configure-trickshot", Title = "Heathen Ballistics / Configure TrickShot")]
         [Description(@"Adds (if missing) and configures a TrickShot component for bounce-trajectory launching.
 TrickShot predicts bounce paths and spawns a projectile template to follow them.
 speed: projectile speed in m/s.

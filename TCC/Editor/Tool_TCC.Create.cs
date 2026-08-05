@@ -11,7 +11,7 @@ namespace MCPTools.TCC.Editor
 {
     public partial class Tool_TCC
     {
-        [McpPluginTool("tcc-create", Title = "Technie Collider / Create")]
+        [AiTool("tcc-create", Title = "Technie Collider / Create")]
         [Description(@"Adds Technie Collider Creator setup to a GameObject and creates a PaintingData asset.
 Opens the RigidColliderCreator window and calls GenerateAsset to create both PaintingData and HullData assets.
 After creation, use tcc-add-hull to add hulls, then tcc-generate to bake colliders.
@@ -44,7 +44,7 @@ The GameObject MUST have a MeshFilter (or SkinnedMeshRenderer) with a sharedMesh
             });
         }
 
-        [McpPluginTool("tcc-add-hull", Title = "Technie Collider / Add Hull")]
+        [AiTool("tcc-add-hull", Title = "Technie Collider / Add Hull")]
         [Description(@"Adds a hull to an existing TCC setup.
 hullType: Box, ConvexHull, Sphere, Face, FaceAsBox, Auto (VHACD), Capsule.
 isChild: if true, generates collider on a child GameObject (default false = same GO).

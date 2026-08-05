@@ -11,7 +11,7 @@ namespace MCPTools.HeathenPhysics.Editor
 {
     public partial class Tool_HeathenPhysics
     {
-        [McpPluginTool("hphys-configure-buoyancy", Title = "Heathen Physics / Configure Buoyancy")]
+        [AiTool("hphys-configure-buoyancy", Title = "Heathen Physics / Configure Buoyancy")]
         [Description(@"Adds (if missing) and configures a BuoyantBody component.
 BuoyantBody requires a PhysicsData component on the same GameObject.
 buoyantMagnitudeY: the upward buoyancy force (default -19.6 = 2x gravity, opposes sinking).
@@ -63,7 +63,7 @@ Assign the water surface via activeSurfaceObjectName -- the named GameObject mus
             });
         }
 
-        [McpPluginTool("hphys-configure-physics-data", Title = "Heathen Physics / Configure PhysicsData")]
+        [AiTool("hphys-configure-physics-data", Title = "Heathen Physics / Configure PhysicsData")]
         [Description(@"Adds (if missing) and configures a PhysicsData component.
 PhysicsData is the base component for all Heathen physics -- add it first.
 volume and cross-section values drive buoyancy and drag calculations.

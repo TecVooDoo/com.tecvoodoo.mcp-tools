@@ -9,7 +9,7 @@ namespace MCPTools.AdventureCreator.Editor
 {
     public partial class Tool_AdventureCreator
     {
-        [McpPluginTool("ac-list-variables", Title = "Adventure Creator / List Variables")]
+        [AiTool("ac-list-variables", Title = "Adventure Creator / List Variables")]
         [Description(@"Lists all global variables defined in the Adventure Creator Variables Manager.
 Shows variable ID, label, type, and initial value.
 Does not require play mode.")]

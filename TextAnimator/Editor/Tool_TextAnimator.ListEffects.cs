@@ -12,7 +12,7 @@ namespace MCPTools.TextAnimator.Editor
 {
     public partial class Tool_TextAnimator
     {
-        [McpPluginTool("ta-list-effects", Title = "Text Animator / List Effects")]
+        [AiTool("ta-list-effects", Title = "Text Animator / List Effects")]
         [Description(@"Lists all available Text Animator effects (behavior and appearance animations).
 Discovers effects via the [EffectInfo] attribute across all loaded assemblies.
 Shows tag ID, category (Behavior/Appearance), and class name.

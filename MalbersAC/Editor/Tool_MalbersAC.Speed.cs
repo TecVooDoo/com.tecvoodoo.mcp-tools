@@ -18,7 +18,7 @@ namespace MCPTools.MalbersAC.Editor
 {
     public partial class Tool_MalbersAC
     {
-        [McpPluginTool("ac-configure-speed", Title = "Malbers AC / Configure Speed")]
+        [AiTool("ac-configure-speed", Title = "Malbers AC / Configure Speed")]
         [Description(@"Configures a speed entry within a speed set on an MAnimal component.
 Speed sets control movement speeds for different states (e.g. Ground has Walk/Trot/Run).
 Only provided parameters are changed; others are left as-is.

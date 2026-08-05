@@ -11,7 +11,7 @@ namespace MCPTools.SensorToolkit.Editor
 {
     public partial class Tool_SensorToolkit
     {
-        [McpPluginTool("sensor-add-range", Title = "SensorToolkit / Add Range or Ray Sensor")]
+        [AiTool("sensor-add-range", Title = "SensorToolkit / Add Range or Ray Sensor")]
         [Description(@"Adds and configures a RangeSensor or RaySensor on a GameObject.
 For RangeSensor: configures sphere shape with radius, detection layers, detection mode, pulse settings.
 For RaySensor: configures ray length, direction, detection/obstruction layers, pulse settings.

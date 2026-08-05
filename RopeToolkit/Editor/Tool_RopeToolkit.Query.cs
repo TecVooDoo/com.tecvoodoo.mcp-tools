@@ -12,7 +12,7 @@ namespace MCPTools.RopeToolkit.Editor
 {
     public partial class Tool_RopeToolkit
     {
-        [McpPluginTool("rope-query", Title = "Rope Toolkit / Query Rope")]
+        [AiTool("rope-query", Title = "Rope Toolkit / Query Rope")]
         [Description(@"Reads the full configuration of a Rope Toolkit Rope component.
 Returns simulation settings (stiffness, energyLoss, gravity, substeps), collision settings
 (enabled, friction, stride), appearance (radius, radialVertices), and measurements

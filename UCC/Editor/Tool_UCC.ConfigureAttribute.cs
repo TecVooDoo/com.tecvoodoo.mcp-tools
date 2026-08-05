@@ -14,7 +14,7 @@ namespace MCPTools.UCC.Editor
 {
     public partial class Tool_UCC
     {
-        [McpPluginTool("uc-configure-attribute", Title = "UCC / Configure Attribute")]
+        [AiTool("uc-configure-attribute", Title = "UCC / Configure Attribute")]
         [Description(@"Configures a character attribute (Health, Stamina, etc.) on a UCC character.
 Requires an AttributeManager component. Only provided parameters are changed.
 Use 'uc-query' first to see available attributes and their current values.

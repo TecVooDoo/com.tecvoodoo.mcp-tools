@@ -13,7 +13,7 @@ namespace MCPTools.MKEdge.Editor
 {
     public partial class Tool_MKEdge
     {
-        [McpPluginTool("mkedge-preset", Title = "MK Edge Detection / Apply Preset")]
+        [AiTool("mkedge-preset", Title = "MK Edge Detection / Apply Preset")]
         [Description(@"Applies a named preset of MK Edge Detection parameters to a target.
 Presets: subtle-outline, comic, blueprint, sketch, ink-wash, souls-like, toon, noir.
 Only works on the URP VolumeComponent variant.")]

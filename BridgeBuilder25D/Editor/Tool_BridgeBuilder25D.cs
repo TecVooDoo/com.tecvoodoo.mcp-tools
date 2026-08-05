@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.BridgeBuilder25D.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_BridgeBuilder25D
     {
         static Bridge25D GetBridge(string gameObjectName)

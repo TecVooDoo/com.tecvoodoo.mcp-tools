@@ -3,7 +3,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace MCPTools.RayFire.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_RayFire
     {
         static string FormatVector3(UnityEngine.Vector3 v)

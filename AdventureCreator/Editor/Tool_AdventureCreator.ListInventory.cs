@@ -9,7 +9,7 @@ namespace MCPTools.AdventureCreator.Editor
 {
     public partial class Tool_AdventureCreator
     {
-        [McpPluginTool("ac-list-inventory", Title = "Adventure Creator / List Inventory")]
+        [AiTool("ac-list-inventory", Title = "Adventure Creator / List Inventory")]
         [Description(@"Lists all inventory items defined in the Adventure Creator Inventory Manager.
 Shows item ID, label, category, and count. Also lists categories and recipes.
 Does not require play mode.")]

@@ -8,7 +8,7 @@ namespace MCPTools.MKEdge.Editor
 {
     public partial class Tool_MKEdge
     {
-        [McpPluginTool("mkedge-toggle", Title = "MK Edge Detection / Toggle")]
+        [AiTool("mkedge-toggle", Title = "MK Edge Detection / Toggle")]
         [Description(@"Enables or disables MK Edge Detection on a target.
 For VolumeComponent: sets .active.
 For RendererFeature: sets .isActive.")]

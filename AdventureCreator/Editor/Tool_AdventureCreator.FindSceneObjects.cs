@@ -10,7 +10,7 @@ namespace MCPTools.AdventureCreator.Editor
 {
     public partial class Tool_AdventureCreator
     {
-        [McpPluginTool("ac-find-scene-objects", Title = "Adventure Creator / Find Scene Objects")]
+        [AiTool("ac-find-scene-objects", Title = "Adventure Creator / Find Scene Objects")]
         [Description(@"Finds Adventure Creator objects in the current scene: Hotspots, NPCs, Players,
 Markers, Triggers, and ActionLists. Shows their names, positions, and key properties.
 Requires a scene to be open.")]

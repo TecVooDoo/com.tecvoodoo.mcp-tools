@@ -17,7 +17,7 @@ namespace MCPTools.MagicaCloth2.Editor
 {
     public partial class Tool_MagicaCloth
     {
-        [McpPluginTool("magica-add-wind", Title = "Magica Cloth / Add Wind Zone")]
+        [AiTool("magica-add-wind", Title = "Magica Cloth / Add Wind Zone")]
         [Description(@"Creates a new GameObject with a MagicaWindZone component.
 Wind zones affect all MagicaCloth in the scene (GlobalDirection) or within an area.
 Modes: GlobalDirection (whole scene), SphereDirection, BoxDirection, SphereRadial.")]

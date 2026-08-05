@@ -9,7 +9,7 @@ namespace MCPTools.InkIntegration.Editor
 {
     public partial class Tool_InkIntegration
     {
-        [McpPluginTool("ink-list-files", Title = "Ink / List Files")]
+        [AiTool("ink-list-files", Title = "Ink / List Files")]
         [Description(@"Lists all .ink files detected in the project via InkLibrary.
 Shows file path, whether it's a master file (compilable), whether auto-compile is enabled,
 and whether a compiled JSON asset exists. Does not require play mode.")]

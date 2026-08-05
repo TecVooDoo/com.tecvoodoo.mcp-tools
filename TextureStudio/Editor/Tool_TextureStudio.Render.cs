@@ -10,7 +10,7 @@ namespace MCPTools.TextureStudio.Editor
 {
     public partial class Tool_TextureStudio
     {
-        [McpPluginTool("texstudio-render", Title = "Texture Studio / Render & Apply")]
+        [AiTool("texstudio-render", Title = "Texture Studio / Render & Apply")]
         [Description(@"Renders the CompositeMap to texture and optionally applies it to linked materials or bakes to a PNG file.
 Call this after texstudio-set-param to see changes reflected on materials.
 width/height: override render dimensions (default: map's current size).

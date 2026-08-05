@@ -9,7 +9,7 @@ namespace MCPTools.AdventureCreator.Editor
 {
     public partial class Tool_AdventureCreator
     {
-        [McpPluginTool("ac-query-managers", Title = "Adventure Creator / Query Managers")]
+        [AiTool("ac-query-managers", Title = "Adventure Creator / Query Managers")]
         [Description(@"Shows the status of all Adventure Creator managers.
 Reports which managers are assigned and their basic statistics
 (inventory item count, variable count, action type count, etc.).

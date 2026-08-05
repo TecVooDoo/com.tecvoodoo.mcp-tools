@@ -10,7 +10,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_AStarPathfinding
     {
-        [McpPluginTool("astar-query", Title = "A* Pathfinding / Query")]
+        [AiTool("astar-query", Title = "A* Pathfinding / Query")]
         [Description(@"Query A* pathfinding system state and AI agent info.
 Without gameObjectName: lists all graphs (type, node count, dimensions for GridGraph, characterRadius for RecastGraph).
 With gameObjectName: reports AIPath/AILerp/RichAI settings (maxSpeed, rotationSpeed, endReachedDistance, destination,

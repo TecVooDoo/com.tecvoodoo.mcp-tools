@@ -10,7 +10,7 @@ namespace MCPTools.UnityEntities.Editor
 {
     public partial class Tool_UnityEntities
     {
-        [McpPluginTool("ecs-create-destroy", Title = "ECS / Create or Destroy Entity")]
+        [AiTool("ecs-create-destroy", Title = "ECS / Create or Destroy Entity")]
         [Description(@"Creates or destroys an ECS entity.
 For 'create': provide componentTypeNames (comma-separated fully qualified type names).
   Creates an entity with those unmanaged IComponentData components attached.

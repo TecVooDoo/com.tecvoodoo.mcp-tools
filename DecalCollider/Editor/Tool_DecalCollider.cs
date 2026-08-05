@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.DecalCollider.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_DecalCollider
     {
         const string DC_TYPE = "DecalCollider.Runtime.DecalCollider";

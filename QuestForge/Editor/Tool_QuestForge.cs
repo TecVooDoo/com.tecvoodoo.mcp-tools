@@ -6,7 +6,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace MCPTools.QuestForge.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_QuestForge
     {
         const string QUEST_TYPE_NAME              = "MalbersAnimations.QuestForge.Quest";

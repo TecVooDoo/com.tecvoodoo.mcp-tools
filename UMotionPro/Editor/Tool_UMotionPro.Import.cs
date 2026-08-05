@@ -12,7 +12,7 @@ namespace MCPTools.UMotionPro.Editor
 {
     public partial class Tool_UMotionPro
     {
-        [McpPluginTool("umotion-import", Title = "UMotion Pro / Import AnimationClips")]
+        [AiTool("umotion-import", Title = "UMotion Pro / Import AnimationClips")]
         [Description(@"Imports AnimationClips into the loaded UMotion project via ClipEditor.ImportClips. Sources: clipPaths (.anim asset paths), fbxPaths (FBX paths — extracts every AnimationClip sub-asset), clipNames (short names resolved via AssetDatabase.FindAssets). Any combo accepted; at least one must yield a clip. Flag params mirror UMotion's clip-import dialog and override ImportClipSettings.Default when non-null: convertToProgressive, disableAnimCompression, fkToIkConversion, fkToIkDeleteFkKeys, humanoidHandIKEnable, humanoidLosslessKeyframeReduction. Requires ClipEditor window open + project loaded. Blocks until import finishes.")]
         public string Import(
             [Description("Asset paths to AnimationClip (.anim) assets to import. May be empty.")]

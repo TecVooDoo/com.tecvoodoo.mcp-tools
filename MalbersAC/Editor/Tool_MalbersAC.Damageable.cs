@@ -18,7 +18,7 @@ namespace MCPTools.MalbersAC.Editor
 {
     public partial class Tool_MalbersAC
     {
-        [McpPluginTool("ac-configure-damageable", Title = "Malbers AC / Configure Damageable")]
+        [AiTool("ac-configure-damageable", Title = "Malbers AC / Configure Damageable")]
         [Description(@"Configures an MDamageable component on a GameObject.
 MDamageable handles how the animal receives damage, including multipliers and alignment.
 Only provided parameters are changed; others are left as-is.")]

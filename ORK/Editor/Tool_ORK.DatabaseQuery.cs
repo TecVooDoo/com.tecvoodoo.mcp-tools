@@ -9,7 +9,7 @@ namespace MCPTools.ORK.Editor
 {
     public partial class Tool_ORK
     {
-        [McpPluginTool("ork-database-query", Title = "ORK / Database Query")]
+        [AiTool("ork-database-query", Title = "ORK / Database Query")]
         [Description(@"Lists definitions from the ORK project database.
 
 category options (case-insensitive):

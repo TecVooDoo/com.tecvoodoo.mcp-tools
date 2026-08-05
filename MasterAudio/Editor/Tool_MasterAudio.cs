@@ -5,7 +5,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_MasterAudio
     {
         const string MA_TYPE_NAME = "DarkTonic.MasterAudio.MasterAudio";

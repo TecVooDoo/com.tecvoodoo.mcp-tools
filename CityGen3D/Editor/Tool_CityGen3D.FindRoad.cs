@@ -9,7 +9,7 @@ namespace MCPTools.CityGen3D.Editor
 {
     public partial class Tool_CityGen3D
     {
-        [McpPluginTool("cg-find-road-at", Title = "CityGen3D / Find Road At Position")]
+        [AiTool("cg-find-road-at", Title = "CityGen3D / Find Road At Position")]
         [Description(@"Queries the road network at a world-space position.
 
 mode options:

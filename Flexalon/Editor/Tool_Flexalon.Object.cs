@@ -17,7 +17,7 @@ namespace MCPTools.Flexalon.Editor
 {
     public partial class Tool_Flexalon
     {
-        [McpPluginTool("flexalon-set-object-size", Title = "Flexalon / Set Object Size")]
+        [AiTool("flexalon-set-object-size", Title = "Flexalon / Set Object Size")]
         [Description(@"Sets the size of a Flexalon Object component on a GameObject.
 FlexalonObject controls how a layout measures the object's bounds.
 Add this to a layout container to define total layout size, or to a child to override its measured size.")]
@@ -59,7 +59,7 @@ Add this to a layout container to define total layout size, or to a child to ove
             });
         }
 
-        [McpPluginTool("flexalon-list-layouts", Title = "Flexalon / List Layouts in Scene")]
+        [AiTool("flexalon-list-layouts", Title = "Flexalon / List Layouts in Scene")]
         [Description("Lists all Flexalon layout components currently in the scene, with their type and child count.")]
         public ListLayoutsResponse ListLayouts()
         {

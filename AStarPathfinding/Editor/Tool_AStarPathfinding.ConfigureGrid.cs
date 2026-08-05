@@ -11,7 +11,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_AStarPathfinding
     {
-        [McpPluginTool("astar-configure-grid", Title = "A* Pathfinding / Configure Grid Graph")]
+        [AiTool("astar-configure-grid", Title = "A* Pathfinding / Configure Grid Graph")]
         [Description(@"Configure a GridGraph in the A* Pathfinding system.
 Sets grid dimensions, node size, center position, slope/step settings, erosion, and neighbour mode.
 Does NOT trigger a scan -- call astar-scan afterwards to apply changes.")]

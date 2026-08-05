@@ -11,7 +11,7 @@ namespace MCPTools.Lumen.Editor
 {
     public partial class Tool_Lumen
     {
-        [McpPluginTool("lumen-query", Title = "Lumen / Query Effect Player")]
+        [AiTool("lumen-query", Title = "Lumen / Query Effect Player")]
         [Description(@"Reports the LumenEffectPlayer configuration on a GameObject.
 Returns: scale, brightness, color, range, update frequency, fading time,
 initialization/deinitialization behaviors, profile name, and layer count.

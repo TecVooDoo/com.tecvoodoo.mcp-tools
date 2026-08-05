@@ -8,7 +8,7 @@ namespace MCPTools.CityGen3D.Editor
 {
     public partial class Tool_CityGen3D
     {
-        [McpPluginTool("cg-generate", Title = "CityGen3D / Generate")]
+        [AiTool("cg-generate", Title = "CityGen3D / Generate")]
         [Description(@"Triggers a CityGen3D map generation.
 
 action options:

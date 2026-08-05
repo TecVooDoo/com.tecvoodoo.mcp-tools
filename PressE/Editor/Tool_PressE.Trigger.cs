@@ -10,7 +10,7 @@ namespace MCPTools.PressE.Editor
 {
     public partial class Tool_PressE
     {
-        [McpPluginTool("pe-trigger", Title = "PressE PRO 2 / Trigger Interaction")]
+        [AiTool("pe-trigger", Title = "PressE PRO 2 / Trigger Interaction")]
         [Description(@"Programmatically triggers an Interactable's Interact() method.
 Most useful in play mode to fire UnityEvents or simulate input.
 Returns an error if the editor is not in play mode for runtime-only interactions.")]

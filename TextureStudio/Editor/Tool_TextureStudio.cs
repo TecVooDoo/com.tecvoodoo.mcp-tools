@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MCPTools.TextureStudio.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_TextureStudio
     {
         const string MAP_TYPE = "TextureStudio.CompositeMap";

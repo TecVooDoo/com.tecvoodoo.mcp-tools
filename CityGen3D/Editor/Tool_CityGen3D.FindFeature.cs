@@ -11,7 +11,7 @@ namespace MCPTools.CityGen3D.Editor
 {
     public partial class Tool_CityGen3D
     {
-        [McpPluginTool("cg-find-feature-at", Title = "CityGen3D / Find Feature At Position")]
+        [AiTool("cg-find-feature-at", Title = "CityGen3D / Find Feature At Position")]
         [Description(@"Finds a CityGen3D feature (building / surface / entity / tree) within a search radius of a world-space position.
 
 category options (case-insensitive):

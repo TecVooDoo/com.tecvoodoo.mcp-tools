@@ -11,7 +11,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_AStarPathfinding
     {
-        [McpPluginTool("astar-configure-recast", Title = "A* Pathfinding / Configure Recast Graph")]
+        [AiTool("astar-configure-recast", Title = "A* Pathfinding / Configure Recast Graph")]
         [Description(@"Configure a RecastGraph in the A* Pathfinding system.
 Sets character radius, walkable height/climb, slope, voxel resolution, contour error,
 region size, tiling options. Does NOT trigger a scan -- call astar-scan afterwards.")]

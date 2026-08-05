@@ -12,7 +12,7 @@ namespace MCPTools.UMotionPro.Editor
 {
     public partial class Tool_UMotionPro
     {
-        [McpPluginTool("umotion-export", Title = "UMotion Pro / Export Clip(s) to AnimationClip Assets")]
+        [AiTool("umotion-export", Title = "UMotion Pro / Export Clip(s) to AnimationClip Assets")]
         [Description(@"Export clips of the loaded UMotion project to AnimationClip assets. mode = 'current' (selected clip only, via ClipEditor.ExportCurrentClip) | 'all' (every clip, via ExportAllClips) | 'variants' (iterates variants[] presets, exporting once per preset). variants[] format: 'variantName:layerA=mute,layerB=unmute' — tool snapshots layer mute state, applies each preset, renames clip to '<original>_<variantName>' pre-export, exports, restores everything via try/finally. clipName optional for 'variants' to pre-select. Requires ClipEditor window open + project loaded. Blocks until export finishes. Output path set by the UMotion project's own settings.")]
         public string Export(
             [Description("Export mode: 'current', 'all', or 'variants'.")]

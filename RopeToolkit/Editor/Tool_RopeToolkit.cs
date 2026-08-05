@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.RopeToolkit.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_RopeToolkit
     {
         static readonly Type? RopeType = FindType("RopeToolkit.Rope");

@@ -9,7 +9,7 @@ namespace MCPTools.UnityEntities.Editor
 {
     public partial class Tool_UnityEntities
     {
-        [McpPluginTool("ecs-query-worlds", Title = "ECS / Query Worlds")]
+        [AiTool("ecs-query-worlds", Title = "ECS / Query Worlds")]
         [Description(@"Lists all active Unity ECS Worlds.
 Shows each world's name, entity count, system count, IsCreated status,
 and whether it is the DefaultGameObjectInjectionWorld.

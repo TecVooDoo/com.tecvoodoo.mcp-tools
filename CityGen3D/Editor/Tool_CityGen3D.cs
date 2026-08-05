@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MCPTools.CityGen3D.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_CityGen3D
     {
         // CityGen3D ships as DLLs (CityGen3D.dll runtime + CityGen3D.EditorExtension.dll editor) under

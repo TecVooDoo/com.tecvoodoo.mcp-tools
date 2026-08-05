@@ -12,7 +12,7 @@ namespace MCPTools.ALINE.Editor
 {
     public partial class Tool_ALINE
     {
-        [McpPluginTool("aline-draw-line", Title = "ALINE / Draw Line")]
+        [AiTool("aline-draw-line", Title = "ALINE / Draw Line")]
         [Description(@"Draws a line in the Scene View using ALINE.
 The line persists for 'duration' seconds, then disappears.
 Useful for visualizing directions, distances, or connections between scene objects.
@@ -64,7 +64,7 @@ After calling, move the mouse in the Scene View to trigger a repaint.")]
             });
         }
 
-        [McpPluginTool("aline-draw-sphere", Title = "ALINE / Draw Sphere")]
+        [AiTool("aline-draw-sphere", Title = "ALINE / Draw Sphere")]
         [Description(@"Draws a wire sphere in the Scene View using ALINE.
 Persists for 'duration' seconds. Useful for visualizing trigger zones, ranges, or spawn points.
 Can position at a named GameObject's world position.")]
@@ -103,7 +103,7 @@ Can position at a named GameObject's world position.")]
             });
         }
 
-        [McpPluginTool("aline-draw-box", Title = "ALINE / Draw Box")]
+        [AiTool("aline-draw-box", Title = "ALINE / Draw Box")]
         [Description(@"Draws a wire box in the Scene View using ALINE.
 Persists for 'duration' seconds. Useful for visualizing areas, volumes, or bounding regions.
 Can position at a named GameObject's world position and use its scale as the box size.")]
@@ -148,7 +148,7 @@ Can position at a named GameObject's world position and use its scale as the box
             });
         }
 
-        [McpPluginTool("aline-label", Title = "ALINE / Draw Label")]
+        [AiTool("aline-label", Title = "ALINE / Draw Label")]
         [Description(@"Draws a 2D text label at a world position in the Scene View using ALINE.
 Persists for 'duration' seconds. Useful for annotating objects, coordinates, or debug info.
 Can position at a named GameObject's world position.")]

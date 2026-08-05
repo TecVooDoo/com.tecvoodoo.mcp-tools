@@ -14,7 +14,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_DOTween
     {
-        [McpPluginTool("dotween-query", Title = "DOTween / Query Animations")]
+        [AiTool("dotween-query", Title = "DOTween / Query Animations")]
         [Description(@"Lists all DOTweenAnimation components on a GameObject.
 Reports animation type, id, duration, delay, ease, loops, end values, and play state.")]
         public string Query(

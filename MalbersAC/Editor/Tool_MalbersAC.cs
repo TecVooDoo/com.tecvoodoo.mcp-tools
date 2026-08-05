@@ -4,7 +4,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace MCPTools.MalbersAC.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_MalbersAC
     {
         static string FormatVector3(UnityEngine.Vector3 v)

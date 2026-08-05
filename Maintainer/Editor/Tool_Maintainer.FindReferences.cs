@@ -11,7 +11,7 @@ namespace MCPTools.Maintainer.Editor
 {
     public partial class Tool_Maintainer
     {
-        [McpPluginTool("maintainer-find-references", Title = "Maintainer / Find Asset References")]
+        [AiTool("maintainer-find-references", Title = "Maintainer / Find Asset References")]
         [Description(@"Answers 'what references this asset?' using Code Stage Maintainer's References Finder —
 the single most useful check before safely deleting or refactoring an asset. Pass an asset project path
 (e.g. 'Assets/Art/Player.prefab') or a plain asset name to resolve by search. Returns the target asset

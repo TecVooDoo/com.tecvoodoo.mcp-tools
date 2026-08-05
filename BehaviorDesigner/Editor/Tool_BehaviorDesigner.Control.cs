@@ -11,7 +11,7 @@ namespace MCPTools.BehaviorDesigner.Editor
 {
     public partial class Tool_BehaviorDesigner
     {
-        [McpPluginTool("bd-control", Title = "Behavior Designer / Control Tree")]
+        [AiTool("bd-control", Title = "Behavior Designer / Control Tree")]
         [Description("Control behavior tree execution: start, stop, pause, unpause, or restart a BehaviorTree on a GameObject.")]
         public string Control(
             [Description("Name of the GameObject with BehaviorTree component(s).")]

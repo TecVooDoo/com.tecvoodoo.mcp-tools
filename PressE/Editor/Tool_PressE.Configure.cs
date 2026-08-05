@@ -10,7 +10,7 @@ namespace MCPTools.PressE.Editor
 {
     public partial class Tool_PressE
     {
-        [McpPluginTool("pe-configure-interactable", Title = "PressE PRO 2 / Configure Interactable")]
+        [AiTool("pe-configure-interactable", Title = "PressE PRO 2 / Configure Interactable")]
         [Description(@"Sets common Interactable properties on a GameObject.
 interactMode: enum value (UnityEvent, Grab, Drag, Hold, Inspection — exact names depend on installed version).
 hasSensor: enable proximity sensor.
@@ -58,7 +58,7 @@ maxInteractions: limit on total interactions (-1 = unlimited).")]
             });
         }
 
-        [McpPluginTool("pe-configure-key", Title = "PressE PRO 2 / Configure Key")]
+        [AiTool("pe-configure-key", Title = "PressE PRO 2 / Configure Key")]
         [Description(@"Sets Key component properties — used by interactables that gate on collected keys.")]
         public string ConfigureKey(
             [Description("GameObject name with Key.")] string gameObjectName,

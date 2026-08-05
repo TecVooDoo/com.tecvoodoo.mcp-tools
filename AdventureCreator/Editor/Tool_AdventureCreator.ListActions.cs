@@ -10,7 +10,7 @@ namespace MCPTools.AdventureCreator.Editor
 {
     public partial class Tool_AdventureCreator
     {
-        [McpPluginTool("ac-list-actions", Title = "Adventure Creator / List Actions")]
+        [AiTool("ac-list-actions", Title = "Adventure Creator / List Actions")]
         [Description(@"Lists all available Action types registered in the Adventure Creator Actions Manager.
 Shows action title, filename, and category. Actions are the building blocks of ActionLists.
 An optional filter can narrow results by name. Does not require play mode.")]

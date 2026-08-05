@@ -11,7 +11,7 @@ namespace MCPTools.SensorToolkit.Editor
 {
     public partial class Tool_SensorToolkit
     {
-        [McpPluginTool("sensor-query-detections", Title = "SensorToolkit / Query Detections")]
+        [AiTool("sensor-query-detections", Title = "SensorToolkit / Query Detections")]
         [Description(@"Queries runtime detections from sensors on a GameObject (play mode only).
 Returns each detected object's name, distance, and signal strength.
 Can filter by sensor type and tag, and sort by distance or signal strength.")]

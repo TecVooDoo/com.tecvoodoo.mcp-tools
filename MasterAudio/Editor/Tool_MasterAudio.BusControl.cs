@@ -9,7 +9,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_MasterAudio
     {
-        [McpPluginTool("ma-bus-control", Title = "Master Audio / Bus Control")]
+        [AiTool("ma-bus-control", Title = "Master Audio / Bus Control")]
         [Description(@"Control a bus: mute, unmute, solo, unsolo, pause, unpause, stop, fade, or pitch.
 For fade action, provide volume and optional fadeTime.
 For pitch action, provide pitch value.")]

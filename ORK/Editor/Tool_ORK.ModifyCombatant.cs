@@ -8,7 +8,7 @@ namespace MCPTools.ORK.Editor
 {
     public partial class Tool_ORK
     {
-        [McpPluginTool("ork-modify-combatant", Title = "ORK / Modify Combatant")]
+        [AiTool("ork-modify-combatant", Title = "ORK / Modify Combatant")]
         [Description(@"Modifies a runtime Combatant.
 
 action options:

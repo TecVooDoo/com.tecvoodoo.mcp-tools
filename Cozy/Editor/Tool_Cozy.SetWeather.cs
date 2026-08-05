@@ -13,7 +13,7 @@ namespace MCPTools.Cozy.Editor
 {
     public partial class Tool_Cozy
     {
-        [McpPluginTool("cozy-set-weather", Title = "Cozy / Set Weather Profile")]
+        [AiTool("cozy-set-weather", Title = "Cozy / Set Weather Profile")]
         [Description(@"Switches the active WeatherProfile on the scene's CozyWeatherModule.
 Wraps CozyEcosystem.SetWeather(profile, transitionTime) and raises OnWeatherChange.
 

@@ -13,7 +13,7 @@ namespace MCPTools.uLipSync.Editor
 {
     public partial class Tool_uLipSync
     {
-        [McpPluginTool("lipsync-query", Title = "uLipSync / Query Components")]
+        [AiTool("lipsync-query", Title = "uLipSync / Query Components")]
         [Description(@"Reports all uLipSync components on a GameObject hierarchy and their configuration.
 Checks for: uLipSync (analyzer), uLipSyncBlendShape, uLipSyncBakedDataPlayer,
 uLipSyncTimelineEvent, uLipSyncTexture, uLipSyncAnimator.

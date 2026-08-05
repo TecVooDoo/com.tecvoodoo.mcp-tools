@@ -3,7 +3,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace MCPTools.Flexalon.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Flexalon
     {
         static string FormatVector3(UnityEngine.Vector3 v)

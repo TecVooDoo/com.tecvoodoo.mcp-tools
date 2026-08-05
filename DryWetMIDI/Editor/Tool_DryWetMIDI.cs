@@ -9,10 +9,10 @@ using Melanchall.DryWetMidi.Multimedia;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_DryWetMIDI
     {
-        [McpPluginTool("midi-query-devices", Title = "DryWetMIDI / Query MIDI Devices")]
+        [AiTool("midi-query-devices", Title = "DryWetMIDI / Query MIDI Devices")]
         [Description(@"Lists all available MIDI input and output devices on this machine.
 Output devices can be used with Maestro (MidiStreamPlayer) or DryWetMIDI Playback.
 Useful for verifying MIDI routing and available hardware/virtual devices.")]

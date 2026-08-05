@@ -10,7 +10,7 @@ namespace MCPTools.DialogueSystem.Editor
 {
     public partial class Tool_DialogueSystem
     {
-        [McpPluginTool("ds-lua", Title = "Dialogue System / Lua Execute")]
+        [AiTool("ds-lua", Title = "Dialogue System / Lua Execute")]
         [Description(@"Executes arbitrary Lua code in the Dialogue System's Lua environment.
 Returns the result as a string, along with type information (bool, float, string, table).
 Use single quotes for strings inside Lua code to avoid escaping issues.

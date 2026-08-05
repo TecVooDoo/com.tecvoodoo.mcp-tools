@@ -12,7 +12,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_BroAudio
     {
-        [McpPluginTool("bro-query", Title = "Bro Audio / Query State")]
+        [AiTool("bro-query", Title = "Bro Audio / Query State")]
         [Description(@"Lists all registered sound entities, their names, and audio types.
 Also shows master volume per audio type.
 Use this to discover entity names before calling bro-play or bro-stop.")]

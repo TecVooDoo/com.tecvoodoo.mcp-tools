@@ -12,7 +12,7 @@ namespace MCPTools.UnityEntities.Editor
 {
     public partial class Tool_UnityEntities
     {
-        [McpPluginTool("ecs-inspect-entity", Title = "ECS / Inspect Entity")]
+        [AiTool("ecs-inspect-entity", Title = "ECS / Inspect Entity")]
         [Description(@"Inspects a specific ECS entity by index and version.
 Lists all components and attempts to read field values from unmanaged IComponentData.
 Requires Play mode.")]

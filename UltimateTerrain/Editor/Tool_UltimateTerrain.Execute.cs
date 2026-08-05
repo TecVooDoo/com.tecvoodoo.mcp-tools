@@ -10,7 +10,7 @@ namespace MCPTools.UltimateTerrain.Editor
 {
     public partial class Tool_UltimateTerrain
     {
-        [McpPluginTool("ut-execute", Title = "Ultimate Terrain / Execute")]
+        [AiTool("ut-execute", Title = "Ultimate Terrain / Execute")]
         [Description(@"Triggers an action on an UltimateTerrain instance.
 action options:
   Execute -- run all modules with animation

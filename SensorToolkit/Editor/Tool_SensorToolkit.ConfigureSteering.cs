@@ -11,7 +11,7 @@ namespace MCPTools.SensorToolkit.Editor
 {
     public partial class Tool_SensorToolkit
     {
-        [McpPluginTool("sensor-configure-steering", Title = "SensorToolkit / Configure Steering Sensor")]
+        [AiTool("sensor-configure-steering", Title = "SensorToolkit / Configure Steering Sensor")]
         [Description(@"Configures a SteeringSensor component on a GameObject.
 Sets seek mode (Position, Direction, Wander, Stop), seek target, arrive/stopping distances,
 resolution, locomotion mode, and spherical mode.

@@ -17,7 +17,7 @@ namespace MCPTools.RayFire.Editor
 {
     public partial class Tool_RayFire
     {
-        [McpPluginTool("rayfire-list-rigid", Title = "RayFire / List Rigid Objects")]
+        [AiTool("rayfire-list-rigid", Title = "RayFire / List Rigid Objects")]
         [Description("Lists all RayfireRigid components in the current scene with their configuration summary.")]
         public ListRigidResponse ListRigid()
         {
@@ -38,7 +38,7 @@ namespace MCPTools.RayFire.Editor
             });
         }
 
-        [McpPluginTool("rayfire-demolish", Title = "RayFire / Demolish Object")]
+        [AiTool("rayfire-demolish", Title = "RayFire / Demolish Object")]
         [Description(@"Forces immediate demolition of a RayfireRigid object at runtime or in play mode.
 The object must have a RayfireRigid component with demolition enabled.")]
         public DemolishResponse Demolish(
@@ -70,7 +70,7 @@ The object must have a RayfireRigid component with demolition enabled.")]
             });
         }
 
-        [McpPluginTool("rayfire-apply-damage", Title = "RayFire / Apply Damage")]
+        [AiTool("rayfire-apply-damage", Title = "RayFire / Apply Damage")]
         [Description(@"Applies damage to a RayfireRigid object. If accumulated damage exceeds max, the object is demolished.
 Damage must be enabled on the component.")]
         public ApplyDamageResponse ApplyDamage(

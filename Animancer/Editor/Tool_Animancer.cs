@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.Animancer.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Animancer
     {
         static GameObject FindGO(string name)

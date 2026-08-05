@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MCPTools.DamageNumbersPro.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_DamageNumbersPro
     {
         static DamageNumber GetDN(string gameObjectName)

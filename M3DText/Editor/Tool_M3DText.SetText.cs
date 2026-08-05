@@ -8,7 +8,7 @@ namespace MCPTools.M3DText.Editor
 {
     public partial class Tool_M3DText
     {
-        [McpPluginTool("m3dt-set-text", Title = "Modular 3D Text / Set Text")]
+        [AiTool("m3dt-set-text", Title = "Modular 3D Text / Set Text")]
         [Description(@"Sets the Text property on a Modular3DText component.
 The setter triggers an end-of-frame mesh rebuild (mesh updates are batched per frame).
 For numeric overloads, use UpdateText(int) or UpdateText(float) via m3dt-configure.

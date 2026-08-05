@@ -15,7 +15,7 @@ namespace MCPTools.BehaviorDesigner.Editor
 {
     public partial class Tool_BehaviorDesigner
     {
-        [McpPluginTool("bd-query", Title = "Behavior Designer / Query Tree")]
+        [AiTool("bd-query", Title = "Behavior Designer / Query Tree")]
         [Description("Query behavior tree state on a GameObject: tree name, enabled status, shared variables, and node info.")]
         public string Query(
             [Description("Name of the GameObject with BehaviorTree component(s).")]

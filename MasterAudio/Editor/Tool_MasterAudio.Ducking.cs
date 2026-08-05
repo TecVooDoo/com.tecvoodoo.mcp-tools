@@ -9,7 +9,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_MasterAudio
     {
-        [McpPluginTool("ma-configure-ducking", Title = "Master Audio / Configure Ducking")]
+        [AiTool("ma-configure-ducking", Title = "Master Audio / Configure Ducking")]
         [Description(@"Configure music ducking for a sound group.
 Add a group to the duck list so music volume ducks when the group plays, or remove it.
 duckedVolCut: volume reduction in dB when ducked (default -6).

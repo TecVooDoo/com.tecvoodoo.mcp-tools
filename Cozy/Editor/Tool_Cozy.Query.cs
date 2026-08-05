@@ -11,7 +11,7 @@ namespace MCPTools.Cozy.Editor
 {
     public partial class Tool_Cozy
     {
-        [McpPluginTool("cozy-query", Title = "Cozy / Query Weather Sphere")]
+        [AiTool("cozy-query", Title = "Cozy / Query Weather Sphere")]
         [Description(@"Reports the runtime state of a CozyWeather sphere.
 If gameObjectName is omitted, queries CozyWeather.instance (the first sphere in the scene).
 Returns: cloud/sky/fog style, current weather profile, time-of-day, date, attached modules,

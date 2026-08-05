@@ -10,7 +10,7 @@ namespace MCPTools.DialogueSystem.Editor
 {
     public partial class Tool_DialogueSystem
     {
-        [McpPluginTool("ds-quest", Title = "Dialogue System / Quest")]
+        [AiTool("ds-quest", Title = "Dialogue System / Quest")]
         [Description(@"Get or set quest and quest entry states in the Dialogue System.
 Actions: 'get' (returns quest state and descriptions), 'set' (sets quest state),
 'getentry' (gets a quest entry state), 'setentry' (sets a quest entry state),

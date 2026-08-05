@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MCPTools.UnityPhysics.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_UnityPhysics
     {
     }

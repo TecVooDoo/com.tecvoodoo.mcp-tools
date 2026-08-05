@@ -10,7 +10,7 @@ namespace MCPTools.UnityPhysics.Editor
 {
     public partial class Tool_UnityPhysics
     {
-        [McpPluginTool("uphys-query", Title = "Unity Physics / Query Authoring")]
+        [AiTool("uphys-query", Title = "Unity Physics / Query Authoring")]
         [Description(@"Reads all Unity Physics authoring components on a GameObject.
 Reports: Rigidbody (mass, drag, angularDrag, useGravity, isKinematic, interpolation, constraints),
 Collider (type, isTrigger, material, bounds), and PhysicsStepAuthoring (gravity, solver iterations,

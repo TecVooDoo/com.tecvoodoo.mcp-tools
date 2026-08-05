@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace MCPTools.Cozy.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Cozy
     {
         static CozyWeather GetWeather(string? gameObjectName)

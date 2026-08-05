@@ -10,7 +10,7 @@ namespace MCPTools.UltimateTerrain.Editor
 {
     public partial class Tool_UltimateTerrain
     {
-        [McpPluginTool("ut-query", Title = "Ultimate Terrain / Query")]
+        [AiTool("ut-query", Title = "Ultimate Terrain / Query")]
         [Description(@"Reports state for Ultimate Terrain instances.
 If gameObjectName provided, reports just that instance.
 Otherwise lists all active UltimateTerrain instances in the scene.

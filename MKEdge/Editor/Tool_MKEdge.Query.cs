@@ -12,7 +12,7 @@ namespace MCPTools.MKEdge.Editor
 {
     public partial class Tool_MKEdge
     {
-        [McpPluginTool("mkedge-query", Title = "MK Edge Detection / Query")]
+        [AiTool("mkedge-query", Title = "MK Edge Detection / Query")]
         [Description(@"Reports the full state of an MK Edge Detection effect.
 target: name of a Volume GameObject, a VolumeProfile asset, or a UniversalRendererData asset with the feature.
 Reports all 36 parameters + active/enabled state + variant (Volume vs RendererFeature).")]

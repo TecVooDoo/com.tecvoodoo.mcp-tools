@@ -5,7 +5,7 @@ using com.IvanMurzak.ReflectorNet.Utils;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_BroAudio
     {
     }

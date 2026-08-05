@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.RTW.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_RTW
     {
         const string MGR_TYPE = "RealTimeWeather.Managers.RealTimeWeatherManager";

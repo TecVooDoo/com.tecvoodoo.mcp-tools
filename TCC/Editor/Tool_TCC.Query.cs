@@ -12,7 +12,7 @@ namespace MCPTools.TCC.Editor
 {
     public partial class Tool_TCC
     {
-        [McpPluginTool("tcc-query", Title = "Technie Collider / Query")]
+        [AiTool("tcc-query", Title = "Technie Collider / Query")]
         [Description(@"Reports TCC setup state on a GameObject.
 Lists hulls (name, type, isChild, isTrigger, material, selected triangles, generated collider name),
 PaintingData asset path, VHACD preset, custom params, and IsGeneratingColliders status.")]

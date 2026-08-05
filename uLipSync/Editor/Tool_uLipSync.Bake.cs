@@ -15,7 +15,7 @@ namespace MCPTools.uLipSync.Editor
 {
     public partial class Tool_uLipSync
     {
-        [McpPluginTool("lipsync-bake", Title = "uLipSync / Bake AudioClips to BakedData")]
+        [AiTool("lipsync-bake", Title = "uLipSync / Bake AudioClips to BakedData")]
         [Description(@"Bakes AudioClip(s) into uLipSync BakedData assets using a calibrated Profile.
 Can bake a single clip by name, or batch-bake all AudioClips in a directory.
 The output BakedData assets can be used with uLipSyncBakedDataPlayer or Timeline tracks.

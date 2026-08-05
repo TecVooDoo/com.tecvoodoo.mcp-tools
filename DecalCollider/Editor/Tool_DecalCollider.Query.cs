@@ -10,7 +10,7 @@ namespace MCPTools.DecalCollider.Editor
 {
     public partial class Tool_DecalCollider
     {
-        [McpPluginTool("decal-query", Title = "Decal Collider / Query")]
+        [AiTool("decal-query", Title = "Decal Collider / Query")]
         [Description(@"Reads full configuration and status of a DecalCollider component.
 Reports: decal mode, projection direction/space, size, subdivisions, surface offset,
 alpha threshold, LOD settings, hit objects, rebuild stats (triangles, rays, time, memory),

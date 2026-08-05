@@ -10,7 +10,7 @@ namespace MCPTools.PWB.Editor
 {
     public partial class Tool_PWB
     {
-        [McpPluginTool("pwb-list-palettes", Title = "PWB / List Palettes")]
+        [AiTool("pwb-list-palettes", Title = "PWB / List Palettes")]
         [Description(@"Lists all Prefab World Builder palettes and their brushes.
 Each palette contains brushes, and each brush references one or more prefabs.
 Use the brush name or palette index with other PWB tools.")]

@@ -13,7 +13,7 @@ namespace MCPTools.UCC.Editor
 {
     public partial class Tool_UCC
     {
-        [McpPluginTool("uc-configure-locomotion", Title = "UCC / Configure Locomotion")]
+        [AiTool("uc-configure-locomotion", Title = "UCC / Configure Locomotion")]
         [Description(@"Configures UltimateCharacterLocomotion properties on a character.
 Only provided parameters are changed; others are left as-is.
 Use 'uc-query' first to see the current configuration.

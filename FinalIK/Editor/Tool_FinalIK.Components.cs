@@ -18,7 +18,7 @@ namespace MCPTools.FinalIK.Editor
 {
     public partial class Tool_FinalIK
     {
-        [McpPluginTool("finalik-add-lookat", Title = "Final IK / Add LookAt IK")]
+        [AiTool("finalik-add-lookat", Title = "Final IK / Add LookAt IK")]
         [Description(@"Adds a LookAtIK component to a character. Makes the head and optionally spine bones
 rotate to look at a target. Great for NPC gaze and attention systems.")]
         public AddIKResponse AddLookAtIK(
@@ -64,7 +64,7 @@ rotate to look at a target. Great for NPC gaze and attention systems.")]
             });
         }
 
-        [McpPluginTool("finalik-add-aim", Title = "Final IK / Add Aim IK")]
+        [AiTool("finalik-add-aim", Title = "Final IK / Add Aim IK")]
         [Description(@"Adds an AimIK component. Rotates a chain of bones to aim at a target.
 Useful for aiming weapons, pointing, or directing limbs toward a target.")]
         public AddIKResponse AddAimIK(
@@ -110,7 +110,7 @@ Useful for aiming weapons, pointing, or directing limbs toward a target.")]
             });
         }
 
-        [McpPluginTool("finalik-list-ik", Title = "Final IK / List IK Components")]
+        [AiTool("finalik-list-ik", Title = "Final IK / List IK Components")]
         [Description("Lists all Final IK components in the current scene with their type and status.")]
         public ListIKResponse ListIK()
         {

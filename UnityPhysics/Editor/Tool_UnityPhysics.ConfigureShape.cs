@@ -10,7 +10,7 @@ namespace MCPTools.UnityPhysics.Editor
 {
     public partial class Tool_UnityPhysics
     {
-        [McpPluginTool("uphys-configure-shape", Title = "Unity Physics / Configure Collider")]
+        [AiTool("uphys-configure-shape", Title = "Unity Physics / Configure Collider")]
         [Description(@"Configures collider components on a GameObject for Unity.Physics baking.
 Works with standard Unity colliders (BoxCollider, SphereCollider, CapsuleCollider, MeshCollider)
 which Unity.Physics bakes into ECS PhysicsCollider at bake time.

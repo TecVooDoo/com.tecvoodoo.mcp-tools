@@ -11,7 +11,7 @@ namespace MCPTools.M3DText.Editor
 {
     public partial class Tool_M3DText
     {
-        [McpPluginTool("m3dt-create-control", Title = "Modular 3D Text / Create UI Control")]
+        [AiTool("m3dt-create-control", Title = "Modular 3D Text / Create UI Control")]
         [Description(@"Creates a new GameObject with a Modular 3D Text UI control component attached.
 
 controlType options:

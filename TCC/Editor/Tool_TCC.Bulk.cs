@@ -11,7 +11,7 @@ namespace MCPTools.TCC.Editor
 {
     public partial class Tool_TCC
     {
-        [McpPluginTool("tcc-bulk", Title = "Technie Collider / Bulk Configure")]
+        [AiTool("tcc-bulk", Title = "Technie Collider / Bulk Configure")]
         [Description(@"Sets the same property on ALL hulls of a TCC setup at once.
 Wraps RigidColliderCreator's SetAllTypes / SetAllMaterials / SetAllAsChild / SetAllAsTrigger.
 Provide only the properties you want to change.

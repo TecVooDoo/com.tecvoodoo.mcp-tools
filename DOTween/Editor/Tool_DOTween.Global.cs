@@ -10,7 +10,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_DOTween
     {
-        [McpPluginTool("dotween-global", Title = "DOTween / Global Control")]
+        [AiTool("dotween-global", Title = "DOTween / Global Control")]
         [Description(@"Global DOTween control. Affects ALL active tweens in the scene.
 Actions: killall, pauseall, playall, completeall, rewindall.")]
         public string GlobalControl(

@@ -12,7 +12,7 @@ namespace MCPTools.BehaviorDesigner.Editor
 {
     public partial class Tool_BehaviorDesigner
     {
-        [McpPluginTool("bd-tick", Title = "Behavior Designer / Manual Tick")]
+        [AiTool("bd-tick", Title = "Behavior Designer / Manual Tick")]
         [Description("Manually ticks a BehaviorTree. Only works in play mode with UpdateMode set to Manual.")]
         public string Tick(
             [Description("Name of the GameObject with BehaviorTree component(s).")]

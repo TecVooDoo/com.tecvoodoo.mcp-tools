@@ -9,7 +9,7 @@ namespace MCPTools.CityGen3D.Editor
 {
     public partial class Tool_CityGen3D
     {
-        [McpPluginTool("cg-query-map", Title = "CityGen3D / Query Map")]
+        [AiTool("cg-query-map", Title = "CityGen3D / Query Map")]
         [Description(@"Reports CityGen3D.Map.Instance state.
 
 Reports map roads / buildings / features / surfaces / trees counts, the origin coordinate,

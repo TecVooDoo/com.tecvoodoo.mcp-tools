@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.FinalIK.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_FinalIK
     {
         static readonly Type? IKType              = FindType("RootMotion.FinalIK.IK");

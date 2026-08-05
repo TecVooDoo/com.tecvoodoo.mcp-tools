@@ -12,7 +12,7 @@ namespace MCPTools.Cozy.Editor
 {
     public partial class Tool_Cozy
     {
-        [McpPluginTool("cozy-set-biome", Title = "Cozy / Configure Biome")]
+        [AiTool("cozy-set-biome", Title = "Cozy / Configure Biome")]
         [Description(@"Lists, configures, or activates a CozyBiome.
 
 action options:

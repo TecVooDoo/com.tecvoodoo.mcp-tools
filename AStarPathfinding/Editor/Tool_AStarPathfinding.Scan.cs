@@ -10,7 +10,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_AStarPathfinding
     {
-        [McpPluginTool("astar-scan", Title = "A* Pathfinding / Scan Graphs")]
+        [AiTool("astar-scan", Title = "A* Pathfinding / Scan Graphs")]
         [Description(@"Trigger a graph scan or runtime graph update.
 action='scan': Full rescan of all graphs or a specific graph by index.
 action='update': Bounds-based graph update at a specific position. Can modify walkability,

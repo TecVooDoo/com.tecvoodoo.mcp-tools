@@ -18,7 +18,7 @@ namespace MCPTools.MalbersAC.Editor
 {
     public partial class Tool_MalbersAC
     {
-        [McpPluginTool("ac-configure-mode", Title = "Malbers AC / Configure Mode")]
+        [AiTool("ac-configure-mode", Title = "Malbers AC / Configure Mode")]
         [Description(@"Configures a mode on an MAnimal component by mode name or ID.
 Only provided parameters are changed; others are left as-is.
 Common modes: Attack1, Attack2, Action, Damage, etc.

@@ -11,7 +11,7 @@ namespace MCPTools.HeathenPhysics.Editor
 {
     public partial class Tool_HeathenPhysics
     {
-        [McpPluginTool("hphys-configure-force-field", Title = "Heathen Physics / Configure Force Field")]
+        [AiTool("hphys-configure-force-field", Title = "Heathen Physics / Configure Force Field")]
         [Description(@"Adds (if missing) and configures a ForceEffectField component.
 ForceEffectField applies forces to nearby ForceEffectReceiver objects within its radius.
 strength: force multiplier applied to receivers.
@@ -43,7 +43,7 @@ A SphereCollider with isTrigger=true is required for trigger-based detection -- 
             });
         }
 
-        [McpPluginTool("hphys-configure-force-receiver", Title = "Heathen Physics / Configure Force Receiver")]
+        [AiTool("hphys-configure-force-receiver", Title = "Heathen Physics / Configure Force Receiver")]
         [Description(@"Adds (if missing) and configures a ForceEffectReceiver component.
 ForceEffectReceiver makes a rigidbody respond to ForceEffectField forces.
 useLinear: whether linear forces are applied.

@@ -11,7 +11,7 @@ namespace MCPTools.RopeToolkit.Editor
 {
     public partial class Tool_RopeToolkit
     {
-        [McpPluginTool("rope-configure-simulation", Title = "Rope Toolkit / Configure Simulation")]
+        [AiTool("rope-configure-simulation", Title = "Rope Toolkit / Configure Simulation")]
         [Description(@"Sets simulation parameters on a Rope component.
 All parameters are optional -- only provided values are changed.
 stiffness [0.01-1.0]: rope rigidity (higher = stiffer, less droopy).
@@ -61,7 +61,7 @@ lengthMultiplier [0-2.0]: dynamic extension/retraction of rope length.")]
             });
         }
 
-        [McpPluginTool("rope-configure-collision", Title = "Rope Toolkit / Configure Collision")]
+        [AiTool("rope-configure-collision", Title = "Rope Toolkit / Configure Collision")]
         [Description(@"Sets collision parameters on a Rope component.
 enabled: toggles collision detection entirely.
 influenceRigidbodies: whether rope particles push attached rigidbodies.
@@ -102,7 +102,7 @@ collisionMargin [0-1.0]: extra buffer around rope particles for collision.")]
             });
         }
 
-        [McpPluginTool("rope-configure-appearance", Title = "Rope Toolkit / Configure Appearance")]
+        [AiTool("rope-configure-appearance", Title = "Rope Toolkit / Configure Appearance")]
         [Description(@"Sets visual properties on a Rope component.
 radius [0.001-1.0]: visual rope thickness in world units.
 radialVertices [3-32]: mesh segments around the rope circumference (higher = rounder, more expensive).

@@ -5,7 +5,7 @@ using UMotionEditor.API;
 
 namespace MCPTools.UMotionPro.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_UMotionPro
     {
         static void RequireClipEditorWindow()

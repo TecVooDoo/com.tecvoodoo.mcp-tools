@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Maestro
     {
-        [McpPluginTool("maestro-query", Title = "Maestro / Query State")]
+        [AiTool("maestro-query", Title = "Maestro / Query State")]
         [Description(@"Lists all MidiFilePlayer and MidiStreamPlayer instances in the scene.
 Reports: GameObject name, MIDI file name, playing/paused state, tempo, loop setting.
 Use this to discover player names before calling maestro-play or maestro-send-note.")]
@@ -45,7 +45,7 @@ Use this to discover player names before calling maestro-play or maestro-send-no
             });
         }
 
-        [McpPluginTool("maestro-play", Title = "Maestro / Play MIDI File")]
+        [AiTool("maestro-play", Title = "Maestro / Play MIDI File")]
         [Description(@"Starts playback on a MidiFilePlayer.
 playerName: the GameObject name of the MidiFilePlayer to control.
 midiName: optional MIDI file name to load before playing (must be in Maestro's MIDI database).
@@ -78,7 +78,7 @@ If midiName is omitted, plays the currently assigned MIDI.")]
             });
         }
 
-        [McpPluginTool("maestro-stop", Title = "Maestro / Stop MIDI Playback")]
+        [AiTool("maestro-stop", Title = "Maestro / Stop MIDI Playback")]
         [Description("Stops MIDI playback on a MidiFilePlayer.")]
         public string StopPlay(
             [Description("GameObject name of the MidiFilePlayer to stop.")]
@@ -96,7 +96,7 @@ If midiName is omitted, plays the currently assigned MIDI.")]
             });
         }
 
-        [McpPluginTool("maestro-send-note", Title = "Maestro / Send Real-Time MIDI Note")]
+        [AiTool("maestro-send-note", Title = "Maestro / Send Real-Time MIDI Note")]
         [Description(@"Sends a real-time MIDI NoteOn event to a MidiStreamPlayer.
 note: MIDI note number 0-127 (60=Middle C, 69=A4).
 channel: MIDI channel 0-15.

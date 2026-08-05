@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.Feel.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Feel
     {
         static MMF_Player GetPlayer(string gameObjectName)

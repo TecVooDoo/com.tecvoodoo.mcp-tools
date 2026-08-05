@@ -10,7 +10,7 @@ namespace MCPTools.Naninovel.Editor
 {
     public partial class Tool_Naninovel
     {
-        [McpPluginTool("nani-list-characters", Title = "Naninovel / List Characters")]
+        [AiTool("nani-list-characters", Title = "Naninovel / List Characters")]
         [Description(@"Lists all characters registered in the Naninovel project configuration.
 Shows character IDs, display names, name colors, message colors, and implementation types.
 Does not require play mode — reads directly from project configuration assets.")]

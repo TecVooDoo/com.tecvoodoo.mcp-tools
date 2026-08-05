@@ -11,7 +11,7 @@ namespace MCPTools.AnimationRigging.Editor
 {
     public partial class Tool_AnimationRigging
     {
-        [McpPluginTool("rig-query", Title = "Animation Rigging / Query Rig Setup")]
+        [AiTool("rig-query", Title = "Animation Rigging / Query Rig Setup")]
         [Description(@"Lists all Animation Rigging components on a GameObject and its hierarchy.
 Reports: RigBuilder (layers, active state), Rig (weight), and all constraints
 (TwoBoneIKConstraint, MultiAimConstraint, MultiParentConstraint, ChainIKConstraint)

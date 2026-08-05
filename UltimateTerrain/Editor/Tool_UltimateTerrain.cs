@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.UltimateTerrain.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_UltimateTerrain
     {
         static GameObject FindGO(string name)

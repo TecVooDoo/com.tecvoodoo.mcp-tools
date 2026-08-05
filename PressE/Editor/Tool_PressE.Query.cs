@@ -10,7 +10,7 @@ namespace MCPTools.PressE.Editor
 {
     public partial class Tool_PressE
     {
-        [McpPluginTool("pe-query", Title = "PressE PRO 2 / Query")]
+        [AiTool("pe-query", Title = "PressE PRO 2 / Query")]
         [Description(@"Reports PressE PRO 2 components on a GameObject.
 Lists Interactables (range, prompt, conditions, mode), Keys (name, behaviors).")]
         public string Query(

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_PMG
     {
         const string MUSIC_GENERATOR_TYPE_NAME   = "ProcGenMusic.MusicGenerator";
@@ -107,7 +107,7 @@ namespace TecVooDoo.MCPTools.Editor
             return generic.Invoke(null, null);
         }
 
-        [McpPluginTool("pmg-query", Title = "Procedural Music Generator / Query State")]
+        [AiTool("pmg-query", Title = "Procedural Music Generator / Query State")]
         [Description(@"Returns the current state of the Procedural Music Generator:
 playing state, tempo (BPM), key (semitone steps from C), scale, mode, and AutoPlay setting.
 Requires a MusicGenerator component in the active scene.")]
@@ -135,7 +135,7 @@ Requires a MusicGenerator component in the active scene.")]
             });
         }
 
-        [McpPluginTool("pmg-play", Title = "Procedural Music Generator / Play")]
+        [AiTool("pmg-play", Title = "Procedural Music Generator / Play")]
         [Description("Starts procedural music generation. Sets generator state to Playing.")]
         public string Play()
         {
@@ -155,7 +155,7 @@ Requires a MusicGenerator component in the active scene.")]
             });
         }
 
-        [McpPluginTool("pmg-stop", Title = "Procedural Music Generator / Stop")]
+        [AiTool("pmg-stop", Title = "Procedural Music Generator / Stop")]
         [Description("Stops procedural music generation. Sets generator state to Stopped.")]
         public string Stop()
         {
@@ -175,7 +175,7 @@ Requires a MusicGenerator component in the active scene.")]
             });
         }
 
-        [McpPluginTool("pmg-configure", Title = "Procedural Music Generator / Configure")]
+        [AiTool("pmg-configure", Title = "Procedural Music Generator / Configure")]
         [Description(@"Configures the Procedural Music Generator at runtime.
 Provide any combination of: tempo (BPM), keySteps (semitones 0-11), scale (Major/Minor/Chromatic/etc), mode (Ionian/Dorian/Phrygian/Lydian/Mixolydian/Aeolian/Locrian).
 Only parameters you provide will be changed. Changes take effect on the next measure.")]

@@ -3,7 +3,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace MCPTools.MagicaCloth2.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_MagicaCloth
     {
         static string FormatVector3(UnityEngine.Vector3 v)

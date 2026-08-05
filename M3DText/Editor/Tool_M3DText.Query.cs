@@ -10,7 +10,7 @@ namespace MCPTools.M3DText.Editor
 {
     public partial class Tool_M3DText
     {
-        [McpPluginTool("m3dt-query", Title = "Modular 3D Text / Query")]
+        [AiTool("m3dt-query", Title = "Modular 3D Text / Query")]
         [Description(@"Reports Modular3DText components in the active scene.
 If gameObjectName is provided, reports just that one with full config.
 Otherwise lists every Modular3DText component with text + font + size.

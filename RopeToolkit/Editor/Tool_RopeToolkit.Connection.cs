@@ -11,7 +11,7 @@ namespace MCPTools.RopeToolkit.Editor
 {
     public partial class Tool_RopeToolkit
     {
-        [McpPluginTool("rope-add-connection", Title = "Rope Toolkit / Add Connection")]
+        [AiTool("rope-add-connection", Title = "Rope Toolkit / Add Connection")]
         [Description(@"Adds or configures a RopeConnection component on a rope GameObject.
 connectionType options:
   PinRopeToTransform -- pins a rope particle to a fixed transform (no rigidbody needed).

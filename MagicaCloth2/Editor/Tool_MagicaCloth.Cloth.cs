@@ -19,7 +19,7 @@ namespace MCPTools.MagicaCloth2.Editor
 {
     public partial class Tool_MagicaCloth
     {
-        [McpPluginTool("magica-add-bone-cloth", Title = "Magica Cloth / Add Bone Cloth")]
+        [AiTool("magica-add-bone-cloth", Title = "Magica Cloth / Add Bone Cloth")]
         [Description(@"Adds a MagicaCloth component configured as BoneCloth to a GameObject.
 BoneCloth simulates cloth using bone transforms -- ideal for capes, hair, tails, skirts.
 Specify root bones that define the cloth chain.")]
@@ -83,7 +83,7 @@ Specify root bones that define the cloth chain.")]
             });
         }
 
-        [McpPluginTool("magica-add-mesh-cloth", Title = "Magica Cloth / Add Mesh Cloth")]
+        [AiTool("magica-add-mesh-cloth", Title = "Magica Cloth / Add Mesh Cloth")]
         [Description(@"Adds a MagicaCloth component configured as MeshCloth to a GameObject.
 MeshCloth simulates cloth on mesh vertices -- ideal for flags, curtains, tablecloths.
 The GameObject should have a Renderer (MeshRenderer or SkinnedMeshRenderer).")]
@@ -134,7 +134,7 @@ The GameObject should have a Renderer (MeshRenderer or SkinnedMeshRenderer).")]
             });
         }
 
-        [McpPluginTool("magica-list-cloth", Title = "Magica Cloth / List Cloth in Scene")]
+        [AiTool("magica-list-cloth", Title = "Magica Cloth / List Cloth in Scene")]
         [Description("Lists all MagicaCloth components in the current scene with their type and configuration.")]
         public ListClothResponse ListCloth()
         {

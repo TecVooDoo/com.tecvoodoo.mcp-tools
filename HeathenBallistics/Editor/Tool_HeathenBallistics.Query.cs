@@ -11,7 +11,7 @@ namespace MCPTools.HeathenBallistics.Editor
 {
     public partial class Tool_HeathenBallistics
     {
-        [McpPluginTool("ballistic-query", Title = "Heathen Ballistics / Query Components")]
+        [AiTool("ballistic-query", Title = "Heathen Ballistics / Query Components")]
         [Description(@"Lists all Heathen Ballistics components on a GameObject.
 Reports BallisticAim (speed, limits), TrickShot (speed, bounces, radius),
 BallisticPathLineRender (resolution, maxLength, bounces), and BallisticTargeting.

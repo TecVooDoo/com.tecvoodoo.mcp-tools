@@ -10,7 +10,7 @@ namespace MCPTools.RTW.Editor
 {
     public partial class Tool_RTW
     {
-        [McpPluginTool("rtw-request", Title = "Real Time Weather Pro / Request Weather")]
+        [AiTool("rtw-request", Title = "Real Time Weather Pro / Request Weather")]
         [Description(@"Triggers a weather data fetch.
 Provide either (city + country), (city + state), or (latitude + longitude).
 Geo-coordinate request returns IEnumerator (coroutine) — kicked off via the manager's StartCoroutine.")]

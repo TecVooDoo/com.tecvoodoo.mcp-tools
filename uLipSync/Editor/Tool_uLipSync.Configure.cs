@@ -15,7 +15,7 @@ namespace MCPTools.uLipSync.Editor
 {
     public partial class Tool_uLipSync
     {
-        [McpPluginTool("lipsync-configure", Title = "uLipSync / Configure Components")]
+        [AiTool("lipsync-configure", Title = "uLipSync / Configure Components")]
         [Description(@"Configures uLipSync components on a GameObject.
 Can set the Profile on the uLipSync analyzer, configure uLipSyncBlendShape mappings
 (phoneme-to-blendshape-index pairs), and adjust volume/smoothness parameters.

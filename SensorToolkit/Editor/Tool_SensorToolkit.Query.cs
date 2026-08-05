@@ -10,7 +10,7 @@ namespace MCPTools.SensorToolkit.Editor
 {
     public partial class Tool_SensorToolkit
     {
-        [McpPluginTool("sensor-query", Title = "SensorToolkit / Query Sensors")]
+        [AiTool("sensor-query", Title = "SensorToolkit / Query Sensors")]
         [Description(@"Lists all sensor components on a GameObject and their configuration.
 Reports sensor type, enabled state, pulse mode, shape, detection layers, and current detections (play mode).
 Supports RangeSensor, RaySensor, LOSSensor, TriggerSensor, and SteeringSensor.")]

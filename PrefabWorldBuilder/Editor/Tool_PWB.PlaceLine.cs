@@ -18,7 +18,7 @@ namespace MCPTools.PWB.Editor
 {
     public partial class Tool_PWB
     {
-        [McpPluginTool("pwb-place-line", Title = "PWB / Place Brush in Line")]
+        [AiTool("pwb-place-line", Title = "PWB / Place Brush in Line")]
         [Description(@"Places multiple instances of a PWB brush prefab in a line.
 Specify start and end positions and the number of instances.
 Objects are evenly spaced along the line. Great for fences, walls, paths, etc.")]
@@ -153,7 +153,7 @@ Objects are evenly spaced along the line. Great for fences, walls, paths, etc.")
             });
         }
 
-        [McpPluginTool("pwb-add-to-palette", Title = "PWB / Add Prefab to Palette")]
+        [AiTool("pwb-add-to-palette", Title = "PWB / Add Prefab to Palette")]
         [Description(@"Adds a prefab asset to a PWB palette as a new brush.
 The prefab is specified by its asset path. Use this to populate palettes programmatically.")]
         public AddToPaletteResponse AddToPalette(

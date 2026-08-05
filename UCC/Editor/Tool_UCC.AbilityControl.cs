@@ -15,7 +15,7 @@ namespace MCPTools.UCC.Editor
 {
     public partial class Tool_UCC
     {
-        [McpPluginTool("uc-ability-control", Title = "UCC / Ability Control")]
+        [AiTool("uc-ability-control", Title = "UCC / Ability Control")]
         [Description(@"List, enable, disable, start, or stop abilities on a UCC character.
 Actions: 'list' shows all abilities, 'enable'/'disable' toggles the Enabled flag,
 'start'/'stop' calls TryStartAbility/TryStopAbility.

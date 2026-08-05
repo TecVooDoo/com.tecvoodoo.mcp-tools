@@ -12,7 +12,7 @@ namespace MCPTools.JuicyActions.Editor
 {
     public partial class Tool_JuicyActions
     {
-        [McpPluginTool("juicy-query", Title = "Juicy Actions / Query Triggers")]
+        [AiTool("juicy-query", Title = "Juicy Actions / Query Triggers")]
         [Description(@"Lists all Juicy Actions trigger components (ActionOnEvent-derived) on a GameObject.
 Reports each trigger's type name, enabled state, and configured action executors.
 For each ActionExecutor: reports executable items count, time mode, and cooldown.

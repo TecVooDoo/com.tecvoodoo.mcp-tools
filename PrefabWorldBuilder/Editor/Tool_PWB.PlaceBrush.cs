@@ -18,7 +18,7 @@ namespace MCPTools.PWB.Editor
 {
     public partial class Tool_PWB
     {
-        [McpPluginTool("pwb-place-brush", Title = "PWB / Place Brush Prefab")]
+        [AiTool("pwb-place-brush", Title = "PWB / Place Brush Prefab")]
         [Description(@"Places a prefab from a PWB palette brush at a specified position in the scene.
 Use 'pwb-list-palettes' first to see available palettes and brushes.
 Specify the palette and brush by index, or search by brush name.")]

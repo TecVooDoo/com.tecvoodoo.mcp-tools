@@ -17,7 +17,7 @@ namespace MCPTools.RayFire.Editor
 {
     public partial class Tool_RayFire
     {
-        [McpPluginTool("rayfire-add-shatter", Title = "RayFire / Add Shatter")]
+        [AiTool("rayfire-add-shatter", Title = "RayFire / Add Shatter")]
         [Description(@"Adds a RayfireShatter component for pre-fragmenting a mesh.
 Choose a fragmentation algorithm and configure its parameters.
 After adding, call Fragment() in the editor to generate fragments.")]
@@ -86,7 +86,7 @@ After adding, call Fragment() in the editor to generate fragments.")]
             });
         }
 
-        [McpPluginTool("rayfire-fragment", Title = "RayFire / Fragment Object")]
+        [AiTool("rayfire-fragment", Title = "RayFire / Fragment Object")]
         [Description(@"Executes fragmentation on a RayfireShatter component, generating fragment meshes in the editor.
 The object must have a RayfireShatter component. This is an editor-time operation.")]
         public FragmentResponse Fragment(

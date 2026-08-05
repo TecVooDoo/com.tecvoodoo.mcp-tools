@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MCPTools.ALINE.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_ALINE
     {
         static Color ParseColor(float r, float g, float b, float a = 1f)

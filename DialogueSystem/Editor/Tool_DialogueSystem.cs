@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.DialogueSystem.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_DialogueSystem
     {
         // --- Cached types ---

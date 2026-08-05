@@ -13,7 +13,7 @@ namespace MCPTools.BoingKit.Editor
 {
     public partial class Tool_BoingKit
     {
-        [McpPluginTool("boing-configure", Title = "Boing Kit / Configure Component")]
+        [AiTool("boing-configure", Title = "Boing Kit / Configure Component")]
         [Description(@"Configures a Boing Kit component on a GameObject. Specify the componentType and only the
 parameters you want to change -- all others remain untouched.
 componentType must be one of: Effector, Behavior, Bones, or ReactorField.

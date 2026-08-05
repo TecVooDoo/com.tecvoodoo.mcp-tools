@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MCPTools.HeathenPhysics.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_HeathenPhysics
     {
         static string FormatVector3(Vector3 v) => $"({v.x:F2}, {v.y:F2}, {v.z:F2})";

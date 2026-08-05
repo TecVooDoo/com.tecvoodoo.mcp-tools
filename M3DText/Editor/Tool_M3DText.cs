@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MCPTools.M3DText.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_M3DText
     {
         // Cached types resolved via reflection. M3DText scripts compile into Assembly-CSharp-firstpass

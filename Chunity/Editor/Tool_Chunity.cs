@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Chunity
     {
         const string CHUCK_MAIN_INSTANCE_TYPE_NAME = "ChuckMainInstance";
@@ -132,7 +132,7 @@ namespace TecVooDoo.MCPTools.Editor
             return null;
         }
 
-        [McpPluginTool("chuck-query", Title = "Chunity / Query Instances")]
+        [AiTool("chuck-query", Title = "Chunity / Query Instances")]
         [Description(@"Lists all ChuckMainInstance components in the scene.
 Reports the GameObject name and whether each instance is active.
 Use the GameObject name as 'instanceName' in other chuck-* tools.")]
@@ -159,7 +159,7 @@ Use the GameObject name as 'instanceName' in other chuck-* tools.")]
             });
         }
 
-        [McpPluginTool("chuck-run", Title = "Chunity / Run ChucK Code")]
+        [AiTool("chuck-run", Title = "Chunity / Run ChucK Code")]
         [Description(@"Runs a ChucK code string on a named ChuckMainInstance.
 instanceName: the GameObject name of the ChuckMainInstance.
 code: valid ChucK DSP code. The code runs as a new shred on the ChucK VM.
@@ -185,7 +185,7 @@ Example code: 'SinOsc s => dac; 440 => s.freq; 1 => s.gain; 2::second => now;'")
             });
         }
 
-        [McpPluginTool("chuck-set-float", Title = "Chunity / Set Global Float")]
+        [AiTool("chuck-set-float", Title = "Chunity / Set Global Float")]
         [Description(@"Sets a global float variable in a ChuckMainInstance's VM.
 The variable must be declared globally in the ChucK code as 'global float myVar;'.
 This allows real-time parameter control of running ChucK shreds.")]
@@ -221,7 +221,7 @@ This allows real-time parameter control of running ChucK shreds.")]
             });
         }
 
-        [McpPluginTool("chuck-set-int", Title = "Chunity / Set Global Int")]
+        [AiTool("chuck-set-int", Title = "Chunity / Set Global Int")]
         [Description(@"Sets a global int variable in a ChuckMainInstance's VM.
 The variable must be declared globally in the ChucK code as 'global int myVar;'.")]
         public string SetInt(

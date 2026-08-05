@@ -10,7 +10,7 @@ namespace MCPTools.M3DText.Editor
 {
     public partial class Tool_M3DText
     {
-        [McpPluginTool("m3dt-configure", Title = "Modular 3D Text / Configure")]
+        [AiTool("m3dt-configure", Title = "Modular 3D Text / Configure")]
         [Description(@"Configures common properties on a Modular3DText component.
 All parameters optional -- only provided values are applied.
 

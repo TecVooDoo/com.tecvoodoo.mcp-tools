@@ -10,7 +10,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_MasterAudio
     {
-        [McpPluginTool("ma-play", Title = "Master Audio / Play Sound")]
+        [AiTool("ma-play", Title = "Master Audio / Play Sound")]
         [Description(@"Play a sound by group name. Supports 2D and 3D positional audio.
 Provide position as 'x,y,z' for 3D spatialized playback.")]
         public string Play(

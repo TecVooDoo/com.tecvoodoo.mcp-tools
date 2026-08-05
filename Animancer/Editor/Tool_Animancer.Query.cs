@@ -10,7 +10,7 @@ namespace MCPTools.Animancer.Editor
 {
     public partial class Tool_Animancer
     {
-        [McpPluginTool("animancer-query", Title = "Animancer / Query")]
+        [AiTool("animancer-query", Title = "Animancer / Query")]
         [Description(@"Reads the full AnimancerComponent state on a GameObject.
 Reports: graph initialized, update mode, layer count, and for each layer:
 current state (clip name, time, normalized time, speed, weight, isPlaying, isLooping),

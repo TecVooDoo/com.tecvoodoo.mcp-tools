@@ -11,7 +11,7 @@ namespace MCPTools.Maintainer.Editor
 {
     public partial class Tool_Maintainer
     {
-        [McpPluginTool("maintainer-scan-unused", Title = "Maintainer / Scan Unused Assets")]
+        [AiTool("maintainer-scan-unused", Title = "Maintainer / Scan Unused Assets")]
         [Description(@"Runs Code Stage Maintainer's Project Cleaner in REPORT-ONLY mode and lists the
 unreferenced / garbage assets and empty folders it flags as safe-to-remove candidates. This tool NEVER
 deletes anything — it only reports; deletion stays a deliberate, human-reviewed step in the Maintainer

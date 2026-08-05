@@ -13,7 +13,7 @@ namespace MCPTools.BehaviorDesigner.Editor
 {
     public partial class Tool_BehaviorDesigner
     {
-        [McpPluginTool("bd-set-variable", Title = "Behavior Designer / Set Variable")]
+        [AiTool("bd-set-variable", Title = "Behavior Designer / Set Variable")]
         [Description("Get or set a SharedVariable on a BehaviorTree by name.")]
         public string SetVariable(
             [Description("Name of the GameObject with BehaviorTree.")]

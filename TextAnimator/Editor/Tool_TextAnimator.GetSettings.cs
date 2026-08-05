@@ -11,7 +11,7 @@ namespace MCPTools.TextAnimator.Editor
 {
     public partial class Tool_TextAnimator
     {
-        [McpPluginTool("ta-get-settings", Title = "Text Animator / Get Settings")]
+        [AiTool("ta-get-settings", Title = "Text Animator / Get Settings")]
         [Description(@"Lists all AnimatorSettings ScriptableObject assets in the project.
 These control default behavior for Text Animator components (time scale, dynamic scaling, etc.).
 Does not require play mode.")]

@@ -9,7 +9,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_MasterAudio
     {
-        [McpPluginTool("ma-group-control", Title = "Master Audio / Group Control")]
+        [AiTool("ma-group-control", Title = "Master Audio / Group Control")]
         [Description(@"Control a sound group: mute, unmute, solo, unsolo, pause, unpause, stop, or fade.
 For fade action, provide volume and optional fadeTime.")]
         public string GroupControl(

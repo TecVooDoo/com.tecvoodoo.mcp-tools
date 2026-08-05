@@ -10,7 +10,7 @@ namespace MCPTools.DialogueSystem.Editor
 {
     public partial class Tool_DialogueSystem
     {
-        [McpPluginTool("ds-bark", Title = "Dialogue System / Bark")]
+        [AiTool("ds-bark", Title = "Dialogue System / Bark")]
         [Description(@"Triggers a character bark (short dialogue line above a character's head).
 Either provide a conversationTitle to bark from a conversation, or barkText for raw text.
 If both are provided, barkText takes priority. Requires a speaker GameObject in the scene.")]

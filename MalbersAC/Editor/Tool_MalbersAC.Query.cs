@@ -19,7 +19,7 @@ namespace MCPTools.MalbersAC.Editor
 {
     public partial class Tool_MalbersAC
     {
-        [McpPluginTool("ac-query-animal", Title = "Malbers AC / Query Animal")]
+        [AiTool("ac-query-animal", Title = "Malbers AC / Query Animal")]
         [Description(@"Reads the full Animal Controller setup on a GameObject.
 Lists all states (name, ID, active, priority), modes (name, ID, active, abilities),
 stances (name, ID, enabled), and speed sets (name, speeds, current index).

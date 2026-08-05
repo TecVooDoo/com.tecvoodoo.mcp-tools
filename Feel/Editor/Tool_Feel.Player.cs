@@ -12,7 +12,7 @@ namespace MCPTools.Feel.Editor
 {
     public partial class Tool_Feel
     {
-        [McpPluginTool("feel-query", Title = "Feel / Query MMF Player")]
+        [AiTool("feel-query", Title = "Feel / Query MMF Player")]
         [Description(@"Reads the MMF_Player setup on a GameObject.
 Reports player settings (intensity, timing, direction, channel) and
 lists all feedbacks in the FeedbacksList (type, label, active, duration, chance).
@@ -60,7 +60,7 @@ Use before configuring to understand current state.")]
             });
         }
 
-        [McpPluginTool("feel-configure-player", Title = "Feel / Configure MMF Player")]
+        [AiTool("feel-configure-player", Title = "Feel / Configure MMF Player")]
         [Description(@"Adds (if missing) and configures an MMF_Player component.
 All parameters are optional -- only provided values are changed.
 intensity [0-1+]: global multiplier on all feedback effects.

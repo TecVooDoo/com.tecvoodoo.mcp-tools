@@ -13,7 +13,7 @@ namespace MCPTools.MKEdge.Editor
 {
     public partial class Tool_MKEdge
     {
-        [McpPluginTool("mkedge-configure", Title = "MK Edge Detection / Configure")]
+        [AiTool("mkedge-configure", Title = "MK Edge Detection / Configure")]
         [Description(@"Sets parameters on an MK Edge Detection effect (URP Volume or RendererFeature).
 target: Volume GO name, VolumeProfile asset name, or UniversalRendererData name.
 Only provided parameters change. Color values use hex format (FF0000).

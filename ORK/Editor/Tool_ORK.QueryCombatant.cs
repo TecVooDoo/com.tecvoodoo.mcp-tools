@@ -9,7 +9,7 @@ namespace MCPTools.ORK.Editor
 {
     public partial class Tool_ORK
     {
-        [McpPluginTool("ork-query-combatant", Title = "ORK / Query Combatant")]
+        [AiTool("ork-query-combatant", Title = "ORK / Query Combatant")]
         [Description(@"Reports runtime state of a Combatant.
 
 If combatantName is omitted, lists every combatant in the player's ActiveGroup with summary

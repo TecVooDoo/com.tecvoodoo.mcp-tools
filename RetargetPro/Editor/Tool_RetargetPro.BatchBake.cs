@@ -16,7 +16,7 @@ namespace MCPTools.RetargetPro.Editor
 {
     public partial class Tool_RetargetPro
     {
-        [McpPluginTool("retarget-batch-bake", Title = "Retarget Pro / Batch Bake Animations")]
+        [AiTool("retarget-batch-bake", Title = "Retarget Pro / Batch Bake Animations")]
         [Description(@"Batch-retargets animation clips using a RetargetProfile asset.
 Takes a folder of source AnimationClips and bakes retargeted versions to an output folder.
 The RetargetProfile must already be configured with source/target characters and rigs.

@@ -12,7 +12,7 @@ namespace MCPTools.Timeflow.Editor
 {
     public partial class Tool_Timeflow
     {
-        [McpPluginTool("timeflow-configure-tween", Title = "Timeflow / Configure Tween")]
+        [AiTool("timeflow-configure-tween", Title = "Timeflow / Configure Tween")]
         [Description(@"Configures a Tween behavior on a GameObject. The GO must have a Tween component.
 All parameters optional except gameObjectName -- only provided values change.
 interpolation: None, Linear, EaseIn, EaseOut, EaseInOut, EaseInExpo, EaseOutExpo, EaseInOutExpo,

@@ -14,7 +14,7 @@ namespace MCPTools.RetargetPro.Editor
 {
     public partial class Tool_RetargetPro
     {
-        [McpPluginTool("retarget-create-profile", Title = "Retarget Pro / Create Profile")]
+        [AiTool("retarget-create-profile", Title = "Retarget Pro / Create Profile")]
         [Description(@"Creates a RetargetProfile ScriptableObject asset for animation retargeting.
 A profile defines the source and target characters, their rigs, and reference poses.
 Both characters must have KRigComponent attached and KRig assets created.
@@ -94,7 +94,7 @@ After creating a profile, add retarget features via the Inspector, then use 'ret
             });
         }
 
-        [McpPluginTool("retarget-query-profiles", Title = "Retarget Pro / Query Profiles")]
+        [AiTool("retarget-query-profiles", Title = "Retarget Pro / Query Profiles")]
         [Description(@"Lists all RetargetProfile ScriptableObject assets in the project.
 Shows source/target characters, rig assignments, and feature count for each profile.")]
         public QueryProfilesResponse QueryProfiles(

@@ -11,7 +11,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_AStarPathfinding
     {
-        [McpPluginTool("astar-configure-seeker", Title = "A* Pathfinding / Configure Seeker")]
+        [AiTool("astar-configure-seeker", Title = "A* Pathfinding / Configure Seeker")]
         [Description(@"Configure a Seeker component on a GameObject.
 Sets traversable tag bitmask and per-tag cost penalties.
 traversableTags: bitmask where bit N enables tag N (e.g. -1 = all tags, 1 = only tag 0, 3 = tags 0+1).

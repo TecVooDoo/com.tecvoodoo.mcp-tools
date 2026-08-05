@@ -8,10 +8,10 @@ using SonicBloom.Koreo;
 
 namespace TecVooDoo.MCPTools.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_Koreographer
     {
-        [McpPluginTool("koreo-query", Title = "Koreographer / Query State")]
+        [AiTool("koreo-query", Title = "Koreographer / Query State")]
         [Description(@"Returns all loaded Koreography assets, their source clip names, track event IDs, and the current beat time.
 Use this to discover available event IDs before registering callbacks in game code.")]
         public string Query()
@@ -51,7 +51,7 @@ Use this to discover available event IDs before registering callbacks in game co
             });
         }
 
-        [McpPluginTool("koreo-beattime", Title = "Koreographer / Get Beat Time")]
+        [AiTool("koreo-beattime", Title = "Koreographer / Get Beat Time")]
         [Description(@"Returns the current beat time for a specific Koreography track (or global if trackName is omitted).
 subdivision divides each beat: 1=quarter notes, 2=eighth, 4=sixteenth.
 Useful for syncing visuals or game events to music in editor scripts.")]

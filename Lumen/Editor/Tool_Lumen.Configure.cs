@@ -10,7 +10,7 @@ namespace MCPTools.Lumen.Editor
 {
     public partial class Tool_Lumen
     {
-        [McpPluginTool("lumen-configure", Title = "Lumen / Configure Effect Player")]
+        [AiTool("lumen-configure", Title = "Lumen / Configure Effect Player")]
         [Description(@"Configures a LumenEffectPlayer component on a GameObject.
 All parameters are optional -- only provided values are changed.
 scale: uniform scale modifier for all effects.

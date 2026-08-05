@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MCPTools.JuicyActions.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_JuicyActions
     {
         static readonly Type? ActionOnEventType   = FindType("MagicPigGames.JuicyActions.ActionOnEvent");

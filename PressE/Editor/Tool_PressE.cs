@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.PressE.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_PressE
     {
         const string INTERACTABLE_TYPE = "FastStudios.Interactable";

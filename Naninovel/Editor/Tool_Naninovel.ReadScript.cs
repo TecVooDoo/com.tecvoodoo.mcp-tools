@@ -10,7 +10,7 @@ namespace MCPTools.Naninovel.Editor
 {
     public partial class Tool_Naninovel
     {
-        [McpPluginTool("nani-read-script", Title = "Naninovel / Read Script")]
+        [AiTool("nani-read-script", Title = "Naninovel / Read Script")]
         [Description(@"Reads the contents of a Naninovel .nani script file.
 Specify the script name (without extension) or a partial path.
 Example: 'Scene1_1' or 'Scene1_1_HolographicHorse'.

@@ -10,7 +10,7 @@ namespace MCPTools.RTW.Editor
 {
     public partial class Tool_RTW
     {
-        [McpPluginTool("rtw-configure", Title = "Real Time Weather Pro / Configure")]
+        [AiTool("rtw-configure", Title = "Real Time Weather Pro / Configure")]
         [Description(@"Sets RealTimeWeatherManager configuration.
 weatherSystem: None, Enviro, Tenkoku, Atmos, Expanse, EasySky.
 waterSystem: None, KWS, Crest.

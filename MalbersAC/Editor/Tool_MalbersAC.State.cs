@@ -18,7 +18,7 @@ namespace MCPTools.MalbersAC.Editor
 {
     public partial class Tool_MalbersAC
     {
-        [McpPluginTool("ac-configure-state", Title = "Malbers AC / Configure State")]
+        [AiTool("ac-configure-state", Title = "Malbers AC / Configure State")]
         [Description(@"Configures a state on an MAnimal component by state name or ID.
 Only provided parameters are changed; others are left as-is.
 Use 'ac-query-animal' first to see available states and their current values.")]

@@ -1,11 +1,13 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.12.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.13.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** August 2, 2026 -- **DOTween reflection refactor: `MCPTools.DOTween.Editor` restored; the leaky-folder class is now fully closed** (TVD S38). DOTween was the last of 57 groups without an asmdef. `DOTweenAnimation` is now bound by reflection, so the asmdef references nothing that varies with DOTween's "Create ASMDEF" layout -- the thing that broke SetDesign with `CS0246` and forced the June 25 revert. Live-verified in TVD; same pass cleared this doc's last 3 over-long lines. Earlier entries: 2026-07-25 drive-corruption restore (TVD S35), and the Unity 6000.5 `GetInstanceID` CS0619 fix (`instanceId` response fields are now **`string`**). See [Session Log](#session-log) for all of it.
+**Last Updated:** August 4, 2026 -- **v1.13.0: the whole package moved off the deprecated `[McpPluginTool]` / `[McpPluginToolType]` aliases onto `[AiTool]` / `[AiToolType]`** (TVD S39). 305 attribute usages across 243 files and all 57 tool groups, a pure 1:1 rename -- same `com.IvanMurzak.McpPlugin` namespace, zero `using` changes, 305 insertions / 305 deletions with no other line touched. Verified live on MCP 0.87.0 / Unity 6000.5.6f1 and **backward-compatible to at least MCP 0.79.0** (the fleet's oldest), so no consuming project breaks. Declared dependency floor raised `0.63.3` -> `0.79.0` to match what is actually verified. Earlier entries: 2026-08-02 DOTween reflection refactor closing the leaky-folder class (TVD S38).
+
+**Prior header (kept for continuity):** August 2, 2026 -- **DOTween reflection refactor: `MCPTools.DOTween.Editor` restored; the leaky-folder class is now fully closed** (TVD S38). DOTween was the last of 57 groups without an asmdef. `DOTweenAnimation` is now bound by reflection, so the asmdef references nothing that varies with DOTween's "Create ASMDEF" layout -- the thing that broke SetDesign with `CS0246` and forced the June 25 revert. Live-verified in TVD; same pass cleared this doc's last 3 over-long lines. Earlier entries: 2026-07-25 drive-corruption restore (TVD S35), and the Unity 6000.5 `GetInstanceID` CS0619 fix (`instanceId` response fields are now **`string`**). See [Session Log](#session-log) for all of it.
 
 > **Header hygiene (2026-07-19):** this line previously carried ~3,700 chars of accumulated session narrative, violating the ~1,000-char living-doc line rule. Nothing was discarded -- an audit found the June 25 and July 9 narrative had **no other home** (only Retarget Pro V5 and the June 4 postprocessor work had Session Log entries), so it was promoted into proper dated Session Log sections below before this line was compacted.
 
@@ -144,6 +146,29 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### Attribute migration -- `[McpPluginTool]` -> `[AiTool]` across all 57 groups, v1.13.0 (August 4, 2026) (TVD Session 39)
+
+TMCP now uses the current attribute names. **305 usages renamed across 243 files in all 57 tool groups** -- 248 `[McpPluginTool(` -> `[AiTool(` and 57 `[McpPluginToolType]` -> `[AiToolType]`.
+
+**Why now.** MCP 0.87.0 ships McpPlugin **8.0.0**, and compiling TMCP against it surfaced 16 `CS0618` warnings in TVD's 4 installed groups: *"'McpPluginToolAttribute' is obsolete: 'Use [AiTool] instead. This alias will be removed in a future major release.'"*
+
+**Correction to the first read of that, worth recording.** The obvious inference -- that 0.87.0 introduced the deprecation -- is **wrong**, and it was checked rather than assumed. Reflection-loading the oldest McpPlugin still on the box (**6.6.0.0**, from AQuokkaStory on MCP **0.79.0**) shows `AiToolAttribute` and `AiToolTypeAttribute` already present and public, and `McpPluginToolAttribute` / `McpPluginToolTypeAttribute` already carrying `[Obsolete]` *and already deriving from the new names*. The aliases have therefore been deprecated for many versions; 2026-08-04 is simply the first session that read the **warning** buffer rather than the error buffer. The migration is overdue, not premature.
+
+**Why the rename is safe, and why it is only a rename.** The new attributes live in the **same namespace** (`com.IvanMurzak.McpPlugin`), so none of the 243 `using com.IvanMurzak.McpPlugin;` lines change. The old names *derive from* the new ones, so the registration scanner already resolved both -- which is why 17 tools were registering fine before the change and register identically after. Survey before touching anything found the syntax completely uniform: **every one of the 305 occurrences is preceded by `[`**, every `McpPluginToolType` is bare `[McpPluginToolType]`, and every `McpPluginTool` is `[McpPluginTool("` with a string first argument. Two exact literal replacements covered the set with no ordering hazard (the discriminator is the following character, `(` vs `]`), and no bare/non-attribute mention of either name exists anywhere in the package.
+
+**Executed byte-level** (read bytes -> Latin1 roundtrip -> replace -> write bytes) specifically so encoding, BOM and line endings survive untouched; both search and replace strings are pure ASCII, so the roundtrip is lossless.
+
+**Verification.**
+- **Diff shape:** `243 files changed, 305 insertions(+), 305 deletions(-)`. Audited both directions -- **0 removed lines that were not `[McpPluginTool*`, 0 added lines that were not `[AiTool*`.** Nothing but attribute lines moved.
+- **Invariant re-run** (the check that would have caught S35's silent Flexalon/RayFire knockouts): **57 groups, exactly one `[AiToolType]` each, 0 violations, 248 `[AiTool(` total** -- identical to the pre-rename figures.
+- **Live compile in TVD:** `scriptCompilationFailed=False`, `Assembly-CSharp` present, and **all 16 `CS0618` warnings gone** (only the 3 pre-existing "no scripts associated" warnings for TVU/TVG's empty `Editor/` folders remain, unrelated).
+- **Compiled metadata, not just source:** all 4 installed tool types read back carrying `AiToolTypeAttribute` -- `Tool_DOTween` (4 tool methods) in `MCPTools.DOTween.Editor`, `Tool_Maintainer` (3), `Tool_RetargetPro` (3), `Tool_TCC` (7) -- **17 methods, matching the 17 tools registered** over MCP.
+- **Live dispatch:** `dotween-query` against a nonexistent GameObject returned its designed negative-path error prefixed *"DOTween / Query Animations"* -- the `Title` from the attribute, proving the `[AiTool(...)]` constructor arguments survived and are read by the 0.87.0 runtime.
+
+**Backward compatibility -- no consuming project breaks.** This mattered because TMCP is **file-ref'd from a shared folder**, so all 13 TMCP-consuming projects on the box share this one working tree and 10 of them are on MCP 0.79.0-0.86.3. Since `AiTool*` exists as far back as the 6.6.0.0 DLL (MCP 0.79.0), the rename is compatible across the whole fleet. **Verified floor is 0.79.0**; anything older is untested, so the declared dependency floor was raised `0.63.3` -> `0.79.0` rather than leaving an assertion of support that can no longer be checked.
+
+**Carryover:** `package.json`'s `description` still says *"58 tool groups"* and still lists the retired **Cinemachine** and **AINavigation** groups. The real count is 57. Pre-existing drift, not touched here -- it wants a deliberate pass over the description string.
 
 ### DOTween reflection refactor -- asmdef restored, leaky-folder class fully closed (August 2, 2026) (TVD Session 38)
 

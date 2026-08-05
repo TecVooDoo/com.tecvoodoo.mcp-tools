@@ -11,7 +11,7 @@ namespace MCPTools.Terrain25D.Editor
 {
     public partial class Tool_Terrain25D
     {
-        [McpPluginTool("terrain25d-configure-mesh", Title = "2.5D Terrain / Configure Mesh Generator")]
+        [AiTool("terrain25d-configure-mesh", Title = "2.5D Terrain / Configure Mesh Generator")]
         [Description(@"Configures the MeshGenerator on a Terrain25D GameObject.
 Only provided parameters are changed; others are left as-is.
 Front/Back bevel controls the 3D depth shape. Middle controls the flat connecting section.

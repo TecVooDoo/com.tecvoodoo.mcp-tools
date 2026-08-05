@@ -9,7 +9,7 @@ namespace MCPTools.UltimateTerrain.Editor
 {
     public partial class Tool_UltimateTerrain
     {
-        [McpPluginTool("ut-configure", Title = "Ultimate Terrain / Configure")]
+        [AiTool("ut-configure", Title = "Ultimate Terrain / Configure")]
         [Description(@"Sets configuration on an UltimateTerrain instance. All parameters optional.")]
         public string Configure(
             [Description("Name of the GameObject with UltimateTerrain.")] string gameObjectName,

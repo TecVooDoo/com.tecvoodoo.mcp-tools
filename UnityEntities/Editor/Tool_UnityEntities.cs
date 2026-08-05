@@ -5,7 +5,7 @@ using Unity.Entities;
 
 namespace MCPTools.UnityEntities.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_UnityEntities
     {
         static World ResolveWorld(string? worldName)

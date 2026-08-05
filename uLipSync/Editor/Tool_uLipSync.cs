@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MCPTools.uLipSync.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_uLipSync
     {
         static readonly Type? ULipSyncType           = FindType("uLipSync.uLipSync");

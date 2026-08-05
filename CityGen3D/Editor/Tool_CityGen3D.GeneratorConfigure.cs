@@ -11,7 +11,7 @@ namespace MCPTools.CityGen3D.Editor
 {
     public partial class Tool_CityGen3D
     {
-        [McpPluginTool("cg-generator-configure", Title = "CityGen3D / Configure Generator")]
+        [AiTool("cg-generator-configure", Title = "CityGen3D / Configure Generator")]
         [Description(@"Sets serialized fields on the scene's CityGen3D Generator (CityGen3D.EditorExtension.Generator).
 
 fieldAssignments format: comma-separated 'field=value' pairs, e.g.

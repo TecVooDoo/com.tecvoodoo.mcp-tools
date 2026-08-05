@@ -10,7 +10,7 @@ namespace MCPTools.Naninovel.Editor
 {
     public partial class Tool_Naninovel
     {
-        [McpPluginTool("nani-list-backgrounds", Title = "Naninovel / List Backgrounds")]
+        [AiTool("nani-list-backgrounds", Title = "Naninovel / List Backgrounds")]
         [Description(@"Lists all backgrounds registered in the Naninovel project configuration.
 Shows background IDs and implementation types.
 Does not require play mode — reads directly from project configuration assets.")]

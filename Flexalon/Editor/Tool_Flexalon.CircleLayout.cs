@@ -17,7 +17,7 @@ namespace MCPTools.Flexalon.Editor
 {
     public partial class Tool_Flexalon
     {
-        [McpPluginTool("flexalon-create-circle-layout", Title = "Flexalon / Create Circle Layout")]
+        [AiTool("flexalon-create-circle-layout", Title = "Flexalon / Create Circle Layout")]
         [Description(@"Creates a new GameObject with a Flexalon Circle Layout component.
 Children added to this object will be arranged in a circle or spiral.
 Use 'flexalon-add-child' to populate the circle with objects.")]

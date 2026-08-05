@@ -11,7 +11,7 @@ namespace MCPTools.UMotionPro.Editor
 {
     public partial class Tool_UMotionPro
     {
-        [McpPluginTool("umotion-query", Title = "UMotion Pro / Query Editor State")]
+        [AiTool("umotion-query", Title = "UMotion Pro / Query Editor State")]
         [Description(@"Reports the full state of the UMotion Clip Editor and Pose Editor.
 Returns: window-open flags, loaded project path, all clip names + currently selected clip,
 clip layer names with mute/weight, frame cursor + last keyframe, pose-editor assigned GameObject,

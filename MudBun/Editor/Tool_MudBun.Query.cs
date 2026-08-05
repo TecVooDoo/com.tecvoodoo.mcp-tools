@@ -11,7 +11,7 @@ namespace MCPTools.MudBun.Editor
 {
     public partial class Tool_MudBun
     {
-        [McpPluginTool("mudbun-query", Title = "MudBun / Query Renderer & Brushes")]
+        [AiTool("mudbun-query", Title = "MudBun / Query Renderer & Brushes")]
         [Description(@"Reports MudBun renderer settings and brush hierarchy on a GameObject.
 Returns: RenderMode, MeshingMode, VoxelDensity, MaxVoxelsK, MaxChunks, MasterColor,
 MasterMetallic, MasterSmoothness, SurfaceShift, Enable2dMode.

@@ -13,7 +13,7 @@ namespace MCPTools.QuestForge.Editor
 {
     public partial class Tool_QuestForge
     {
-        [McpPluginTool("qf-create-poi", Title = "Quest Forge / Create POI")]
+        [AiTool("qf-create-poi", Title = "Quest Forge / Create POI")]
         [Description(@"Creates a new PointOfInterest ScriptableObject asset for the minimap/compass system.
 POIs mark locations on the minimap and can be quest objectives, NPCs, merchants, etc.
 Categories: QuestObjective, QuestGiver, Waypoint, Location, Enemy, NPC, Item, Merchant, FastTravel, Custom.")]
@@ -110,7 +110,7 @@ Categories: QuestObjective, QuestGiver, Waypoint, Location, Enemy, NPC, Item, Me
             });
         }
 
-        [McpPluginTool("qf-query-pois", Title = "Quest Forge / Query POIs")]
+        [AiTool("qf-query-pois", Title = "Quest Forge / Query POIs")]
         [Description(@"Lists all PointOfInterest ScriptableObject assets in the project.
 Shows name, category, location ID, position, and display settings for each POI.")]
         public QueryPOIsResponse QueryPOIs(

@@ -13,7 +13,7 @@ namespace MCPTools.Naninovel.Editor
 {
     public partial class Tool_Naninovel
     {
-        [McpPluginTool("nani-list-commands", Title = "Naninovel / List Commands")]
+        [AiTool("nani-list-commands", Title = "Naninovel / List Commands")]
         [Description(@"Lists all available Naninovel script commands with their aliases and parameter info.
 Shows command name, alias (used in .nani scripts with @), and parameters.
 Useful for understanding what commands are available when writing .nani scripts.")]

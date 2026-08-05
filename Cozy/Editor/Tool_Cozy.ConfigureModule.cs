@@ -13,7 +13,7 @@ namespace MCPTools.Cozy.Editor
 {
     public partial class Tool_Cozy
     {
-        [McpPluginTool("cozy-configure-module", Title = "Cozy / Configure Module")]
+        [AiTool("cozy-configure-module", Title = "Cozy / Configure Module")]
         [Description(@"Add/remove/enable/disable/query/configure a CozyModule on a CozyWeather sphere. moduleType accepts a short name (Climate, Wind, Time, Atmosphere, Ambience, Weather, Reflections, Satellite, Interactions, Event, SaveLoad, Debug, Microsplat, PureNature, TVE, Buto, Transit, SystemTime) or a full type name. Use action='list' to see all module types and which are attached.")]
         public string ConfigureModule(
             [Description("'list' | 'query' | 'add' | 'remove' | 'reset' | 'enable' | 'disable' | 'set'.")]

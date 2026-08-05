@@ -5,7 +5,7 @@ using UnityEngine.Animations.Rigging;
 
 namespace MCPTools.AnimationRigging.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_AnimationRigging
     {
         static GameObject FindGO(string name)

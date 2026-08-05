@@ -9,7 +9,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_MasterAudio
     {
-        [McpPluginTool("ma-playlist", Title = "Master Audio / Playlist Control")]
+        [AiTool("ma-playlist", Title = "Master Audio / Playlist Control")]
         [Description(@"Control playlist playback: play, stop, next, previous, random, pause, unpause, mute, unmute, fade, or change.
 For change action, provide playlistName.
 For fade action, provide volume and optional fadeTime.

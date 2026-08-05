@@ -11,7 +11,7 @@ namespace MCPTools.Naninovel.Editor
 {
     public partial class Tool_Naninovel
     {
-        [McpPluginTool("nani-list-scripts", Title = "Naninovel / List Scripts")]
+        [AiTool("nani-list-scripts", Title = "Naninovel / List Scripts")]
         [Description(@"Lists all .nani scenario script files in the project.
 Shows file names, paths, and file sizes. Searches the Assets/Scenario folder
 and any other folders containing .nani files.")]

@@ -5,7 +5,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace MCPTools.PWB.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_PWB
     {
         const string PALETTE_MANAGER_TYPE = "PluginMaster.PaletteManager, Assembly-CSharp-Editor";

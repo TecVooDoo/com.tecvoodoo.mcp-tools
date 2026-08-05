@@ -3,7 +3,7 @@ using com.IvanMurzak.McpPlugin;
 
 namespace MCPTools.RetargetPro.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_RetargetPro
     {
     }

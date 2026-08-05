@@ -10,7 +10,7 @@ namespace MCPTools.DecalCollider.Editor
 {
     public partial class Tool_DecalCollider
     {
-        [McpPluginTool("decal-rebuild", Title = "Decal Collider / Rebuild")]
+        [AiTool("decal-rebuild", Title = "Decal Collider / Rebuild")]
         [Description(@"Triggers a rebuild of the DecalCollider mesh and optionally sets dynamic content before rebuilding.
 Use after decal-configure to see changes take effect, or to update sprite/text/color on the fly.
 spriteName: assigns a Sprite by asset name (searched via AssetDatabase).

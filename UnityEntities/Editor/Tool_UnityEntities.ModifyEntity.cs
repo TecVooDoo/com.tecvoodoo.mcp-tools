@@ -12,7 +12,7 @@ namespace MCPTools.UnityEntities.Editor
 {
     public partial class Tool_UnityEntities
     {
-        [McpPluginTool("ecs-modify-entity", Title = "ECS / Modify Entity")]
+        [AiTool("ecs-modify-entity", Title = "ECS / Modify Entity")]
         [Description(@"Modifies a field on an unmanaged IComponentData component of an ECS entity.
 Uses reflection to get the component, modify the field, and set it back.
 Only works for unmanaged IComponentData with public fields.

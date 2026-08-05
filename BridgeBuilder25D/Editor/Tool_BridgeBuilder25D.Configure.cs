@@ -11,7 +11,7 @@ namespace MCPTools.BridgeBuilder25D.Editor
 {
     public partial class Tool_BridgeBuilder25D
     {
-        [McpPluginTool("bridge25d-configure", Title = "2.5D Bridge / Configure")]
+        [AiTool("bridge25d-configure", Title = "2.5D Bridge / Configure")]
         [Description(@"Configures physics, visuals, and damage on a Bridge25D component.
 Only provided parameters are changed; others are left as-is.
 Use 'bridge25d-query' first to see current values.
@@ -88,7 +88,7 @@ Call 'bridge25d-control' with action='recreate' after configuring to apply chang
             });
         }
 
-        [McpPluginTool("bridge25d-control", Title = "2.5D Bridge / Control")]
+        [AiTool("bridge25d-control", Title = "2.5D Bridge / Control")]
         [Description(@"Controls bridge state: recreate, break, or toggle physics.
 Actions: 'recreate' rebuilds the bridge from its spline, 'break' breaks the bridge
 at a normalized position (0-1 from start to end), 'physics-on'/'physics-off' toggles

@@ -9,7 +9,7 @@ namespace MCPTools.Maintainer.Editor
 {
     public partial class Tool_Maintainer
     {
-        [McpPluginTool("maintainer-scan-issues", Title = "Maintainer / Scan Project Issues")]
+        [AiTool("maintainer-scan-issues", Title = "Maintainer / Scan Project Issues")]
         [Description(@"Runs Code Stage Maintainer's Issues Finder over the project and returns the text
 report (the same content the Maintainer window exports). Detects: missing scripts / prefabs /
 references, missing or duplicate components, invalid or duplicate layers and sorting layers, shader

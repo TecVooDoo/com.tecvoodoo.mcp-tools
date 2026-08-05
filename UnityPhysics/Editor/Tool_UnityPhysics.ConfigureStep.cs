@@ -11,7 +11,7 @@ namespace MCPTools.UnityPhysics.Editor
 {
     public partial class Tool_UnityPhysics
     {
-        [McpPluginTool("uphys-configure-step", Title = "Unity Physics / Configure Step")]
+        [AiTool("uphys-configure-step", Title = "Unity Physics / Configure Step")]
         [Description(@"Adds (if missing) and configures a PhysicsStepAuthoring component on a GameObject.
 PhysicsStepAuthoring controls global ECS physics simulation parameters: gravity, solver iterations,
 substep count, multi-threading, collision tolerance, broadphase settings, and depenetration velocity.

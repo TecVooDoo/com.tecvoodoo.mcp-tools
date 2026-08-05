@@ -12,7 +12,7 @@ namespace MCPTools.DialogueSystem.Editor
 {
     public partial class Tool_DialogueSystem
     {
-        [McpPluginTool("ds-query", Title = "Dialogue System / Query Database")]
+        [AiTool("ds-query", Title = "Dialogue System / Query Database")]
         [Description(@"Queries the Dialogue System database contents and active conversation state.
 Lists conversations (title, actor, conversant, entry count), actors (name, isPlayer),
 variables (name, initial value, type), quest count, and active conversation info.

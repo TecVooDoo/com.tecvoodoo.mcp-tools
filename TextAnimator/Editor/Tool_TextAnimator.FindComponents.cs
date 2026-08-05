@@ -10,7 +10,7 @@ namespace MCPTools.TextAnimator.Editor
 {
     public partial class Tool_TextAnimator
     {
-        [McpPluginTool("ta-find-components", Title = "Text Animator / Find Components")]
+        [AiTool("ta-find-components", Title = "Text Animator / Find Components")]
         [Description(@"Finds all TextAnimator components in the current scene.
 Shows the GameObject name, component type, animation loop mode, and current text.
 Requires a scene to be open.")]

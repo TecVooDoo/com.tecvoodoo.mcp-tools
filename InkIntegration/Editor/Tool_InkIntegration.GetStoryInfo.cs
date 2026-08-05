@@ -12,7 +12,7 @@ namespace MCPTools.InkIntegration.Editor
 {
     public partial class Tool_InkIntegration
     {
-        [McpPluginTool("ink-get-story-info", Title = "Ink / Get Story Info")]
+        [AiTool("ink-get-story-info", Title = "Ink / Get Story Info")]
         [Description(@"Loads a compiled Ink story (.json) and reports its structure:
 total content lines, choice points, and global variables.
 Specify the .ink file name (without extension). The file must be compiled first.")]

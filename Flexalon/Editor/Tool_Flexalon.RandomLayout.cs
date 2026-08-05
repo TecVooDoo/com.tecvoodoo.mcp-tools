@@ -17,7 +17,7 @@ namespace MCPTools.Flexalon.Editor
 {
     public partial class Tool_Flexalon
     {
-        [McpPluginTool("flexalon-create-random-layout", Title = "Flexalon / Create Random Layout")]
+        [AiTool("flexalon-create-random-layout", Title = "Flexalon / Create Random Layout")]
         [Description(@"Creates a new GameObject with a Flexalon Random Layout component.
 Children are placed at random positions within the layout bounds.
 Great for scattering objects like trees, rocks, debris, etc.")]

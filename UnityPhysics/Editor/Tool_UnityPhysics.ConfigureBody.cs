@@ -10,7 +10,7 @@ namespace MCPTools.UnityPhysics.Editor
 {
     public partial class Tool_UnityPhysics
     {
-        [McpPluginTool("uphys-configure-body", Title = "Unity Physics / Configure Rigidbody")]
+        [AiTool("uphys-configure-body", Title = "Unity Physics / Configure Rigidbody")]
         [Description(@"Adds (if missing) and configures a Rigidbody component on a GameObject.
 The Rigidbody is the standard Unity component that Unity.Physics bakes into ECS PhysicsMass,
 PhysicsVelocity, PhysicsDamping, and PhysicsGravityFactor at bake time. Only provided

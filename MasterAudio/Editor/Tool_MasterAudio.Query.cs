@@ -13,7 +13,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_MasterAudio
     {
-        [McpPluginTool("ma-query", Title = "Master Audio / Query")]
+        [AiTool("ma-query", Title = "Master Audio / Query")]
         [Description(@"Lists all sound groups, buses, playlists, master volume, mute state, and currently playing variations.
 Use this to inspect the full Master Audio runtime state before making changes.")]
         public string Query()

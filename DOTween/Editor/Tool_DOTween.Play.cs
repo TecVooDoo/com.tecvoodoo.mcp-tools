@@ -12,7 +12,7 @@ namespace TecVooDoo.MCPTools.Editor
 {
     public partial class Tool_DOTween
     {
-        [McpPluginTool("dotween-play", Title = "DOTween / Play Control")]
+        [AiTool("dotween-play", Title = "DOTween / Play Control")]
         [Description(@"Runtime control of DOTweenAnimation components on a GameObject.
 Supports play, pause, rewind, restart, complete, and kill actions.
 Optionally target a specific tween by id.")]

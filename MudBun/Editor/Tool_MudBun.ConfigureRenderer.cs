@@ -9,7 +9,7 @@ namespace MCPTools.MudBun.Editor
 {
     public partial class Tool_MudBun
     {
-        [McpPluginTool("mudbun-configure-renderer", Title = "MudBun / Configure Renderer")]
+        [AiTool("mudbun-configure-renderer", Title = "MudBun / Configure Renderer")]
         [Description(@"Configures a MudRenderer component on a GameObject. All parameters optional except gameObjectName.
 renderMode: FlatMesh, SmoothMesh, CircleSplats, QuadSplats, Decal.
 meshingMode: MarchingCubes, DualQuads, SurfaceNets, DualContouring.

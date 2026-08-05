@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MCPTools.BoingKit.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_BoingKit
     {
         static readonly Type? BoingBehaviorType     = FindType("BoingKit.BoingBehavior");

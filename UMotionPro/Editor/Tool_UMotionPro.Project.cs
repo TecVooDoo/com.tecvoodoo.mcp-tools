@@ -11,7 +11,7 @@ namespace MCPTools.UMotionPro.Editor
 {
     public partial class Tool_UMotionPro
     {
-        [McpPluginTool("umotion-project", Title = "UMotion Pro / Project & Clip Control")]
+        [AiTool("umotion-project", Title = "UMotion Pro / Project & Clip Control")]
         [Description(@"Control surface for UMotion Clip Editor + Pose Editor. operation = open-windows | load | close | select-clip | rename-clip | delete-clip | set-frame | set-layer-blend | assign-pose-go | clear-pose-go. Most ops need ClipEditor window open AND a project loaded (chain open-windows + load first; call umotion-query to verify IsProjectLoaded before further ops). 'load' needs projectPath; '*-clip' need clipName (+ newClipName for rename); 'set-frame' needs frame; 'set-layer-blend' needs layerName + at least one of layerMute/layerWeight; 'assign-pose-go' needs poseGameObjectName. clearMode='revert' (default) reverts pose, 'keep' bakes it.")]
         public string Project(
             [Description("Operation to perform. One of: open-windows, load, close, select-clip, rename-clip, delete-clip, set-frame, set-layer-blend, assign-pose-go, clear-pose-go.")]

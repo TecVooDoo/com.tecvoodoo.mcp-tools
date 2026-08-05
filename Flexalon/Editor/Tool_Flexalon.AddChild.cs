@@ -17,7 +17,7 @@ namespace MCPTools.Flexalon.Editor
 {
     public partial class Tool_Flexalon
     {
-        [McpPluginTool("flexalon-add-child", Title = "Flexalon / Add Child to Layout")]
+        [AiTool("flexalon-add-child", Title = "Flexalon / Add Child to Layout")]
         [Description(@"Adds a child GameObject to an existing Flexalon layout. The child can be:
 - A new primitive (cube, sphere, cylinder, etc.)
 - An existing GameObject (moved into the layout)
@@ -128,7 +128,7 @@ The layout will automatically arrange the child.")]
             });
         }
 
-        [McpPluginTool("flexalon-add-prefab-children", Title = "Flexalon / Add Multiple Prefab Children")]
+        [AiTool("flexalon-add-prefab-children", Title = "Flexalon / Add Multiple Prefab Children")]
         [Description(@"Adds multiple instances of a prefab as children of a Flexalon layout.
 Useful for quickly populating a grid or circle with identical objects.")]
         public AddMultipleResponse AddPrefabChildren(

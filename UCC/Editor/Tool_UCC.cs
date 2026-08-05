@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MCPTools.UCC.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_UCC
     {
         static GameObject FindGO(string name)

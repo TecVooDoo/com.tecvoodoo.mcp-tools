@@ -10,7 +10,7 @@ namespace MCPTools.DialogueSystem.Editor
 {
     public partial class Tool_DialogueSystem
     {
-        [McpPluginTool("ds-conversation", Title = "Dialogue System / Conversation")]
+        [AiTool("ds-conversation", Title = "Dialogue System / Conversation")]
         [Description(@"Start, stop, or check conversations.
 Actions: 'start' (begins a conversation), 'stop' (stops current conversation),
 'stopall' (stops all active conversations), 'check' (checks if conversation has valid entries).

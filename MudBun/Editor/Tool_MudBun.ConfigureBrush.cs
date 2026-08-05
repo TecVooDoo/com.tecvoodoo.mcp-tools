@@ -9,7 +9,7 @@ namespace MCPTools.MudBun.Editor
 {
     public partial class Tool_MudBun
     {
-        [McpPluginTool("mudbun-configure-brush", Title = "MudBun / Configure Brush")]
+        [AiTool("mudbun-configure-brush", Title = "MudBun / Configure Brush")]
         [Description(@"Configures a MudBun brush (primitive) on a named GameObject.
 The brush must be a child of a MudRenderer. Detects brush type automatically via reflection.
 operator: Union, Subtract, Intersect, Dye, Pipe, Engrave.

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MCPTools.TCC.Editor
 {
-    [McpPluginToolType]
+    [AiToolType]
     public partial class Tool_TCC
     {
         static GameObject FindGO(string name)
