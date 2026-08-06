@@ -1,16 +1,18 @@
 # TecVooDoo MCP Tools -- API Reference
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.5.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.13.0
 **Source:** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
-**Last Updated:** March 23, 2026
+**Last Updated:** 2026-08-06 (partial audit -- see below)
+
+> **Audit status, and why this line is worth reading.** Between March 23 and 2026-08-06 this doc's header claimed **v1.5.0** while the package shipped **1.13.0**, and it fully documented a tool group that had been deleted on 2026-05-10. **The two corrections below were verified against the build; the rest of this file has NOT been re-audited against v1.13.0**, so treat any section you depend on as needing a spot-check rather than assuming currency. The structural fix is the rule now recorded in the Asset Inventory tombstone: **adding or removing a tool group means editing this file too, not just `TMCP_Status.md`.**
 
 ---
 
 ## Architecture
 
 All tools follow the same pattern:
-- `[McpPluginToolType]` on partial class per group
-- `[McpPluginTool]` on each tool method
+- `[AiToolType]` on partial class per group (was `[McpPluginToolType]` -- **renamed fleet-wide in TMCP 1.13.0, 2026-08-04**; the old aliases still exist but are `[Obsolete]` and emit `CS0618`)
+- `[AiTool]` on each tool method (was `[McpPluginTool]`, same rename)
 - `MainThread.Instance.Run()` for main-thread execution
 - `GameObjectRef` for scene object lookup
 - `Undo.RegisterCreatedObjectUndo()` on all creations
@@ -28,7 +30,6 @@ All tools follow the same pattern:
 | `HAS_FINALIK` | `RootMotion.FinalIK.FullBodyBipedIK` | `Assembly-CSharp-firstpass` |
 | `HAS_ANIMANCER` | `Animancer.AnimancerComponent` | `Kybernetik.Animancer` |
 | `HAS_PLAYMAKER` | `HutongGames.PlayMaker.PlayMakerFSM` | `PlayMaker` |
-| `HAS_ASSETINVENTORY` | `AssetInventory.AssetSearch` | `AssetInventory.Editor` |
 | `HAS_MALBERS_AC` | `MalbersAnimations.Controller.MAnimal` | `MalbersAnimations` |
 | `HAS_MALBERS_QUESTFORGE` | `MalbersAnimations.QuestForge.QuestManager` | `Assembly-CSharp` |
 | `HAS_RETARGETPRO` | `KINEMATION.RetargetProComponent` | `RetargetPro.Runtime` |
@@ -562,68 +563,15 @@ ListIKResponse ListIK()
 
 ---
 
-## 6. Asset Inventory (4 Tools)
+## 6. Asset Inventory -- REMOVED 2026-05-10 (this group is not in the build)
 
-**Files:** `MCPTools/AssetInventory/Editor/Tool_AssetInventory.*.cs`
-**Asmdef:** `MCPTools.AssetInventory.Editor` | **Define:** `HAS_ASSETINVENTORY`
+**The four tools this section used to document do not exist.** The 10 `Tool_AssetInventory.*.cs` files were deleted on 2026-05-10 (TMCP Session 6, "Other housekeeping" -- see `TMCP_Status.md`). Verified 2026-08-06: `unity-tool-list` returns none of `asset-inventory-search` / `-search-prefabs` / `-import` / `-list-packages`, no matching source exists anywhere in the package, and no `HAS_ASSETINVENTORY` define is declared in any asmdef.
 
-### asset-inventory-search
+**The full API description sat here for three months after the deletion**, and was still being read as a live tool surface (Sandbox, 2026-08-01). It is replaced by this tombstone rather than silently dropped, because the failure mode was someone trusting the doc over the build. **Doc and build drifted because a group removal updated `TMCP_Status.md` and not this file** -- removing a group means editing both.
 
-Searches Asset Inventory 4 database by name, type, or tag.
+**Orphaned generated skills:** `.claude/skills/asset-inventory-*` folders dated before the removal survive in ~10 project trees. They are not regenerated and they advertise these dead tools into every session's context -- delete them when a project next has a reason to touch its skills folder.
 
-```csharp
-SearchResponse SearchAssets(
-    string searchPhrase,
-    string? fileType = null,
-    string? packageFilter = null,
-    int maxResults = 20
-)
-```
-
-**Returns:** resultCount, returnedCount, results (paths, package names, metadata)
-
-### asset-inventory-search-prefabs
-
-Convenience wrapper for prefab-only search.
-
-```csharp
-SearchResponse SearchPrefabs(
-    string searchPhrase,
-    string? packageFilter = null,
-    int maxResults = 20
-)
-```
-
-**Returns:** resultCount, returnedCount, results
-
-### asset-inventory-import
-
-Imports asset from indexed package into project (even if package not installed).
-
-```csharp
-ImportResponse ImportAsset(
-    string assetPath,
-    bool withDependencies = true,
-    bool addToScene = false,
-    Vector3? position = null
-)
-```
-
-**Returns:** assetPath, packageName, addToScene, message
-**Note:** Uses `EditorApplication.delayCall` for async import. Watch Console for completion.
-
-### asset-inventory-list-packages
-
-Lists all indexed packages in Asset Inventory database.
-
-```csharp
-ListPackagesResponse ListPackages(
-    string? nameFilter = null,
-    int maxResults = 50
-)
-```
-
-**Returns:** packageCount, details (names, file counts, versions)
+**Asset Inventory 4 itself is still fully usable from Unity**, just not through TMCP: drive it with `script-execute` against the AI4 API, plus read-only SQLite against the shared database. See Sandbox memory `feedback_ai4_maintenance_wizard`.
 
 ---
 
