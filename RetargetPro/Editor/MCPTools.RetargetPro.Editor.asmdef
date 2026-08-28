@@ -21,7 +21,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_RETARGETPRO"
+        "HAS_RETARGETPRO",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [],
     "noEngineReferences": false

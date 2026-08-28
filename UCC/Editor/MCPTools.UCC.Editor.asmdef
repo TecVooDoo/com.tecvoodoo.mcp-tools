@@ -19,7 +19,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_UCC"
+        "HAS_UCC",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [],
     "noEngineReferences": false

@@ -19,7 +19,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_ANIMATION_RIGGING"
+        "HAS_ANIMATION_RIGGING",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [],
     "noEngineReferences": false

@@ -19,7 +19,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_HEATHEN_BALLISTICS"
+        "HAS_HEATHEN_BALLISTICS",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [],
     "noEngineReferences": false

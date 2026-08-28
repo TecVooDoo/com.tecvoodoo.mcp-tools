@@ -19,7 +19,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_DAMAGE_NUMBERS_PRO"
+        "HAS_DAMAGE_NUMBERS_PRO",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [],
     "noEngineReferences": false

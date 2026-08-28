@@ -18,7 +18,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_PWB"
+        "HAS_PWB",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [ { "name": "com.ivanmurzak.unity.mcp", "expression": "0.69.0", "define": "MCP_HAS_AIGD" } ],
     "noEngineReferences": false

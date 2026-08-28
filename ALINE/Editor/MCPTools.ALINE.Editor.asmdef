@@ -21,7 +21,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_ALINE"
+        "HAS_ALINE",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [],
     "noEngineReferences": false

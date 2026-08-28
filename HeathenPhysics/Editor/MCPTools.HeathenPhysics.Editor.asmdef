@@ -19,7 +19,8 @@
     ],
     "autoReferenced": true,
     "defineConstraints": [
-        "HAS_HEATHEN_PHYSICS"
+        "HAS_HEATHEN_PHYSICS",
+        "UNITY_MCP_READY"
     ],
     "versionDefines": [],
     "noEngineReferences": false
