@@ -1,6 +1,7 @@
 #if HAS_DOTWEEN
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using com.IvanMurzak.McpPlugin;
 using UnityEngine;
@@ -35,8 +36,13 @@ namespace TecVooDoo.MCPTools.Editor
 
         static Type? FindType(string fullName)
         {
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            for (int i = 0; i < assemblies.Length; i++)
+            // AppDomain.GetAssemblies() can return already-unloaded assemblies (UAC0005)
+#if UNITY_6000_4_OR_NEWER
+            IReadOnlyList<Assembly> assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
+#else
+            IReadOnlyList<Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
+            for (int i = 0; i < assemblies.Count; i++)
             {
                 Type? type = assemblies[i].GetType(fullName, false);
                 if (type != null) return type;

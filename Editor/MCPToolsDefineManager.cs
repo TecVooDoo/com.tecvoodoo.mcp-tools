@@ -123,9 +123,17 @@ namespace MCPTools.Editor
             string typeName = parts[0].Trim();
             string assemblyName = parts[1].Trim();
 
+            // AppDomain.GetAssemblies() can return already-unloaded assemblies (UAC0005)
+#if UNITY_6000_4_OR_NEWER
+            IReadOnlyList<System.Reflection.Assembly> assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
+#else
+            IReadOnlyList<System.Reflection.Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
+
             // First pass: match the specified assembly name exactly
-            foreach (System.Reflection.Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            for (int i = 0; i < assemblies.Count; i++)
             {
+                System.Reflection.Assembly asm = assemblies[i];
                 string asmSimpleName = asm.GetName().Name ?? "";
                 if (string.Equals(asmSimpleName, assemblyName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -136,9 +144,9 @@ namespace MCPTools.Editor
 
             // Second pass: type may live in a different assembly than expected
             // (e.g. Assets/Plugins/ compiles to Assembly-CSharp-firstpass instead of Assembly-CSharp)
-            foreach (System.Reflection.Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            for (int i = 0; i < assemblies.Count; i++)
             {
-                t = asm.GetType(typeName);
+                t = assemblies[i].GetType(typeName);
                 if (t != null) return t;
             }
 
