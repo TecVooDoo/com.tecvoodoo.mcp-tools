@@ -1,11 +1,11 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.13.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.14.0
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** September 24, 2026 -- **UAC0005 x3 fixed** (`MCPToolsDefineManager.FindType` both passes, `Tool_DOTween.FindType`): `AppDomain.GetAssemblies()` -> `CurrentAssemblies.GetLoadedAssemblies()` under `UNITY_6000_4_OR_NEWER` (TVD S48, `07874d8`). Verified on MCP **0.93.0** / Unity 6000.6.2f1: 17 tools register after a `CleanBuildCache` rebuild. See Session Log.
+**Last Updated:** September 26, 2026 -- **+1 group: Grabbit 2 (Jungle), 3 tools, v1.13.0 -> v1.14.0** (TVD S49), live-verified on MCP **0.93.1** / Unity 6000.6.2f1; `package.json` description re-derived from the folder list (was 58 names incl. 3 retired groups, missing Maintainer + UMotionPro). **Prior Sep 24:** **UAC0005 x3 fixed** (`MCPToolsDefineManager.FindType` both passes, `Tool_DOTween.FindType`): `AppDomain.GetAssemblies()` -> `CurrentAssemblies.GetLoadedAssemblies()` under `UNITY_6000_4_OR_NEWER` (TVD S48, `07874d8`). Verified on MCP **0.93.0** / Unity 6000.6.2f1: 17 tools register after a `CleanBuildCache` rebuild. See Session Log.
 
 **Prior header (kept for continuity):** August 28, 2026 -- **gate hardening VALIDATED on two live crossings (FearSteez + BloodMiner, both un-danced and clean; BM near-controlled against TVD).** Applied August 27: **gate hardening: the 13 groups importing `com.IvanMurzak.Unity.MCP.*` now carry `UNITY_MCP_READY` in `defineConstraints`, so they drop out of the build during an MCP crossing instead of failing it (TVD S43).** Prior: August 4, 2026 -- **v1.13.0: the whole package moved off the deprecated `[McpPluginTool]` / `[McpPluginToolType]` aliases onto `[AiTool]` / `[AiToolType]`** (TVD S39). 305 attribute usages across 243 files and all 57 tool groups, a pure 1:1 rename -- same `com.IvanMurzak.McpPlugin` namespace, zero `using` changes, 305 insertions / 305 deletions with no other line touched. Verified live on MCP 0.87.0 / Unity 6000.5.6f1 and **backward-compatible to at least MCP 0.79.0** (the fleet's oldest), so no consuming project breaks. Declared dependency floor raised `0.63.3` -> `0.79.0` to match what is actually verified. Earlier entries: 2026-08-02 DOTween reflection refactor closing the leaky-folder class (TVD S38).
 
@@ -18,7 +18,9 @@
 
 ## Current State
 
-**248 tools across 57 asset groups.** All compiling.
+**251 tools across 58 asset groups.** All compiling. (Re-derived from source 2026-09-26: `[AiTool(` = 251, `[AiToolType]` = 58.)
+
+- **2026-09-26 — +1 group: Grabbit 2 (Jungle), 3 tools** (`grabbit-run-op`, `grabbit-create`, `grabbit-bake-colliders`); editor-only, asmdef-isolated + `#if HAS_GRABBIT`; wraps the vendor's host-independent `Grabbit2.GrabbitOps` / `GrabbitColliderBakeApi` (Grabbit ships 3 MCP adapters for OTHER hosts -- `com.coplaydev.unity-mcp`, `com.unity.ai.assistant`, Unity CLI -- all inert under Ivan's MCP). Tool names/params mirror the vendor adapters so Grabbit's own `AI/Skills/*/SKILL.md` map 1:1 (`grabbit_run_op` -> `grabbit-run-op`, etc.). Live-verified end-to-end in TVD S49 (ENTRY-406).
 
 - **2026-07-09 — +1 group: Maintainer (Code Stage), 3 tools** (`maintainer-scan-issues`, `maintainer-find-references`, `maintainer-scan-unused`); editor-only, asmdef-isolated, live-verified end-to-end in TVD.
 - **Prior baseline: 245 tools across 56 asset groups** — grep-verified ground truth as of 2026-06-04 (`[McpPluginTool(` attributes = 245; `[McpPluginToolType]` markers = 56, one per group folder). This supersedes the prior "~259" running tally, which had drifted ~14 high over many sessions.
@@ -90,6 +92,7 @@
 | **CityGen3D** | **6** | `HAS_CITYGEN3D` | `MCPTools.CityGen3D.Editor` (reflection) | **New TVD5** |
 | **UMotion Pro** | **4** | `HAS_UMOTION_PRO` | `MCPTools.UMotionPro.Editor` (DLL refs `UMotionApplication.dll` + `UMotionEditor.dll`; editor-only static API in `UMotionEditor.API`) | **New TVD10** |
 | **Maintainer (Code Stage)** | **3** | `HAS_MAINTAINER` | `MCPTools.Maintainer.Editor` (asmdef ref `CodeStage.Maintainer.Editor`, editor-only; `#if HAS_MAINTAINER` guard too) | **New — 2026-07-09** |
+| **Grabbit 2 (Jungle)** | **3** | `HAS_GRABBIT` | `MCPTools.Grabbit.Editor` (asmdef refs `Grabbit2Assembly`, `Grabbit2`, `Grabbit2Vhacd`, editor-only; `#if HAS_GRABBIT` guard too) | **New — 2026-09-26** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 

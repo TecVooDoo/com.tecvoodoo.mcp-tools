@@ -101,6 +101,8 @@ namespace MCPTools.Editor
             ("HAS_UMOTION_PRO",        "UMotionEditor.API.ClipEditor, UMotionEditor"),
             // TecVooDoo Maintainer addition (Jul 09) -- editor-only, asmdef-isolated (ENTRY-390)
             ("HAS_MAINTAINER",         "CodeStage.Maintainer.Issues.IssuesFinder, CodeStage.Maintainer.Editor"),
+            // TecVooDoo S49 addition (Sep 26) -- editor-only, asmdef-isolated (ENTRY-406)
+            ("HAS_GRABBIT",            "Grabbit2.GrabbitOps, Grabbit2Assembly"),
         };
 
         static MCPToolsDefineManager()

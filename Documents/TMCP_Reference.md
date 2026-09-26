@@ -1,6 +1,6 @@
 # TecVooDoo MCP Tools -- API Reference
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.13.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.14.0
 **Source:** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Last Updated:** 2026-08-06 (partial audit -- see below)
 
@@ -2173,6 +2173,35 @@ Triggers `generate | clear | cancel` on the active Generator. Method names are b
 
 ```csharp
 string Generate(string action = "generate")
+```
+
+## Grabbit 2 (Jungle) (3 Tools)
+
+**Define:** `HAS_GRABBIT` (type probe `Grabbit2.GrabbitOps, Grabbit2Assembly`) | **Asmdef:** `MCPTools.Grabbit.Editor` (editor-only) | **Added:** 2026-09-26 (TVD S49), ENTRY-406.
+Wraps Grabbit's host-independent headless facade. Grabbit's own three MCP adapters target other hosts and are inert here, so its bundled skills (`Assets/Plugins/Jungle/Grabbit 2/AI/Skills/`) describe these tools under underscore names -- `grabbit_run_op` = `grabbit-run-op`, `grabbit_create` = `grabbit-create`, `grabbit_bake_colliders` = `grabbit-bake-colliders`; parameters are camelCase here (`max_steps` -> `maxSteps`, `include_children` -> `includeChildren`). Targets resolve by `GameObject.Find` (active objects, name or hierarchy path) and fall back to the editor selection when omitted; instance IDs are NOT accepted. **Side effect:** a run can re-save `ProjectSettings/DynamicsManager.asset` (observed S49 -- a format upgrade, values unchanged).
+
+### grabbit-run-op -- Run Operation
+
+Headless physics op to settlement, no play mode. `place` = drop / move; `arrange` = align (alias distribute) / level / orient; `scatter` = randomize / explode / cramp / nudge. Box / Point / Grab are interactive-only. `action='info'` lists modes/ops. Returns status (`Settled` / `TimedOut`), steps, and each target's final pose. S49: drop settled 3 cubes in 346 steps; align in 103.
+
+```csharp
+string RunOp(string? action = null, string? mode = null, string? operation = null, string[]? targets = null, int? maxSteps = null)
+```
+
+### grabbit-create -- Create Around
+
+Duplicates `templates` `count` times in a box over either `around` objects (spread `padding`) or a `centerX/Y/Z` point (spread `radius`), dropped from `height`, then settles. A `TimedOut` status is not a failure -- round templates keep rolling (S49: 5 spheres hit the 1500-step cap, one rolled off the ground).
+
+```csharp
+string Create(int count, string[]? templates = null, string[]? around = null, float? centerX = null, float? centerY = null, float? centerZ = null, float padding = 1f, float radius = 2f, float height = 3f, int? maxSteps = null)
+```
+
+### grabbit-bake-colliders -- Bake Colliders
+
+`bake` (default) or `info`. Strategies: `balance` (VHACD), `precision` (CoACD), `performance` (primitives). Run `info` first: it reports defaults and `TargetsHaveBakeableMesh`. 0 colliders added usually means mesh Read/Write is off or the target is a read-only model prefab. Baked colliders parent under a `Grabbit Colliders` child; shippable meshes save under `Assets/Grabbit Baked Colliders/`.
+
+```csharp
+string BakeColliders(string? action = null, string[]? targets = null, string? strategy = null, bool includeChildren = true, int? maxPieces = null, bool? perChild = null)
 ```
 
 ---
