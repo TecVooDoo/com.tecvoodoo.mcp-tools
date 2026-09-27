@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 
 namespace MCPTools.Editor
@@ -166,24 +165,44 @@ namespace MCPTools.Editor
                 target = BuildTargetGroup.Standalone;
 
             var namedTarget = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(target);
-            var current = PlayerSettings.GetScriptingDefineSymbols(namedTarget);
-            var defines = new HashSet<string>(current.Split(';', StringSplitOptions.RemoveEmptyEntries));
+            List<string> defines = ReadDefines(namedTarget);
             bool changed = false;
 
             foreach (var (symbol, detectType) in Entries)
             {
                 bool assetPresent = FindType(detectType) != null;
-                if (assetPresent && defines.Add(symbol))
+                if (assetPresent && !defines.Contains(symbol))
+                {
+                    InsertDefine(defines, symbol);
                     changed = true;
+                }
                 else if (!assetPresent && defines.Remove(symbol))
                     changed = true;
             }
 
             if (changed)
-            {
-                var newDefines = string.Join(";", defines.OrderBy(d => d));
-                PlayerSettings.SetScriptingDefineSymbols(namedTarget, newDefines);
-            }
+                PlayerSettings.SetScriptingDefineSymbols(namedTarget, string.Join(";", defines));
+        }
+
+        // MCP's RecompileGate keeps its gate defines (UNITY_MCP_READY, UNITY_MCP_DEPS_*) LAST and
+        // compares define lists ORDER-SENSITIVELY. Re-sorting the list here moved them, so every
+        // HAS_* change provoked a gate rewrite and a second full recompile (TVD S50 saw an
+        // 18-cycle ping-pong). Preserve the existing order; insert ahead of the gate tail.
+        const string GateDefinePrefix = "UNITY_MCP_";
+
+        static List<string> ReadDefines(UnityEditor.Build.NamedBuildTarget namedTarget)
+        {
+            string current = PlayerSettings.GetScriptingDefineSymbols(namedTarget);
+            return new List<string>(current.Split(';', StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        static void InsertDefine(List<string> defines, string symbol)
+        {
+            int gateIndex = defines.FindIndex(d => d.StartsWith(GateDefinePrefix, StringComparison.Ordinal));
+            if (gateIndex < 0)
+                defines.Add(symbol);
+            else
+                defines.Insert(gateIndex, symbol);
         }
 
         /// <summary>
@@ -220,8 +239,7 @@ namespace MCPTools.Editor
                 target = BuildTargetGroup.Standalone;
 
             var namedTarget = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(target);
-            var current = PlayerSettings.GetScriptingDefineSymbols(namedTarget);
-            var defines = new HashSet<string>(current.Split(';', StringSplitOptions.RemoveEmptyEntries));
+            List<string> defines = ReadDefines(namedTarget);
             bool changed = false;
 
             // AUTHORITATIVE deletion signal (postprocessor path): extract deleted
@@ -329,10 +347,7 @@ namespace MCPTools.Editor
             }
 
             if (changed)
-            {
-                var newDefines = string.Join(";", defines.OrderBy(d => d));
-                PlayerSettings.SetScriptingDefineSymbols(namedTarget, newDefines);
-            }
+                PlayerSettings.SetScriptingDefineSymbols(namedTarget, string.Join(";", defines));
         }
 
         [Serializable]
