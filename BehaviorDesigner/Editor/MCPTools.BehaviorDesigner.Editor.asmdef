@@ -3,9 +3,7 @@
     "rootNamespace": "",
     "references": [
         "com.IvanMurzak.Unity.MCP.Editor",
-        "com.IvanMurzak.Unity.MCP.Runtime",
-        "Opsive.BehaviorDesigner.Runtime",
-        "Opsive.GraphDesigner.Runtime"
+        "com.IvanMurzak.Unity.MCP.Runtime"
     ],
     "includePlatforms": [
         "Editor"
@@ -16,12 +14,20 @@
     "precompiledReferences": [
         "McpPlugin.dll",
         "McpPlugin.Common.dll",
-        "ReflectorNet.dll"
+        "ReflectorNet.dll",
+        "Opsive.BehaviorDesigner.Runtime.dll",
+        "Opsive.GraphDesigner.Runtime.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [
         "HAS_BEHAVIOR_DESIGNER"
     ],
-    "versionDefines": [ { "name": "com.ivanmurzak.unity.mcp", "expression": "0.69.0", "define": "MCP_HAS_AIGD" } ],
+    "versionDefines": [
+        {
+            "name": "com.ivanmurzak.unity.mcp",
+            "expression": "0.69.0",
+            "define": "MCP_HAS_AIGD"
+        }
+    ],
     "noEngineReferences": false
 }

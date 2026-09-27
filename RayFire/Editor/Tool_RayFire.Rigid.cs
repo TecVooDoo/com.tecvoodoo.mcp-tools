@@ -82,8 +82,8 @@ Use 'rayfire-add-shatter' afterward to configure fragmentation.")]
                 rigid.lim.depth = maxDepth;
 
                 // Fading
-                rigid.fading.fadeType = ParseEnum<FadeType>(fadeType, FadeType.None);
-                rigid.fading.lifeTime = fadeLifetime;
+                rigid.fading.ftp = ParseEnum<FadeType>(fadeType, FadeType.None);
+                rigid.fading.ltm = fadeLifetime;
 
                 if (initialize)
                     rigid.Initialize();
@@ -149,8 +149,8 @@ Only provided parameters are changed; others are left as-is.")]
                 if (maxDamage.HasValue) rigid.damage.max = maxDamage.Value;
                 if (useGravity.HasValue) rigid.physics.gr = useGravity.Value;
                 if (maxDepth.HasValue) rigid.lim.depth = maxDepth.Value;
-                if (fadeType != null) rigid.fading.fadeType = ParseEnum<FadeType>(fadeType, rigid.fading.fadeType);
-                if (fadeLifetime.HasValue) rigid.fading.lifeTime = fadeLifetime.Value;
+                if (fadeType != null) rigid.fading.ftp = ParseEnum<FadeType>(fadeType, rigid.fading.ftp);
+                if (fadeLifetime.HasValue) rigid.fading.ltm = fadeLifetime.Value;
 
                 EditorUtility.SetDirty(go);
 
