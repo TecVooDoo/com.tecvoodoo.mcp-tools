@@ -20,6 +20,7 @@
 
 **252 tools across 58 asset groups.** All compiling. (Re-derived from source 2026-09-26 after SS S17: `[AiTool(` = 252, `[AiToolType]` = 58.)
 
+- **2026-09-27 (Sandbox S91) -- `MCPToolsDefineManager` fix, no version bump (`8b4396c`):** the stale-define fallback matched Entries' ASSEMBLY names against asmdef FILENAMES, so `Grabbit 2 Assembly.asmdef` (declares `Grabbit2Assembly`) made every unrelated folder/`.cs` deletion strip `HAS_GRABBIT` -- a recompile without the group, then a second when `UpdateDefines` re-added it. Now also reads each asmdef's declared `name`. Validated against the reproduced failure. **Any Entry whose asmdef filename differs from its assembly name had the same exposure.**
 - **2026-09-26 (SS S17) -- +1 tool in Unity Entities: `ecs-set-component-enabled`** (group now 6 tools). See Session Log.
 
 - **2026-09-26 — +1 group: Grabbit 2 (Jungle), 3 tools** (`grabbit-run-op`, `grabbit-create`, `grabbit-bake-colliders`); editor-only, asmdef-isolated + `#if HAS_GRABBIT`; wraps the vendor's host-independent `Grabbit2.GrabbitOps` / `GrabbitColliderBakeApi` (Grabbit ships 3 MCP adapters for OTHER hosts -- `com.coplaydev.unity-mcp`, `com.unity.ai.assistant`, Unity CLI -- all inert under Ivan's MCP). Tool names/params mirror the vendor adapters so Grabbit's own `AI/Skills/*/SKILL.md` map 1:1 (`grabbit_run_op` -> `grabbit-run-op`, etc.). Live-verified end-to-end in TVD S49 (ENTRY-406).
