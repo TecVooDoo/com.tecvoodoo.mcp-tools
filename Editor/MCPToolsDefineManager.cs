@@ -258,6 +258,13 @@ namespace MCPTools.Editor
                 // the source for PackageCache/registry asmdefs that File.Exists confirms.)
                 if (!System.IO.File.Exists(path)) continue;
                 presentAssemblies.Add(System.IO.Path.GetFileNameWithoutExtension(path));
+                // An asmdef's FILENAME need not match the assembly NAME it declares, and
+                // Entries name the assembly: "Grabbit 2 Assembly.asmdef" declares
+                // "Grabbit2Assembly", so a filename-only set stripped HAS_GRABBIT on every
+                // unrelated folder/.cs deletion (found 2026-09-27, Sandbox S91).
+                string? declaredName = ReadAsmdefName(path);
+                if (!string.IsNullOrEmpty(declaredName))
+                    presentAssemblies.Add(declaredName!);
             }
 
             // DLL enumeration via filesystem (AssetDatabase doesn't surface .dll under
@@ -325,6 +332,25 @@ namespace MCPTools.Editor
             {
                 var newDefines = string.Join(";", defines.OrderBy(d => d));
                 PlayerSettings.SetScriptingDefineSymbols(namedTarget, newDefines);
+            }
+        }
+
+        [Serializable]
+        sealed class AsmdefName
+        {
+            public string? name;
+        }
+
+        static string? ReadAsmdefName(string asmdefPath)
+        {
+            try
+            {
+                return UnityEngine.JsonUtility.FromJson<AsmdefName>(System.IO.File.ReadAllText(asmdefPath))?.name;
+            }
+            catch (Exception)
+            {
+                // Unreadable or malformed asmdef: the filename entry above still stands.
+                return null;
             }
         }
 
