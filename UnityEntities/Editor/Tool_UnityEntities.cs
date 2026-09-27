@@ -42,10 +42,16 @@ namespace MCPTools.UnityEntities.Editor
             Type? type = Type.GetType(fullyQualifiedTypeName);
             if (type == null)
             {
-                // Try searching all loaded assemblies
-                foreach (System.Reflection.Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+                // Try searching all loaded assemblies.
+                // AppDomain.GetAssemblies() can return already-unloaded assemblies (UAC0005)
+#if UNITY_6000_4_OR_NEWER
+                System.Collections.Generic.IReadOnlyList<System.Reflection.Assembly> assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
+#else
+                System.Collections.Generic.IReadOnlyList<System.Reflection.Assembly> assemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
+                for (int i = 0; i < assemblies.Count; i++)
                 {
-                    type = asm.GetType(fullyQualifiedTypeName);
+                    type = assemblies[i].GetType(fullyQualifiedTypeName);
                     if (type != null) break;
                 }
             }

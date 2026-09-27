@@ -1,6 +1,6 @@
 # TecVooDoo MCP Tools -- API Reference
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.14.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.14.1
 **Source:** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Last Updated:** 2026-08-06 (partial audit -- see below)
 
@@ -2174,6 +2174,38 @@ Triggers `generate | clear | cancel` on the active Generator. Method names are b
 ```csharp
 string Generate(string action = "generate")
 ```
+
+## Unity Entities (6 Tools)
+
+`HAS_UNITY_ENTITIES`, `MCPTools.UnityEntities.Editor`. Every tool takes an optional `worldName` (default `DefaultGameObjectInjectionWorld`, which needs Play mode; a named World such as `Editor World`, or one you created, does not). Entities are addressed by `entityIndex` + `entityVersion` from `ecs-query-entities`. **Only the tools touched in SS S17 are documented in full here; `ecs-query-worlds`, `ecs-modify-entity` and `ecs-create-destroy` are summarised in `TMCP_Status.md`.**
+
+**Enabled-state trap:** an entity whose `IEnableableComponent` is disabled does **not** match a query requiring that component. The escape hatch is `EntityQueryOptions.IgnoreComponentEnabledState` -- **not** `IncludeDisabledEntities`, which is about the whole-entity `Disabled` tag.
+
+### ecs-query-entities -- Query Entities
+
+Up to 50 entities matching every listed type (or all entities if none listed). `ignoreComponentEnabledState=true` also matches entities whose filtered enableable component is disabled.
+
+```csharp
+string QueryEntities(string? componentTypeNames = null, string? worldName = null, bool ignoreComponentEnabledState = false)
+```
+
+### ecs-inspect-entity -- Inspect Entity
+
+Lists components with public field values; enableable components also print `enabled: <bool>`.
+
+```csharp
+string InspectEntity(int entityIndex, int entityVersion, string? worldName = null)
+```
+
+### ecs-set-component-enabled -- Set Component Enabled
+
+Flips the enabled bit of an `IEnableableComponent` (not a structural change). Errors if the type is not enableable, the entity lacks the component, or the entity no longer exists. Returns `before -> after`.
+
+```csharp
+string SetComponentEnabled(int entityIndex, int entityVersion, string componentTypeName, bool enabled, string? worldName = null)
+```
+
+---
 
 ## Grabbit 2 (Jungle) (3 Tools)
 

@@ -14,13 +14,19 @@ namespace MCPTools.UnityEntities.Editor
         [AiTool("ecs-query-entities", Title = "ECS / Query Entities")]
         [Description(@"Queries entities in an ECS World, optionally filtered by component types.
 Returns entity index+version and component type names for each match.
-Output is capped at 50 entities. Requires Play mode.")]
+Output is capped at 50 entities. Requires Play mode.
+By default an entity whose filtered IEnableableComponent is DISABLED does not match -- set
+ignoreComponentEnabledState=true to include it (EntityQueryOptions.IgnoreComponentEnabledState,
+NOT IncludeDisabledEntities, which is the whole-entity 'Disabled' tag).")]
         public string QueryEntities(
             [Description("Comma-separated fully qualified component type names to filter by (e.g. 'Unity.Transforms.LocalTransform,Unity.Rendering.RenderMesh'). Leave empty to list all entities.")]
             string? componentTypeNames = null,
 
             [Description("Name of the World to query. Defaults to DefaultGameObjectInjectionWorld.")]
-            string? worldName = null
+            string? worldName = null,
+
+            [Description("Match entities even when a filtered IEnableableComponent is disabled. Needed to find an entity in order to re-enable it. Default false.")]
+            bool ignoreComponentEnabledState = false
         )
         {
             return MainThread.Instance.Run(() =>
@@ -45,7 +51,14 @@ Output is capped at 50 entities. Requires Play mode.")]
                         componentTypes[i] = ComponentType.ReadOnly(managedType);
                     }
 
-                    query = em.CreateEntityQuery(componentTypes);
+                    EntityQueryDesc desc = new EntityQueryDesc
+                    {
+                        All = componentTypes,
+                        Options = ignoreComponentEnabledState
+                            ? EntityQueryOptions.IgnoreComponentEnabledState
+                            : EntityQueryOptions.Default
+                    };
+                    query = em.CreateEntityQuery(desc);
                 }
                 else
                 {

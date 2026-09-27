@@ -1,11 +1,11 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.14.0
+**Package:** `com.tecvoodoo.mcp-tools` v1.14.1
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
 **MCP Compatibility:** **Self-syncing across MCP versions.** As of 2026-05-10 (Session 7), [`Editor/MCPToolsAsmdefSync.cs`](../Editor/MCPToolsAsmdefSync.cs) auto-rewrites every TMCP tool-group asmdef's `precompiledReferences` on each domain reload to match whatever `McpPlugin*.dll` / `McpPlugin.Common*.dll` / `ReflectorNet*.dll` filenames exist under `Assets/Plugins/NuGet/`. So a fresh MCP version bump (whether the new release ships `McpPlugin.dll`, `McpPlugin.6.2.1.dll`, `McpPlugin.7.0.0.dll`, or anything else) self-heals on first compile. Manual fallback: **Tools > TecVooDoo > Sync MCP DLL References**. The 46 asmdefs ship with a static fallback list covering MCP 0.66.x / 0.69.x / 0.71.0 / 0.72.0 conventions so the very first compile after install also succeeds. **Projects on MCP 0.66.1 must still upgrade MCP first** before reinstalling TMCP — see [Sandbox/Documents/MCP_ConnectionBrief.md](../../../Sandbox/Documents/MCP_ConnectionBrief.md) for the per-project recipe.
-**Last Updated:** September 26, 2026 -- **+1 group: Grabbit 2 (Jungle), 3 tools, v1.13.0 -> v1.14.0** (TVD S49), live-verified on MCP **0.93.1** / Unity 6000.6.2f1; `package.json` description re-derived from the folder list (was 58 names incl. 3 retired groups, missing Maintainer + UMotionPro). **Prior Sep 24:** **UAC0005 x3 fixed** (`MCPToolsDefineManager.FindType` both passes, `Tool_DOTween.FindType`): `AppDomain.GetAssemblies()` -> `CurrentAssemblies.GetLoadedAssemblies()` under `UNITY_6000_4_OR_NEWER` (TVD S48, `07874d8`). Verified on MCP **0.93.0** / Unity 6000.6.2f1: 17 tools register after a `CleanBuildCache` rebuild. See Session Log.
+**Last Updated:** September 26, 2026 -- **v1.14.1: `ecs-set-component-enabled` + enabled-state in `ecs-inspect-entity` + `ignoreComponentEnabledState` on `ecs-query-entities`, and a 4th UAC0005 site fixed in `Tool_UnityEntities.cs`** (SS S17 -- the only project that compiles the group), live-verified on MCP 0.93.1 / Unity 6000.6.2f1 / Entities 6.6.0. **Earlier Sep 26:** **+1 group: Grabbit 2 (Jungle), 3 tools, v1.13.0 -> v1.14.0** (TVD S49), live-verified on MCP **0.93.1** / Unity 6000.6.2f1; `package.json` description re-derived from the folder list (was 58 names incl. 3 retired groups, missing Maintainer + UMotionPro). **Prior Sep 24:** **UAC0005 x3 fixed** (`MCPToolsDefineManager.FindType` both passes, `Tool_DOTween.FindType`): `AppDomain.GetAssemblies()` -> `CurrentAssemblies.GetLoadedAssemblies()` under `UNITY_6000_4_OR_NEWER` (TVD S48, `07874d8`). Verified on MCP **0.93.0** / Unity 6000.6.2f1: 17 tools register after a `CleanBuildCache` rebuild. See Session Log.
 
 **Prior header (kept for continuity):** August 28, 2026 -- **gate hardening VALIDATED on two live crossings (FearSteez + BloodMiner, both un-danced and clean; BM near-controlled against TVD).** Applied August 27: **gate hardening: the 13 groups importing `com.IvanMurzak.Unity.MCP.*` now carry `UNITY_MCP_READY` in `defineConstraints`, so they drop out of the build during an MCP crossing instead of failing it (TVD S43).** Prior: August 4, 2026 -- **v1.13.0: the whole package moved off the deprecated `[McpPluginTool]` / `[McpPluginToolType]` aliases onto `[AiTool]` / `[AiToolType]`** (TVD S39). 305 attribute usages across 243 files and all 57 tool groups, a pure 1:1 rename -- same `com.IvanMurzak.McpPlugin` namespace, zero `using` changes, 305 insertions / 305 deletions with no other line touched. Verified live on MCP 0.87.0 / Unity 6000.5.6f1 and **backward-compatible to at least MCP 0.79.0** (the fleet's oldest), so no consuming project breaks. Declared dependency floor raised `0.63.3` -> `0.79.0` to match what is actually verified. Earlier entries: 2026-08-02 DOTween reflection refactor closing the leaky-folder class (TVD S38).
 
@@ -18,7 +18,9 @@
 
 ## Current State
 
-**251 tools across 58 asset groups.** All compiling. (Re-derived from source 2026-09-26: `[AiTool(` = 251, `[AiToolType]` = 58.)
+**252 tools across 58 asset groups.** All compiling. (Re-derived from source 2026-09-26 after SS S17: `[AiTool(` = 252, `[AiToolType]` = 58.)
+
+- **2026-09-26 (SS S17) -- +1 tool in Unity Entities: `ecs-set-component-enabled`** (group now 6 tools). See Session Log.
 
 - **2026-09-26 — +1 group: Grabbit 2 (Jungle), 3 tools** (`grabbit-run-op`, `grabbit-create`, `grabbit-bake-colliders`); editor-only, asmdef-isolated + `#if HAS_GRABBIT`; wraps the vendor's host-independent `Grabbit2.GrabbitOps` / `GrabbitColliderBakeApi` (Grabbit ships 3 MCP adapters for OTHER hosts -- `com.coplaydev.unity-mcp`, `com.unity.ai.assistant`, Unity CLI -- all inert under Ivan's MCP). Tool names/params mirror the vendor adapters so Grabbit's own `AI/Skills/*/SKILL.md` map 1:1 (`grabbit_run_op` -> `grabbit-run-op`, etc.). Live-verified end-to-end in TVD S49 (ENTRY-406).
 
@@ -57,7 +59,7 @@
 | **UCC (Opsive)** | **5** | `HAS_UCC` | `MCPTools.UCC.Editor` | **New S4** |
 | **Behavior Designer** | **5** | `HAS_BEHAVIOR_DESIGNER` | `MCPTools.BehaviorDesigner.Editor` | Updated SS1, asmdef-ified S24 |
 | **DOTween Pro** | **4** | `HAS_DOTWEEN` | `MCPTools.DOTween.Editor` | New S4; asmdef reverted S24 (`a2804f0`), **restored 2026-08-02** via reflection. `DOTweenAnimation` is resolved by type name at runtime, so the asmdef binds only `DOTween.dll` (core, layout-invariant) and never `DOTweenPro.Scripts` / `Assembly-CSharp` — which is what broke SetDesign with `CS0246` under DOTween's "Create ASMDEF = off" layout. |
-| **Unity Entities** | **5** | `HAS_UNITY_ENTITIES` | `MCPTools.UnityEntities.Editor` | **New S4b** |
+| **Unity Entities** | **6** | `HAS_UNITY_ENTITIES` | `MCPTools.UnityEntities.Editor` | New S4b; **+`ecs-set-component-enabled` SS S17** |
 | **Unity Physics** | **4** | `HAS_UNITY_PHYSICS` | `MCPTools.UnityPhysics.Editor` | **New S4b** |
 | **Bro Audio** | **4** | `HAS_BROAUDIO` | `MCPTools.BroAudio.Editor` | **New S5** |
 | **Koreographer** | **2** | `HAS_KOREOGRAPHER` | `MCPTools.Koreographer.Editor` | **New S5** |
@@ -149,6 +151,18 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### `ecs-set-component-enabled` + UAC0005 #4 (September 26, 2026) (SS Session 17)
+
+- **Why here:** SpaceSucks is the fleet's only project with `com.unity.entities`, so `MCPTools.UnityEntities.Editor` compiles nowhere else -- TVD could not build it. Origin: ENTRY-396 (SS S13), where toggling the N-Body `SatelliteSpawnerData` needed `script-execute` because `ecs-modify-entity` writes field values only.
+- **New tool `ecs-set-component-enabled(entityIndex, entityVersion, componentTypeName, enabled, worldName?)`:** wraps the non-generic `EntityManager.SetComponentEnabled(Entity, ComponentType, bool)` -- no reflection. Rejects non-enableable types (`ComponentType.IsEnableable`), missing components and stale entities with pointed errors; reports `before -> after` and flags a no-op.
+- **`ecs-inspect-entity`:** prints `enabled: <bool>` under each enableable component (via `IsComponentEnabled`). Note `Unity.Entities.Simulate` is itself enableable and present on every entity, so it shows up too.
+- **`ecs-query-entities`:** new optional `ignoreComponentEnabledState` (default false -- existing behaviour unchanged). **Without it the tool cannot find an entity whose filtered component is disabled, i.e. exactly the one you want to re-enable.** Implemented as `EntityQueryDesc { All, Options = IgnoreComponentEnabledState }`.
+- **The query trap is in both tool descriptions:** the flag is `EntityQueryOptions.IgnoreComponentEnabledState`, **NOT** `IncludeDisabledEntities` (that governs the whole-entity `Disabled` tag; it returned 0 of 4 spawners in S13).
+- **UAC0005 #4:** `Tool_UnityEntities.ResolveComponentType` still used `AppDomain.GetAssemblies()` -- a site TVD S48's x3 sweep could not see, because the analyzer only fires where the group compiles. SS's `Editor.log` carried it at `Tool_UnityEntities.cs(46,60)`. Same fix as S48 (`CurrentAssemblies.GetLoadedAssemblies()` under `UNITY_6000_4_OR_NEWER`, `AppDomain` fallback). Warning absent after rebuild. **`UnityPhysics` has no such call** (grepped).
+- **Verified live in SS (MCP 0.93.1, Entities 6.6.0), in an isolated system-less `World`** so the N-Body spawner system could not act on a toggled spawner: default query 1 match vs 2 with the flag; inspect shows `enabled: False`; toggle False->True and True->False; no-op reported; non-enableable (`LocalTransform`), missing-component, stale-version and unknown-type errors all correct; re-tested after the UAC0005 rebuild (type resolution through the new loop). 0 `error CS`. Probe world disposed.
+- **Version:** 1.14.0 -> **1.14.1** (additive tool in an existing group; new groups bump the minor, this adds none).
+- **Not included:** the `BehaviorDesigner` asmdef + `Tool_RayFire.Rigid.cs` working-tree edits (dated Aug 30, not this session's) -- left unstaged, as S48 did. Pre-existing `CS0618 IsManagedComponent` warnings in `InspectEntity.cs` (deprecated in Entities 6.6) left as-is.
 
 ### UAC0005 x3 -- `AppDomain.GetAssemblies()` replaced with `CurrentAssemblies` (September 24, 2026) (TVD Session 48)
 
@@ -818,12 +832,13 @@ Audio packages rated High in Sandbox AssetLog. All are optional -- tools auto-ac
 - `dotween-play` -- Runtime: play/pause/rewind/restart/complete/kill by id
 - `dotween-global` -- Global DOTween control (killall/pauseall/playall/completeall)
 
-**Unity Entities (5 tools):** `HAS_UNITY_ENTITIES`, `MCPTools.UnityEntities.Editor`
+**Unity Entities (6 tools):** `HAS_UNITY_ENTITIES`, `MCPTools.UnityEntities.Editor`
 - `ecs-query-worlds` -- List all active Worlds (name, entity count, system count, default flag)
-- `ecs-query-entities` -- Query entities by component types, list up to 50 with component lists
-- `ecs-inspect-entity` -- Inspect entity by index+version, read all component field values via reflection
+- `ecs-query-entities` -- Query entities by component types, list up to 50 with component lists; `ignoreComponentEnabledState` includes entities whose filtered enableable component is disabled
+- `ecs-inspect-entity` -- Inspect entity by index+version, read all component field values via reflection; reports `enabled:` for IEnableableComponent types
 - `ecs-modify-entity` -- Modify IComponentData field on entity via reflection (supports float3, quaternion, enums)
 - `ecs-create-destroy` -- Create entity with component types or destroy by index+version
+- `ecs-set-component-enabled` -- Enable/disable an IEnableableComponent (`EntityManager.SetComponentEnabled`); reports before -> after
 
 **Unity Physics (4 tools):** `HAS_UNITY_PHYSICS`, `MCPTools.UnityPhysics.Editor`
 - `uphys-query` -- Read Rigidbody, Colliders, PhysicsStepAuthoring on a GO with full config

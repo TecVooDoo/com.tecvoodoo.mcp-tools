@@ -15,6 +15,7 @@ namespace MCPTools.UnityEntities.Editor
         [AiTool("ecs-inspect-entity", Title = "ECS / Inspect Entity")]
         [Description(@"Inspects a specific ECS entity by index and version.
 Lists all components and attempts to read field values from unmanaged IComponentData.
+IEnableableComponent types also report their enabled state (toggle it with ecs-set-component-enabled).
 Requires Play mode.")]
         public string InspectEntity(
             [Description("Entity index (from ecs-query-entities output).")]
@@ -61,6 +62,9 @@ Requires Play mode.")]
                     ComponentType ct = componentTypes[i];
                     Type managedType = ct.GetManagedType();
                     sb.AppendLine($"\n  [{i}] {managedType.FullName}");
+
+                    if (ct.IsEnableable)
+                        sb.AppendLine($"      enabled: {em.IsComponentEnabled(entity, ct)}");
 
                     // Only try to read values for unmanaged IComponentData (not buffers, shared, managed, tag)
                     bool isUnmanagedComponent = ct.IsComponent
