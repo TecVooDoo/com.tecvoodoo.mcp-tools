@@ -2238,4 +2238,52 @@ string BakeColliders(string? action = null, string[]? targets = null, string? st
 
 ---
 
+## Gaia Pro VS (Procedural Worlds) (5 Tools)
+
+**Define:** `HAS_GAIA` (type probe `Gaia.GaiaAPI, GaiaCore`) | **Asmdef:** `MCPTools.Gaia.Editor` (editor-only, refs `GaiaCore`) | **Added:** 2026-10-10 (TVD S52), ENTRY-431. **Compile-verified; live test owed in SetDesign.**
+All edit-mode only. **Gaia finishes world creation and tree/detail spawning on later editor ticks -- read results with `gaia-query` on a SEPARATE call.** Stamping is synchronous.
+
+### gaia-query -- Query (read-only)
+
+Session manager, sea level, per-terrain size / world height range / tree count / prototype counts; warns on terrain below sea level and on `drawHeightmap = false`. Lists spawners; `includeBiomePresets` adds every BiomePreset asset.
+
+```csharp
+string Query(bool includeSpawners = true, bool includeBiomePresets = false)
+```
+
+### gaia-create-world -- Create World
+
+`GaiaAPI.CreateGaiaWorld`. Refuses when terrains exist (unless `replaceExisting`) or a creation is running -- guards against the MCP client re-sending a slow call. Adds the active scene to EditorBuildSettings (Gaia's side effect).
+
+```csharp
+string CreateWorld(int tileSize = 1024, float tileHeight = 1000f, int xTiles = 1, int zTiles = 1, int seaLevel = 50, bool replaceExisting = false)
+```
+
+### gaia-sea-level -- Sea Level
+
+Get (omit `value`) or set, plus the terrain report. Spawn masks are sea-level relative: terrain below it receives nothing.
+
+```csharp
+string SeaLevel(float? value = null)
+```
+
+### gaia-stamp -- Stamp
+
+Stamps a texture asset through Gaia's stamper. Defaults = Fit To Terrain on the first terrain (width 100 % of one tile, height 5, centred, base Y). `operation` is any `GaiaConstants.FeatureOperation` name; default RaiseHeight.
+
+```csharp
+string Stamp(string stampPath, string? operation = null, float? x = null, float? z = null, float? y = null, float width = 100f, float height = 5f, float rotation = 0f)
+```
+
+### gaia-spawn -- Spawn
+
+`create-biome` instantiates a BiomePreset by asset name and lists its spawners. `spawn` runs ONE spawner by exact GameObject name and **refuses when every terrain is below sea level**. One spawner per call (a loop places no trees/details); texture spawners first; a first tree spawn on a fresh API world can place 0, so spawn it again. Re-spawning replaces.
+
+```csharp
+string Spawn(string action, string name, bool allTerrains = true)
+```
+
+---
+
+
 **End of Document**

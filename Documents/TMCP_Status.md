@@ -18,7 +18,9 @@
 
 ## Current State
 
-**252 tools across 58 asset groups.** All compiling. (Re-derived from source 2026-09-26 after SS S17: `[AiTool(` = 252, `[AiToolType]` = 58.)
+**257 tools across 59 asset groups.** All compiling. (Re-derived from source 2026-10-10, TVD S52: `[AiTool(` = 257, `[AiToolType]` = 59.)
+
+- **2026-10-10 (TVD S52) -- v1.15.0: +1 group, Gaia Pro VS (Procedural Worlds), 5 tools** (`gaia-query`, `gaia-create-world`, `gaia-sea-level`, `gaia-stamp`, `gaia-spawn`). Editor-only, asmdef-isolated (`MCPTools.Gaia.Editor` -> `GaiaCore`) + `#if HAS_GAIA`. **COMPILE-VERIFIED ONLY -- not yet live-tested:** Gaia is installed in SetDesign, not TVD (lean-install rule). Compiled offline against `SetDesign/Library/ScriptAssemblies/GaiaCore.dll`: 0 errors, 0 warnings. See Session Log.
 
 - **2026-09-27 (TVD S50) -- v1.14.2: define writes are order-preserving.** Both `UpdateDefines` and `RemoveStaleDefines` wrote back `OrderBy(d => d)`; MCP's `RecompileGate` compares lists ORDER-SENSITIVELY and keeps `UNITY_MCP_READY;UNITY_MCP_DEPS_*` last, so every TMCP write provoked a gate re-sync and a second full recompile. Now: existing order kept, a new `HAS_*` inserted ahead of the `UNITY_MCP_*` tail. See Session Log.
 - **2026-09-27 (Sandbox S91) -- `MCPToolsDefineManager` fix, no version bump (`8b4396c`):** the stale-define fallback matched Entries' ASSEMBLY names against asmdef FILENAMES, so `Grabbit 2 Assembly.asmdef` (declares `Grabbit2Assembly`) made every unrelated folder/`.cs` deletion strip `HAS_GRABBIT` -- a recompile without the group, then a second when `UpdateDefines` re-added it. Now also reads each asmdef's declared `name`. Validated against the reproduced failure. **Any Entry whose asmdef filename differs from its assembly name had the same exposure.**
@@ -97,6 +99,7 @@
 | **UMotion Pro** | **4** | `HAS_UMOTION_PRO` | `MCPTools.UMotionPro.Editor` (DLL refs `UMotionApplication.dll` + `UMotionEditor.dll`; editor-only static API in `UMotionEditor.API`) | **New TVD10** |
 | **Maintainer (Code Stage)** | **3** | `HAS_MAINTAINER` | `MCPTools.Maintainer.Editor` (asmdef ref `CodeStage.Maintainer.Editor`, editor-only; `#if HAS_MAINTAINER` guard too) | **New — 2026-07-09** |
 | **Grabbit 2 (Jungle)** | **3** | `HAS_GRABBIT` | `MCPTools.Grabbit.Editor` (asmdef refs `Grabbit2Assembly`, `Grabbit2`, `Grabbit2Vhacd`, editor-only; `#if HAS_GRABBIT` guard too) | **New — 2026-09-26** |
+| **Gaia Pro VS (Procedural Worlds)** | **5** | `HAS_GAIA` | `MCPTools.Gaia.Editor` (asmdef ref `GaiaCore`, editor-only; `#if HAS_GAIA` guard too) | **New — 2026-10-10, compile-verified, live test owed in SetDesign** |
 
 **Auto-detection:** `MCPToolsDefineManager.cs` (Editor folder) scans for installed assets on domain reload and adds/removes `HAS_*` defines automatically. No manual setup needed. When an asset is removed from a project, its tools silently deactivate.
 
@@ -153,6 +156,25 @@ All 33 groups built directly in the package folder. No separate source location.
 ---
 
 ## Session Log
+
+### Gaia Pro VS tool group -- v1.15.0 (October 10, 2026) (TVD Session 52)
+
+**Source:** Sandbox ENTRY-431 (Gaia Pro VS 4.2.6, SetDesign-hosted) rated it **MCP candidate: HIGH** and named the group (`gaia-create-world` / `gaia-stamp` / `gaia-spawn-biome` / `gaia-sea-level`) plus one requirement: **refuse to spawn when the terrain is below sea level**. The same group drives ENTRY-436, 438, 446 and 474-478 (biome and stamp packs: data only, used through the same API).
+
+**Tools (5):**
+- `gaia-query` (read-only): session manager, sea level, per-terrain size / world height range / tree count / prototype counts, spawners, optional BiomePreset list. Flags terrain below sea level and `drawHeightmap = false` (ENTRY-431: a scripted spawn left the ground invisible).
+- `gaia-create-world`: `GaiaAPI.CreateGaiaWorld`, fields set as in Gaia's own `APITest.CreateTerrainButton`. **Refuses if terrains already exist** (`replaceExisting` overrides) or `m_worldCreationRunning` is set -- the MCP client re-sends slow calls (ENTRY-431: a 33 s call re-sent 3x; an install re-run 10x), and this is the idempotency guard.
+- `gaia-sea-level`: get / set via `GaiaAPI.Get/SetSeaLevel`, with the terrain report.
+- `gaia-stamp`: `GaiaAPI.GaiaStamp` with the image in `m_imageMasks[0]` (`ImageMaskOperation.ImageMask`), mirroring `APITest.StampButton`. Defaults reproduce Gaia's Fit To Terrain (`Stamper.cs` ~L1115: width 100 %, height 5, centred, terrain base Y). Synchronous, so it reports before/after max height.
+- `gaia-spawn`: `create-biome` (`BiomePreset.CreateBiome(true)`, lists its spawners) and `spawn` (ONE spawner, exact name, `Spawner.Spawn(allTerrains)`). **Refuses when every terrain's world max height is below sea level.**
+
+**Measured rules encoded, not left to the caller:** one spawner per call (ENTRY-446 Gotcha 2: a loop placed 0 trees / 0 details; one per call placed 8,348 trees); results a call later (`Spawner.Spawn` sets `m_spawnComplete = true` on return while the tree/detail `AreaSpawn` coroutine still runs on editor ticks -- so the tools never claim completion, they point to `gaia-query`); texture spawners before tree/detail; exact-name spawner lookup that throws on duplicates (ENTRY-436: a name search hit a leftover spawner); the first tree spawn on a fresh API world can place 0 (ENTRY-431: min/max height cache), so the result text says to spawn again.
+
+**Deliberately NOT included:** time-of-day / weather (ENTRY-433, MEDIUM). Those `GaiaAPI` methods are all inside `#if GAIA_2023_PRO`, which Gaia writes to the **Standalone** target only, so a tool calling them would fail to compile with any other build target selected. Add them later behind the same `#if`, with the edit-mode `PW_VFX_Atmosphere` tick ENTRY-433 measured.
+
+**Verification -- what was and was NOT done.** TVD has no Gaia (lean install), so the group cannot compile here: `HAS_GAIA` absent and `MCPTools.Gaia.Editor` not in `CompilationPipeline` (both checked); TVD stayed green at 140 editor assemblies. **Offline compile:** Unity 6000.6.3f1's Roslyn (`DotNetSdk/sdk/8.0.318/Roslyn/bincore/csc.dll`) on TVD's Bee response file for `MCPTools.Grabbit.Editor`, with the Grabbit refs/sources removed and `-define:HAS_GAIA` + `-r:SetDesign/Library/ScriptAssemblies/GaiaCore.dll` added: **0 errors, 0 warnings, 22 KB DLL.** Every Gaia signature was read from SetDesign's source first. **Not done: live registration, or any live call.** Owed in SetDesign: confirm `HAS_GAIA` lands (probe `Gaia.GaiaAPI, GaiaCore`; `Gaia Core.asmdef` declares `GaiaCore`, so the S91 declared-name fix matters here) and that 5 tools register; then on a scratch scene run create-world -> query (next call) -> stamp -> sea-level -> create-biome -> spawn x N (one per call) -> query.
+
+**Technique worth reusing:** a TMCP group for an asset NOT installed in TVD can be compile-checked from TVD against another tree's `Library/ScriptAssemblies/<Asm>.dll`, by reusing a Bee `.rsp` from any sibling TMCP group.
 
 ### Define writes preserve order -- v1.14.2 (September 27, 2026) (TVD Session 50)
 

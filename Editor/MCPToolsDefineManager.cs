@@ -102,6 +102,9 @@ namespace MCPTools.Editor
             ("HAS_MAINTAINER",         "CodeStage.Maintainer.Issues.IssuesFinder, CodeStage.Maintainer.Editor"),
             // TecVooDoo S49 addition (Sep 26) -- editor-only, asmdef-isolated (ENTRY-406)
             ("HAS_GRABBIT",            "Grabbit2.GrabbitOps, Grabbit2Assembly"),
+            // TecVooDoo S52 addition (Oct 10) -- editor-only, asmdef-isolated (ENTRY-431).
+            // "Gaia Core.asmdef" declares "GaiaCore" (filename != name; the S91 fix reads declared names)
+            ("HAS_GAIA",               "Gaia.GaiaAPI, GaiaCore"),
         };
 
         static MCPToolsDefineManager()
