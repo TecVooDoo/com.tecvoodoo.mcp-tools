@@ -76,20 +76,32 @@ Each call ADDS props -- not idempotent. 26 of 52 GeNa sample materials render MA
             });
         }
 
-        /// <summary>Objects under GeNa's 'GeNa Spawns' output root (inactive included); 0 when it does not exist yet.</summary>
+        /// <summary>Objects under every 'GeNa Spawns' container at ANY depth (inactive included); 0 when none exists yet.</summary>
+        /// <remarks>
+        /// Not just scene roots: on a terrain GeNa parents 'GeNa Spawns' UNDER the terrain it spawned on
+        /// (measured SetDesign 2026-10-10: 'Gaia Terrains/Terrain_0_0.../GeNa Spawns/...'), so a root-only search always read 0.
+        /// </remarks>
         static int SpawnedObjectCount()
         {
             int count = 0;
-            for (int s = 0; s < UnityEngine.SceneManagement.SceneManager.sceneCount; s++)
+            foreach (Transform t in UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Include))
             {
-                UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(s);
-                if (!scene.isLoaded)
+                if (t.name != "GeNa Spawns")
                     continue;
-                foreach (GameObject root in scene.GetRootGameObjects())
+                // Skip a container nested inside another one so nothing is counted twice.
+                Transform? parent = t.parent;
+                bool nested = false;
+                while (parent != null)
                 {
-                    if (root.name == "GeNa Spawns")
-                        count += root.GetComponentsInChildren<Transform>(true).Length - 1;
+                    if (parent.name == "GeNa Spawns")
+                    {
+                        nested = true;
+                        break;
+                    }
+                    parent = parent.parent;
                 }
+                if (!nested)
+                    count += t.GetComponentsInChildren<Transform>(true).Length - 1;
             }
             return count;
         }
