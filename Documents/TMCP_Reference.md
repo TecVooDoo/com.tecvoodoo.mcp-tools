@@ -2238,6 +2238,37 @@ string BakeColliders(string? action = null, string[]? targets = null, string? st
 
 ---
 
+## GeNa Pro (Procedural Worlds) (3 Tools)
+
+**Define:** `HAS_GENA` (type probe `GeNa.Core.GeNaSpline, GeNa.Scripts.Core`) | **Asmdef:** `MCPTools.GeNa.Editor` (editor-only, **reflection -- no vendor reference**) | **Added:** 2026-10-10 (TVD S52), ENTRY-434.
+Points are `"x,z"` (snapped to terrain) or `"x,y,z"`.
+
+### gena-query -- Query (read-only)
+
+Splines (active = unbaked; node / curve / extension counts; road baked?) and spawners (spawned anything?), inactive included.
+
+```csharp
+string Query()
+```
+
+### gena-road -- Road
+
+GeNa's "Add Road Spline" + nodes, then `Bake()` + road `Bake(true)`. **Destructive, no undo.** Refuses a TerrainData shared with another scene (`allowSharedTerrainData` overrides) and an existing spline name. Reports trees cleared and road meshes / triangles.
+
+```csharp
+string Road(string name, string[] points, float yOffset = 0f, bool allowSharedTerrainData = false)
+```
+
+### gena-spawn -- Spawn
+
+Runs a GeNa spawner prefab (`GeNaSpawner.Spawn(Vector3)`, synchronous) at each point; reuses its scene instance. Additive -- not idempotent. Sample props are magenta on URP until the Render Pipeline Converter runs.
+
+```csharp
+string Spawn(string spawner, string[] points)
+```
+
+---
+
 ## Pegasus (Procedural Worlds) (3 Tools)
 
 **Define:** `HAS_PEGASUS` (type probe `Pegasus.PegasusManager, Assembly-CSharp`) | **Asmdef:** `MCPTools.Pegasus.Editor` (editor-only, **reflection -- no vendor reference**) | **Added:** 2026-10-10 (TVD S52), ENTRY-435. **Live-verified in SetDesign 2026-10-10 (all steps PASS).**

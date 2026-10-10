@@ -108,6 +108,9 @@ namespace MCPTools.Editor
             // TecVooDoo S52 addition (Oct 10) -- Pegasus has NO asmdef (Assembly-CSharp), so the group is
             // reflection-only and removal detection uses the MonoScript path (ENTRY-435)
             ("HAS_PEGASUS",            "Pegasus.PegasusManager, Assembly-CSharp"),
+            // TecVooDoo S52 addition (Oct 10) -- GeNa Pro core is a precompiled DLL (GeNa.Scripts.Core.dll), the
+            // road extension is asmdef-less source, so the group is reflection-only (ENTRY-434)
+            ("HAS_GENA",               "GeNa.Core.GeNaSpline, GeNa.Scripts.Core"),
         };
 
         static MCPToolsDefineManager()
