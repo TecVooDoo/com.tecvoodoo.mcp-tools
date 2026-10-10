@@ -4,7 +4,7 @@ description: "Use this skill whenever the user wants to build or dress an outdoo
 metadata:
   author: TecVooDoo (TMCP)
   tools: "gaia-query, gaia-create-world, gaia-sea-level, gaia-stamp, gaia-spawn, gena-query, gena-road, gena-spawn, pegasus-query, pegasus-create, pegasus-control, screenshot-camera, assets-create-folder, scene-create"
-  verified: "SetDesign, Unity 6000.6.3f1, TMCP 1.18.2, 2026-10-10 (valley trial)"
+  verified: "SetDesign, Unity 6000.6.3f1, TMCP 1.18.3, 2026-10-10 (valley trial)"
 ---
 
 # World building: Gaia -> GeNa -> Pegasus

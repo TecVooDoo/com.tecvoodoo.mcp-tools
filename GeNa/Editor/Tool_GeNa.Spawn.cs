@@ -208,22 +208,31 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
         }
 
         /// <summary>
-        /// True when a downward ray at the point AND at 8 points on a ring of radius 'clearance' (plus 4 at half of it)
-        /// all hit a TerrainCollider first -- no road mesh, prop or other collider covers that ground or sits too close.
+        /// True when the ground at the point is bare terrain (the first collider straight down is a TerrainCollider) AND no
+        /// other collider lies within 'clearance' of it -- roads, props, anything that is not terrain.
         /// </summary>
-        /// <remarks>Clearance default 4 m: at the first version's fixed 1.5 m, a re-dressed area got two lamps ~2 m apart (SetDesign 2026-10-10).</remarks>
+        /// <remarks>
+        /// Clearance is a VOLUME query (OverlapCapsule from 2 m below to 3 m above the ground). The 1.18.2 version used a ring
+        /// of downward rays and missed a street lamp's 0.5 m post standing in the ~3 m gaps between rays, placing a new lamp
+        /// 2.83 m away with clearance 4 (SetDesign 2026-10-10). Ray sampling cannot guarantee a clearance wider than the
+        /// thinnest obstacle; an overlap can.
+        /// </remarks>
         static bool OnBareTerrain(Vector3 position, float clearance)
         {
-            if (!ProbeIsTerrain(position))
+            Terrain? terrain = TerrainAt(position);
+            if (terrain == null || !ProbeIsTerrain(position))
                 return false;
-            float diagonal = clearance * 0.7071f;
-            float half = clearance * 0.5f;
-            return ProbeIsTerrain(position + new Vector3(clearance, 0f, 0f)) && ProbeIsTerrain(position + new Vector3(-clearance, 0f, 0f))
-                && ProbeIsTerrain(position + new Vector3(0f, 0f, clearance)) && ProbeIsTerrain(position + new Vector3(0f, 0f, -clearance))
-                && ProbeIsTerrain(position + new Vector3(diagonal, 0f, diagonal)) && ProbeIsTerrain(position + new Vector3(-diagonal, 0f, diagonal))
-                && ProbeIsTerrain(position + new Vector3(diagonal, 0f, -diagonal)) && ProbeIsTerrain(position + new Vector3(-diagonal, 0f, -diagonal))
-                && ProbeIsTerrain(position + new Vector3(half, 0f, 0f)) && ProbeIsTerrain(position + new Vector3(-half, 0f, 0f))
-                && ProbeIsTerrain(position + new Vector3(0f, 0f, half)) && ProbeIsTerrain(position + new Vector3(0f, 0f, -half));
+            if (clearance <= 0f)
+                return true;
+            float ground = terrain.SampleHeight(position) + terrain.GetPosition().y;
+            Vector3 bottom = new Vector3(position.x, ground - 2f, position.z);
+            Vector3 top = new Vector3(position.x, ground + 3f, position.z);
+            foreach (Collider collider in Physics.OverlapCapsule(bottom, top, clearance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                if (!(collider is TerrainCollider))
+                    return false;
+            }
+            return true;
         }
 
         /// <summary>True when the first collider straight down at this XZ is a terrain.</summary>
