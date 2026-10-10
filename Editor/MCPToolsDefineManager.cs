@@ -105,6 +105,9 @@ namespace MCPTools.Editor
             // TecVooDoo S52 addition (Oct 10) -- editor-only, asmdef-isolated (ENTRY-431).
             // "Gaia Core.asmdef" declares "GaiaCore" (filename != name; the S91 fix reads declared names)
             ("HAS_GAIA",               "Gaia.GaiaAPI, GaiaCore"),
+            // TecVooDoo S52 addition (Oct 10) -- Pegasus has NO asmdef (Assembly-CSharp), so the group is
+            // reflection-only and removal detection uses the MonoScript path (ENTRY-435)
+            ("HAS_PEGASUS",            "Pegasus.PegasusManager, Assembly-CSharp"),
         };
 
         static MCPToolsDefineManager()

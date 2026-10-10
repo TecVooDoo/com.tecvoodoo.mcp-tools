@@ -2238,6 +2238,37 @@ string BakeColliders(string? action = null, string[]? targets = null, string? st
 
 ---
 
+## Pegasus (Procedural Worlds) (3 Tools)
+
+**Define:** `HAS_PEGASUS` (type probe `Pegasus.PegasusManager, Assembly-CSharp`) | **Asmdef:** `MCPTools.Pegasus.Editor` (editor-only, **reflection -- no vendor reference**) | **Added:** 2026-10-10 (TVD S52), ENTRY-435.
+POI-based flythroughs that stay above terrain (ENTRY-435: 0/300 samples below ground vs 176/300 for a stock Cinemachine spline dolly). Points are `"x,y,z"` strings.
+
+### pegasus-query -- Query (read-only)
+
+Every manager: target, POIs, length, type, state, min height, auto-start, speed.
+
+```csharp
+string Query()
+```
+
+### pegasus-create -- Create Flythrough
+
+Manager + POIs in order; optional look-ats (one, or one per point). Drives a NEW disabled Camera `<name> Camera` unless `target` names an existing GameObject. Idempotent (`replaceExisting` rebuilds). `type` Looped / SingleShot.
+
+```csharp
+string Create(string name, string[] points, string[]? lookAts = null, string? target = null, string type = "Looped", float? minHeightAboveTerrain = null, bool autoStartAtRuntime = false, bool replaceExisting = false)
+```
+
+### pegasus-control -- Control
+
+`scrub` (percent 0..1, deterministic -- pair with `screenshot-camera`), `sample` (terrain clearance min / mean / below-ground over N samples, read-only), `start` / `pause` / `resume` / `stop` (play mode).
+
+```csharp
+string Control(string action, string? manager = null, float percent = 0f, int samples = 200)
+```
+
+---
+
 ## Gaia Pro VS (Procedural Worlds) (5 Tools)
 
 **Define:** `HAS_GAIA` (type probe `Gaia.GaiaAPI, GaiaCore`) | **Asmdef:** `MCPTools.Gaia.Editor` (editor-only, refs `GaiaCore`) | **Added:** 2026-10-10 (TVD S52), ENTRY-431. **Live-verified in SetDesign 2026-10-10 (v1.15.1, all steps PASS).**
