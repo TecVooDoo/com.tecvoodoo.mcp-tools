@@ -15,12 +15,11 @@ namespace MCPTools.Gaia.Editor
     {
         [AiTool("gaia-spawn", Title = "Gaia / Spawn")]
         [Description(@"Gaia biome spawning, ONE step per call.
-action='create-biome': instantiate the BiomePreset named 'name' (BiomePreset.CreateBiome, prototypes auto-assigned to all terrains); returns its spawner names.
-IDEMPOTENT: if '<name> Biome' already exists it is NOT created again -- its spawners are listed instead (the MCP client re-sends slow calls; one call once made three copies). replaceExisting=true deletes the existing biome root(s) first.
-action='spawn': run the ONE Spawner GameObject named exactly 'name' (Spawner.Spawn). REFUSES when every terrain is below sea level -- Gaia would place nothing and report success.
-RULES (measured, ENTRY-431/436/446): spawn ONE spawner per call -- looping several in one call placed 0 trees and 0 details. Run TEXTURE spawners before tree and detail spawners (their rules mask on terrain textures).
-Trees and details land on LATER editor ticks: read the result with gaia-query on a separate call. On a freshly API-created world the first tree spawn can place 0 -- spawn that spawner again.
-Re-spawning a spawner replaces its output rather than duplicating it. Spawning writes into the TerrainData asset.")]
+create-biome: instantiate BiomePreset 'name' (prototypes auto-assigned to all terrains); lists its spawners. IDEMPOTENT: an existing '<name> Biome' is listed, not re-created (the MCP client re-sends slow calls); replaceExisting=true rebuilds it.
+spawn: run the ONE Spawner named exactly 'name'. REFUSES when every terrain is below sea level (Gaia would place nothing and report success).
+RULES (ENTRY-431/436/446): ONE spawner per call -- a loop in one call placed 0 trees/details. TEXTURE spawners before tree/detail spawners.
+Trees and details land on LATER editor ticks: check with gaia-query on a separate call. If a fresh world's first tree spawn shows 0, spawn it again.
+Re-spawning replaces output. Spawning writes into the TerrainData asset.")]
         public string Spawn(
             [Description("'create-biome' or 'spawn'.")] string action,
             [Description("BiomePreset asset name (create-biome) or exact Spawner GameObject name (spawn).")] string name,

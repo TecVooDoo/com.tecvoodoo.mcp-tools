@@ -2240,7 +2240,7 @@ string BakeColliders(string? action = null, string[]? targets = null, string? st
 
 ## Pegasus (Procedural Worlds) (3 Tools)
 
-**Define:** `HAS_PEGASUS` (type probe `Pegasus.PegasusManager, Assembly-CSharp`) | **Asmdef:** `MCPTools.Pegasus.Editor` (editor-only, **reflection -- no vendor reference**) | **Added:** 2026-10-10 (TVD S52), ENTRY-435.
+**Define:** `HAS_PEGASUS` (type probe `Pegasus.PegasusManager, Assembly-CSharp`) | **Asmdef:** `MCPTools.Pegasus.Editor` (editor-only, **reflection -- no vendor reference**) | **Added:** 2026-10-10 (TVD S52), ENTRY-435. **Live-verified in SetDesign 2026-10-10 (all steps PASS).**
 POI-based flythroughs that stay above terrain (ENTRY-435: 0/300 samples below ground vs 176/300 for a stock Cinemachine spline dolly). Points are `"x,y,z"` strings.
 
 ### pegasus-query -- Query (read-only)

@@ -14,13 +14,13 @@ namespace MCPTools.Pegasus.Editor
     public partial class Tool_Pegasus
     {
         [AiTool("pegasus-create", Title = "Pegasus / Create Flythrough")]
-        [Description(@"Creates a Pegasus flythrough: a manager named 'name' with one POI per entry of 'points' ('x,y,z' world positions), in order.
-'lookAts' (optional, 'x,y,z' each): one per point, or a single entry used for every point; omitted = look along the path.
-TARGET: by default a NEW disabled Camera '<name> Camera' is created and driven -- NOT the Main Camera (Pegasus moves its target directly; a CinemachineBrain would fight it, and edit-mode scrubs leave it moved). Pass 'target' to drive an existing GameObject instead.
-Pegasus keeps the path at least minHeightAboveTerrain above the ground (measured ENTRY-435: 0/300 samples below ground where a stock Cinemachine spline dolly had 176/300).
-IDEMPOTENT: a manager already named 'name' is NOT recreated (the MCP client re-sends slow calls); replaceExisting=true deletes it (and its POIs) first.
-Side effects: the first SetDefaults() may create Assets/PegasusDefaults.asset; selecting a manager in the editor makes Pegasus add PEGASUS_PRESENT (a full recompile, ~60 s in SetDesign).
-Then use pegasus-control (scrub / sample) and screenshot-camera on the target camera.")]
+        [Description(@"Creates a Pegasus flythrough: manager 'name' with one POI per 'points' entry ('x,y,z' world positions), in order.
+'lookAts' ('x,y,z'): one per point or one for all; omit to look along the path.
+TARGET: by default a NEW disabled Camera '<name> Camera' (screenshot-camera still renders it) -- NOT the Main Camera, which Pegasus would move and a CinemachineBrain would fight. 'target' drives an existing GameObject instead.
+The path stays >= minHeightAboveTerrain above ground (ENTRY-435: 0/300 samples below ground vs 176/300 for a Cinemachine dolly). Pegasus enforces it by MOVING the POIs up, so stored POIs can differ from 'points'.
+IDEMPOTENT: an existing 'name' is not recreated (MCP re-send); replaceExisting=true rebuilds it.
+Selecting a manager in the editor makes Pegasus add PEGASUS_PRESENT (a full recompile).
+Then: pegasus-control scrub / sample.")]
         public string Create(
             [Description("Manager GameObject name.")] string name,
             [Description("POI world positions, in order, each 'x,y,z'. At least 2.")] string[] points,
