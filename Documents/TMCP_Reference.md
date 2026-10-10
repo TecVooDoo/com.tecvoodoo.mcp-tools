@@ -2240,7 +2240,7 @@ string BakeColliders(string? action = null, string[]? targets = null, string? st
 
 ## Gaia Pro VS (Procedural Worlds) (5 Tools)
 
-**Define:** `HAS_GAIA` (type probe `Gaia.GaiaAPI, GaiaCore`) | **Asmdef:** `MCPTools.Gaia.Editor` (editor-only, refs `GaiaCore`) | **Added:** 2026-10-10 (TVD S52), ENTRY-431. **Live-tested in SetDesign 2026-10-10; v1.15.1 fixes re-run pending.**
+**Define:** `HAS_GAIA` (type probe `Gaia.GaiaAPI, GaiaCore`) | **Asmdef:** `MCPTools.Gaia.Editor` (editor-only, refs `GaiaCore`) | **Added:** 2026-10-10 (TVD S52), ENTRY-431. **Live-verified in SetDesign 2026-10-10 (v1.15.1, all steps PASS).**
 All edit-mode only. **Gaia finishes world creation and tree/detail spawning on later editor ticks -- read results with `gaia-query` on a SEPARATE call.** Stamping is synchronous.
 
 ### gaia-query -- Query (read-only)
