@@ -2240,7 +2240,7 @@ string BakeColliders(string? action = null, string[]? targets = null, string? st
 
 ## GeNa Pro (Procedural Worlds) (3 Tools)
 
-**Define:** `HAS_GENA` (type probe `GeNa.Core.GeNaSpline, GeNa.Scripts.Core`) | **Asmdef:** `MCPTools.GeNa.Editor` (editor-only, **reflection -- no vendor reference**) | **Added:** 2026-10-10 (TVD S52), ENTRY-434.
+**Define:** `HAS_GENA` (type probe `GeNa.Core.GeNaSpline, GeNa.Scripts.Core`) | **Asmdef:** `MCPTools.GeNa.Editor` (editor-only, **reflection -- no vendor reference**) | **Added:** 2026-10-10 (TVD S52), ENTRY-434. **Live-verified in SetDesign 2026-10-10 (v1.17.2; 1.17.3 adds the landing check).**
 Points are `"x,z"` (snapped to terrain) or `"x,y,z"`.
 
 ### gena-query -- Query (read-only)
@@ -2263,7 +2263,7 @@ The shared-scene scan is budgeted (8 s) and resumable -- a big project may answe
 
 ### gena-spawn -- Spawn
 
-Runs a GeNa spawner prefab (`GeNaSpawner.Spawn(Vector3)`, synchronous) at each point; reuses its scene instance. Additive -- not idempotent. Sample props are magenta on URP until the Render Pipeline Converter runs.
+Runs a GeNa spawner prefab (`GeNaSpawner.Spawn(Vector3)`, synchronous) at each point; reuses its scene instance. Reports per point PLACED / NOTHING (criteria rejection, with slope) and flags props that landed off the terrain (GeNa stacks onto existing colliders). Additive -- not idempotent. Sample props are magenta on URP until the Render Pipeline Converter runs.
 
 ```csharp
 string Spawn(string spawner, string[] points)

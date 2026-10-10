@@ -1,6 +1,7 @@
 #if HAS_GENA
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using com.IvanMurzak.McpPlugin;
@@ -17,7 +18,7 @@ namespace MCPTools.GeNa.Editor
         [Description(@"Runs a GeNa spawner prefab at each of 'points' ('x,z' snapped to terrain, or 'x,y,z') -- GeNaSpawner.Spawn(Vector3), synchronous.
 'spawner' = project path of a GeNa spawner prefab (e.g. '.../Spawner - Street Lamp.prefab'); its scene instance is reused if one with the same name exists.
 Reports PER POINT whether anything was actually placed (objects counted under the 'GeNa Spawns' root) and the terrain slope there: GeNa's spawn criteria silently REJECT points (measured: a street lamp placed at 3 deg, nothing at 17 or 30 deg, no message).
-Each call ADDS props -- not idempotent. 26 of 52 GeNa sample materials render MAGENTA on URP until the Render Pipeline Converter runs.")]
+Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new prop onto the old one's collider (flagged per point). 26 of 52 GeNa sample materials render MAGENTA on URP until the Render Pipeline Converter runs.")]
         public string Spawn(
             [Description("Project path of a GeNa spawner prefab.")] string spawner,
             [Description("Spawn positions: 'x,z' (snapped to terrain) or 'x,y,z'.")] string[] points
@@ -61,13 +62,15 @@ Each call ADDS props -- not idempotent. 26 of 52 GeNa sample materials render MA
                 for (int i = 0; i < points.Length; i++)
                 {
                     Vector3 position = ParsePoint(points[i], $"points[{i}]", 0f);
-                    int before = SpawnedObjectCount();
+                    HashSet<Transform> before = SpawnedTransforms();
                     Invoke(instance, "Spawn", new[] { typeof(Vector3) }, position);
-                    int placed = SpawnedObjectCount() - before;
-                    placedTotal += Math.Max(0, placed);
+                    HashSet<Transform> after = SpawnedTransforms();
+                    after.ExceptWith(before);
+                    int placed = after.Count;
+                    placedTotal += placed;
                     string slope = SlopeAt(position);
                     sb.AppendLine(placed > 0
-                        ? $"  [{i}] PLACED {placed} object(s) at ({position.x:F1}, {position.y:F1}, {position.z:F1}){slope}"
+                        ? $"  [{i}] PLACED {placed} object(s) at ({position.x:F1}, {position.y:F1}, {position.z:F1}){slope}{LandingCheck(after)}"
                         : $"  [{i}] NOTHING placed at ({position.x:F1}, {position.y:F1}, {position.z:F1}){slope} -- rejected by the spawner's criteria (often slope)");
                 }
                 // SpawnedSomething() is sticky (true after any earlier success), so the per-point counts are the real answer.
@@ -76,34 +79,57 @@ Each call ADDS props -- not idempotent. 26 of 52 GeNa sample materials render MA
             });
         }
 
-        /// <summary>Objects under every 'GeNa Spawns' container at ANY depth (inactive included); 0 when none exists yet.</summary>
+        const string SpawnsContainer = "GeNa Spawns";
+
+        /// <summary>Every object under every 'GeNa Spawns' container at ANY depth (inactive included), containers excluded.</summary>
         /// <remarks>
         /// Not just scene roots: on a terrain GeNa parents 'GeNa Spawns' UNDER the terrain it spawned on
         /// (measured SetDesign 2026-10-10: 'Gaia Terrains/Terrain_0_0.../GeNa Spawns/...'), so a root-only search always read 0.
+        /// A set (not a count) so nested containers -- GeNa nests one under a prop it stacks onto -- are never double-counted.
         /// </remarks>
-        static int SpawnedObjectCount()
+        static HashSet<Transform> SpawnedTransforms()
         {
-            int count = 0;
+            HashSet<Transform> result = new HashSet<Transform>();
             foreach (Transform t in UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Include))
             {
-                if (t.name != "GeNa Spawns")
+                if (t.name != SpawnsContainer)
                     continue;
-                // Skip a container nested inside another one so nothing is counted twice.
-                Transform? parent = t.parent;
-                bool nested = false;
-                while (parent != null)
+                foreach (Transform child in t.GetComponentsInChildren<Transform>(true))
                 {
-                    if (parent.name == "GeNa Spawns")
-                    {
-                        nested = true;
-                        break;
-                    }
-                    parent = parent.parent;
+                    if (child != t)
+                        result.Add(child);
                 }
-                if (!nested)
-                    count += t.GetComponentsInChildren<Transform>(true).Length - 1;
             }
-            return count;
+            return result;
+        }
+
+        /// <summary>
+        /// Flags a placement that did not land on the terrain. GeNa raycasts onto COLLIDERS, so spawning on an occupied
+        /// point stacks the new prop on top of the old one (measured: a second street lamp 8.0 m up, on the first's BoxCollider).
+        /// </summary>
+        static string LandingCheck(HashSet<Transform> placed)
+        {
+            Transform? lowestProp = null;
+            foreach (Transform t in placed)
+            {
+                if (t.name == SpawnsContainer || t.name.StartsWith("GeNa Spawner", StringComparison.Ordinal))
+                    continue;
+                Transform? parent = t.parent;
+                if (parent != null && placed.Contains(parent) && parent.name != SpawnsContainer && !parent.name.StartsWith("GeNa Spawner", StringComparison.Ordinal))
+                    continue; // only the placed roots
+                if (lowestProp == null || t.position.y < lowestProp.position.y)
+                    lowestProp = t;
+            }
+            if (lowestProp == null)
+                return "";
+            Terrain? terrain = TerrainAt(lowestProp.position);
+            if (terrain == null)
+                return $", landed at y {lowestProp.position.y:F2}";
+            float ground = terrain.SampleHeight(lowestProp.position) + terrain.GetPosition().y;
+            float above = lowestProp.position.y - ground;
+            return Mathf.Abs(above) <= 0.5f
+                ? $", grounded (y {lowestProp.position.y:F2})"
+                : $" -- ** landed {above:F2} m {(above > 0f ? "ABOVE" : "BELOW")} the terrain (on another object's collider?) **";
         }
 
         static string SlopeAt(Vector3 position)
