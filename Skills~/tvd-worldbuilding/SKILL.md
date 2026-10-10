@@ -4,7 +4,7 @@ description: "Use this skill whenever the user wants to build or dress an outdoo
 metadata:
   author: TecVooDoo (TMCP)
   tools: "gaia-query, gaia-create-world, gaia-sea-level, gaia-stamp, gaia-spawn, gena-query, gena-road, gena-spawn, pegasus-query, pegasus-create, pegasus-control, screenshot-camera, assets-create-folder, scene-create"
-  verified: "SetDesign, Unity 6000.6.3f1, TMCP 1.18.0, 2026-10-10 (valley trial)"
+  verified: "SetDesign, Unity 6000.6.3f1, TMCP 1.18.1, 2026-10-10 (valley trial)"
 ---
 
 # World building: Gaia -> GeNa -> Pegasus
@@ -34,7 +34,7 @@ Run `unity-tool-list` with regex `^(gaia|gena|pegasus)-`. Each group appears onl
    - Skip `GaiaPro-Village`, `-VFX`, `-Audio` unless asked.
    After the trees, `gaia-query` next call: `trees > 0` and a nonzero detail density. If a tree spawner shows 0 on a fresh world, spawn it once more.
 6. **Roads.** `gena-road name=... points=['x,z', ...]` (snapped to terrain). It's DESTRUCTIVE with no undo: it carves, clears trees and paints. **Route and grade:** a straight road over a ~95 m summit carved a deep trench with 30-68 deg banks. Route diagonally or around the peak, keep the hill lower, or raise `yOffset` where it crosses. Read the reply's **Verges** line (slope 6 and 12 m out). In a big project the first call may say "scan incomplete"; call again. Then `gena-query`: `road BAKED`. Props already on the route are NOT moved; move them with `gameobject-modify` / re-spawn.
-7. **Props.** `gena-spawn spawner=<GeNa spawner prefab> points=[...] searchRadius=12`. Beside a fresh road the verges are steep (16-25 deg), and GeNa silently rejects steep ground: a street lamp placed at up to 11.2 deg and was rejected from 16.8. `searchRadius` moves each point to the nearest spot under `maxSlope` (default 11) and says how far. Read EACH line: `PLACED` vs `NOTHING`; `landed N m ABOVE` means it stacked onto another prop. GeNa sample props render MAGENTA on URP until Unity's Render Pipeline Converter runs.
+7. **Props.** `gena-spawn spawner=<GeNa spawner prefab> points=[...] searchRadius=12`. Beside a fresh road the verges are steep (16-25 deg), and GeNa silently rejects steep ground: a street lamp placed at up to 11.2 deg and was rejected from 16.8. `searchRadius` moves each point to the nearest BARE-TERRAIN spot under `maxSlope` (default 11) -- never onto the road or another object -- and says how far; "** no bare-terrain spot ... **" means nothing within the radius passed, so give a point on the open side, away from cut banks. Read EACH line: `PLACED` vs `NOTHING`; `landed N m ABOVE` means it stacked onto another prop. GeNa sample props render MAGENTA on URP until Unity's Render Pipeline Converter runs.
 8. **Review.** `pegasus-create`. **Starting recipe** (worked first time):
    - an orbit of 4 points at radius about 0.35 x terrain size;
    - altitude about 1.2 x the peak height;

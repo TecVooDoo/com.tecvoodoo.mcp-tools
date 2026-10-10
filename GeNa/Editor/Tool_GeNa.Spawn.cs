@@ -18,7 +18,7 @@ namespace MCPTools.GeNa.Editor
         [Description(@"Runs a GeNa spawner prefab at each of 'points' ('x,z' snapped to terrain, or 'x,y,z') -- GeNaSpawner.Spawn(Vector3), synchronous.
 'spawner' = project path of a GeNa spawner prefab (e.g. '.../Spawner - Street Lamp.prefab'); its scene instance is reused if one with the same name exists.
 Reports PER POINT: PLACED / NOTHING (GeNa silently REJECTS steep points -- a street lamp placed up to 11.2 deg, rejected from 16.8) and the slope.
-FIND A SPOT: searchRadius > 0 moves each point whose slope exceeds maxSlope (default 11) to the flattest spot within that radius first. Road verges are steep after a carve; e.g. searchRadius=12 beside a road.
+FIND A SPOT: searchRadius > 0 moves each point that is too steep (> maxSlope, default 11) or not on bare terrain to the nearest bare-terrain spot within the radius -- never onto a road or another object. E.g. searchRadius=12 beside a road.
 Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new prop onto the old one's collider (flagged per point). 26 of 52 GeNa sample materials render MAGENTA on URP until the Render Pipeline Converter runs.")]
         public string Spawn(
             [Description("Project path of a GeNa spawner prefab.")] string spawner,
@@ -69,10 +69,12 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
                     if (searchRadius > 0f)
                     {
                         Vector3 requested = position;
-                        position = FlattestNear(position, searchRadius, maxSlope);
+                        position = FlattestNear(position, searchRadius, maxSlope, out bool passed);
                         float distance = Vector2.Distance(new Vector2(requested.x, requested.z), new Vector2(position.x, position.z));
-                        if (distance > 0.01f)
-                            moved = $" (moved {distance:F1} m from ({requested.x:F1}, {requested.z:F1}) to find a flatter spot)";
+                        if (!passed)
+                            moved = $" (** no bare-terrain spot <= {maxSlope:F0} deg within {searchRadius:F0} m; used the least steep found, {distance:F1} m away -- may be rejected **)";
+                        else if (distance > 0.01f)
+                            moved = $" (moved {distance:F1} m from ({requested.x:F1}, {requested.z:F1}) to bare terrain <= {maxSlope:F0} deg)";
                     }
                     HashSet<Transform> before = SpawnedTransforms();
                     Invoke(instance, "Spawn", new[] { typeof(Vector3) }, position);
@@ -145,22 +147,28 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
         }
 
         /// <summary>
-        /// The point itself if it is within maxSlope; otherwise the least-steep terrain point on a 2 m grid within
-        /// radius, preferring the nearest one that passes. Snapped to the terrain surface.
+        /// The point itself if it is bare terrain within maxSlope; otherwise the nearest bare-terrain point on a 2 m grid
+        /// within radius that passes, or -- when none passes -- the least-steep bare-terrain point (passed = false).
+        /// Snapped to the terrain surface.
         /// </summary>
         /// <remarks>
-        /// SetDesign trial 2026-10-10: after a road carve both verges were 16-25 deg (30-68 at the summit), nothing
-        /// 5-6 m out was under 10 deg, and the agent had to hand-write slope scans to place three lamps.
+        /// SetDesign trials 2026-10-10: after a road carve both verges were 16-25 deg (30-68 at a summit), and the agent
+        /// hand-wrote slope scans to place lamps. The first version of this search then put a lamp ON the road in a summit
+        /// cut (the asphalt was the only flat ground within 12 m), so candidates must be bare terrain (OnBareTerrain).
         /// </remarks>
-        static Vector3 FlattestNear(Vector3 origin, float radius, float maxSlope)
+        static Vector3 FlattestNear(Vector3 origin, float radius, float maxSlope, out bool passed)
         {
+            passed = true;
             Terrain? home = TerrainAt(origin);
-            if (home == null || Steepness(home, origin) <= maxSlope)
+            if (home == null)
+                return origin;
+            Physics.SyncTransforms(); // edit-mode raycasts must see objects moved or created since the last sync
+            if (Steepness(home, origin) <= maxSlope && OnBareTerrain(origin))
                 return origin;
 
             const float step = 2f;
             Vector3 best = origin;
-            float bestSlope = Steepness(home, origin);
+            float bestSlope = float.MaxValue;
             float bestPassingDistance = float.MaxValue;
             bool foundPassing = false;
             for (float dz = -radius; dz <= radius; dz += step)
@@ -172,7 +180,7 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
                         continue;
                     Vector3 candidate = new Vector3(origin.x + dx, 0f, origin.z + dz);
                     Terrain? terrain = TerrainAt(candidate);
-                    if (terrain == null)
+                    if (terrain == null || !OnBareTerrain(candidate))
                         continue;
                     float slope = Steepness(terrain, candidate);
                     if (slope <= maxSlope)
@@ -191,10 +199,34 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
                     }
                 }
             }
+            passed = foundPassing;
             Terrain? bestTerrain = TerrainAt(best);
             if (bestTerrain != null)
                 best.y = bestTerrain.SampleHeight(best) + bestTerrain.GetPosition().y;
             return best;
+        }
+
+        /// <summary>
+        /// True when a downward ray at the point AND at 4 points 1.5 m around it all hit a TerrainCollider first --
+        /// i.e. no road mesh, prop or other collider covers that ground.
+        /// </summary>
+        static bool OnBareTerrain(Vector3 position)
+        {
+            const float margin = 1.5f;
+            Vector3[] offsets = { Vector3.zero, new Vector3(margin, 0f, 0f), new Vector3(-margin, 0f, 0f), new Vector3(0f, 0f, margin), new Vector3(0f, 0f, -margin) };
+            foreach (Vector3 offset in offsets)
+            {
+                Vector3 p = position + offset;
+                Terrain? terrain = TerrainAt(p);
+                if (terrain == null)
+                    return false;
+                float top = terrain.GetPosition().y + terrain.terrainData.size.y + 100f;
+                if (!Physics.Raycast(new Vector3(p.x, top, p.z), Vector3.down, out RaycastHit hit, top + 1000f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    return false;
+                if (!(hit.collider is TerrainCollider))
+                    return false;
+            }
+            return true;
         }
 
         static float Steepness(Terrain terrain, Vector3 position)
