@@ -127,29 +127,82 @@ namespace MCPTools.GeNa.Editor
             return null;
         }
 
-        /// <summary>Other scene assets that reference this TerrainData (ENTRY-434: Save-As shares it, so a road would carve them all).</summary>
-        static List<string> OtherScenesUsing(TerrainData data)
+        // Per-scene scan results, keyed "scenePath|guid" and invalidated by file size + timestamp.
+        // Static, so it survives between calls (and MCP re-sends) until the next domain reload.
+        static readonly Dictionary<string, (long length, long ticks, bool hit)> s_sceneScan = new Dictionary<string, (long, long, bool)>();
+
+        /// <summary>
+        /// Other scene files that reference this TerrainData (ENTRY-434: Save-As shares it, so a road would carve them all).
+        /// A raw byte search for the asset GUID, budgeted and resumable: SetDesign has 424 scenes / 3.6 GB, and the earlier
+        /// AssetDatabase.GetDependencies scan took 12 s warm and over 110 s cold -- past MCP's per-attempt timeout, so every
+        /// call was re-sent 10x. Unfinished work is picked up by the next call through s_sceneScan.
+        /// </summary>
+        static List<string> OtherScenesUsing(TerrainData data, double budgetSeconds, out int scanned, out int total)
         {
             List<string> result = new List<string>();
+            scanned = 0;
+            total = 0;
             string dataPath = AssetDatabase.GetAssetPath(data);
             if (string.IsNullOrEmpty(dataPath))
                 return result;
+            string dataGuid = AssetDatabase.AssetPathToGUID(dataPath);
+            byte[] pattern = System.Text.Encoding.ASCII.GetBytes(dataGuid);
             string activeScene = SceneManager.GetActiveScene().path;
-            foreach (string guid in AssetDatabase.FindAssets("t:Scene", new[] { "Assets" }))
+            System.Diagnostics.Stopwatch timer = System.Diagnostics.Stopwatch.StartNew();
+
+            foreach (string sceneGuid in AssetDatabase.FindAssets("t:Scene", new[] { "Assets" }))
             {
-                string scenePath = AssetDatabase.GUIDToAssetPath(guid);
+                string scenePath = AssetDatabase.GUIDToAssetPath(sceneGuid);
                 if (scenePath == activeScene)
                     continue;
-                foreach (string dependency in AssetDatabase.GetDependencies(scenePath, false))
+                total++;
+                System.IO.FileInfo file = new System.IO.FileInfo(scenePath);
+                if (!file.Exists)
                 {
-                    if (dependency == dataPath)
-                    {
-                        result.Add(scenePath);
-                        break;
-                    }
+                    scanned++;
+                    continue;
                 }
+                string key = scenePath + "|" + dataGuid;
+                if (s_sceneScan.TryGetValue(key, out (long length, long ticks, bool hit) cached)
+                    && cached.length == file.Length && cached.ticks == file.LastWriteTimeUtc.Ticks)
+                {
+                    scanned++;
+                    if (cached.hit)
+                        result.Add(scenePath);
+                    continue;
+                }
+                if (timer.Elapsed.TotalSeconds > budgetSeconds)
+                    continue; // left for the next call
+                bool hit = FileContains(file.FullName, pattern);
+                s_sceneScan[key] = (file.Length, file.LastWriteTimeUtc.Ticks, hit);
+                scanned++;
+                if (hit)
+                    result.Add(scenePath);
             }
             return result;
+        }
+
+        /// <summary>Streams a file looking for an ASCII pattern; stops at the first hit.</summary>
+        static bool FileContains(string path, byte[] pattern)
+        {
+            const int chunk = 1 << 22;
+            byte[] buffer = new byte[chunk + pattern.Length];
+            int carried = 0;
+            using (System.IO.FileStream stream = new System.IO.FileStream(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite, 1 << 16))
+            {
+                while (true)
+                {
+                    int read = stream.Read(buffer, carried, chunk);
+                    if (read <= 0)
+                        return false;
+                    int length = carried + read;
+                    if (System.MemoryExtensions.IndexOf(new ReadOnlySpan<byte>(buffer, 0, length), pattern) >= 0)
+                        return true;
+                    // Keep the tail so a GUID split across two chunks is still found.
+                    carried = Math.Min(pattern.Length - 1, length);
+                    Buffer.BlockCopy(buffer, length - carried, buffer, 0, carried);
+                }
+            }
         }
     }
 }

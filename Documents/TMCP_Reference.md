@@ -2259,6 +2259,8 @@ GeNa's "Add Road Spline" + nodes, then `Bake()` + road `Bake(true)`. **Destructi
 string Road(string name, string[] points, float yOffset = 0f, bool allowSharedTerrainData = false)
 ```
 
+The shared-scene scan is budgeted (8 s) and resumable -- a big project may answer "scan incomplete, call again". Idempotent: a re-sent call returns the stored result of the build.
+
 ### gena-spawn -- Spawn
 
 Runs a GeNa spawner prefab (`GeNaSpawner.Spawn(Vector3)`, synchronous) at each point; reuses its scene instance. Additive -- not idempotent. Sample props are magenta on URP until the Render Pipeline Converter runs.
