@@ -2269,7 +2269,7 @@ string SeaLevel(float? value = null)
 
 ### gaia-stamp -- Stamp
 
-Stamps a texture asset through Gaia's stamper. Defaults = Fit To Terrain on the first terrain (width 100 % of one tile, height 5, centred, base Y). `operation` is any `GaiaConstants.FeatureOperation` name; default RaiseHeight.
+Stamps a texture asset through Gaia's stamper. Defaults = Fit To Terrain on the first terrain (width 100 % of one tile, height 5, centred, base Y). `operation` is any `GaiaConstants.FeatureOperation` name; default RaiseHeight. Unhooks every stamper's `EditorApplication.update` callback in the same call (ENTRY-438: otherwise an endless per-frame exception in non-Gaia scenes).
 
 ```csharp
 string Stamp(string stampPath, string? operation = null, float? x = null, float? z = null, float? y = null, float width = 100f, float height = 5f, float rotation = 0f)

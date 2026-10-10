@@ -18,7 +18,8 @@ namespace MCPTools.Gaia.Editor
 'stampPath' = project path of the stamp texture (e.g. 'Assets/Procedural Worlds/Packages - Install/Stamps/Mountains/2k Mountain 1.exr').
 Placement defaults to the first Gaia terrain, centred and covering it (Gaia's own Fit To Terrain values): width = 100 (% of one terrain tile's size), height = 5 (vertical scale), y = terrain base.
 operation: RaiseHeight (default) | LowerHeight | BlendHeight | SetHeight | AddHeight | SubtractHeight | MixHeight.
-Edit mode only. Run gaia-sea-level afterwards: a stamp can leave terrain below sea level, where spawns place nothing.")]
+Edit mode only. Run gaia-sea-level afterwards: a stamp can leave terrain below sea level, where spawns place nothing.
+Safe outside Gaia-built scenes: the stamper's editor-update hook is removed in the same call (a scripted stamp otherwise left an endless per-frame exception that dropped MCP, ENTRY-438).")]
         public string Stamp(
             [Description("Project path of the stamp texture.")] string stampPath,
             [Description("Feature operation. Default RaiseHeight.")] string? operation = null,
@@ -62,7 +63,20 @@ Edit mode only. Run gaia-sea-level afterwards: a stamp can leave terrain below s
                 settings.m_imageMasks = new ImageMask[] { new ImageMask { m_operation = ImageMaskOperation.ImageMask, ImageMaskTexture = texture } };
 
                 float maxBefore = WorldMaxHeight(target);
-                GaiaAPI.GaiaStamp(settings, true);
+                try
+                {
+                    GaiaAPI.GaiaStamp(settings, true);
+                }
+                finally
+                {
+                    // UWF_Unity v1.33 / ENTRY-438: Stamper.Stamp() ends with StartEditorUpdates(), and ~10 s later
+                    // that callback's cleanup (AfterSessionPlaybackCleanup) throws in a scene Gaia did not build
+                    // BEFORE it unsubscribes -- an endless per-frame exception that dropped MCP until a restart.
+                    // Unhook every stamper in this same call. Cost: Gaia's temporary "Session Stamper" is left in place.
+                    // (Spawner is safe: its EditorUpdate unsubscribes before the cleanup, so it cannot loop.)
+                    foreach (Stamper stamper in UnityEngine.Object.FindObjectsByType<Stamper>(FindObjectsInactive.Include))
+                        stamper.StopEditorUpdates();
+                }
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"Stamped '{texture.name}' ({featureOperation}) at ({settings.m_x:F1}, {settings.m_y:F1}, {settings.m_z:F1}), width {width}%, height {height}, rotation {rotation}.");
