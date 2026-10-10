@@ -18,13 +18,14 @@ namespace MCPTools.GeNa.Editor
         [Description(@"Runs a GeNa spawner prefab at each of 'points' ('x,z' snapped to terrain, or 'x,y,z') -- GeNaSpawner.Spawn(Vector3), synchronous.
 'spawner' = project path of a GeNa spawner prefab (e.g. '.../Spawner - Street Lamp.prefab'); its scene instance is reused if one with the same name exists.
 Reports PER POINT: PLACED / NOTHING (GeNa silently REJECTS steep points -- a street lamp placed up to 11.2 deg, rejected from 16.8) and the slope.
-FIND A SPOT: searchRadius > 0 moves each point that is too steep (> maxSlope, default 11) or not on bare terrain to the nearest bare-terrain spot within the radius -- never onto a road or another object. E.g. searchRadius=12 beside a road.
+FIND A SPOT: searchRadius > 0 moves each point that is too steep (> maxSlope, default 11) or not on bare terrain to the nearest bare-terrain spot within the radius, at least 'clearance' (default 4 m) from roads and props. E.g. searchRadius=12 beside a road.
 Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new prop onto the old one's collider (flagged per point). 26 of 52 GeNa sample materials render MAGENTA on URP until the Render Pipeline Converter runs.")]
         public string Spawn(
             [Description("Project path of a GeNa spawner prefab.")] string spawner,
             [Description("Spawn positions: 'x,z' (snapped to terrain) or 'x,y,z'.")] string[] points,
             [Description("Search this far (metres) for a flatter spot when a point is steeper than maxSlope. Default 0 = spawn exactly at the point.")] float searchRadius = 0f,
-            [Description("Slope limit (degrees) for the search. Default 11 (highest slope a street lamp was measured to accept).")] float maxSlope = 11f
+            [Description("Slope limit (degrees) for the search. Default 11 (highest slope a street lamp was measured to accept).")] float maxSlope = 11f,
+            [Description("Search only: keep this far (m) from roads, props and any other collider. Default 4.")] float clearance = 4f
         )
         {
             return MainThread.Instance.Run(() =>
@@ -69,7 +70,7 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
                     if (searchRadius > 0f)
                     {
                         Vector3 requested = position;
-                        position = FlattestNear(position, searchRadius, maxSlope, out bool passed);
+                        position = FlattestNear(position, searchRadius, maxSlope, clearance, out bool passed);
                         float distance = Vector2.Distance(new Vector2(requested.x, requested.z), new Vector2(position.x, position.z));
                         if (!passed)
                             moved = $" (** no bare-terrain spot <= {maxSlope:F0} deg within {searchRadius:F0} m; used the least steep found, {distance:F1} m away -- may be rejected **)";
@@ -156,14 +157,14 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
         /// hand-wrote slope scans to place lamps. The first version of this search then put a lamp ON the road in a summit
         /// cut (the asphalt was the only flat ground within 12 m), so candidates must be bare terrain (OnBareTerrain).
         /// </remarks>
-        static Vector3 FlattestNear(Vector3 origin, float radius, float maxSlope, out bool passed)
+        static Vector3 FlattestNear(Vector3 origin, float radius, float maxSlope, float clearance, out bool passed)
         {
             passed = true;
             Terrain? home = TerrainAt(origin);
             if (home == null)
                 return origin;
             Physics.SyncTransforms(); // edit-mode raycasts must see objects moved or created since the last sync
-            if (Steepness(home, origin) <= maxSlope && OnBareTerrain(origin))
+            if (Steepness(home, origin) <= maxSlope && OnBareTerrain(origin, clearance))
                 return origin;
 
             const float step = 2f;
@@ -180,7 +181,7 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
                         continue;
                     Vector3 candidate = new Vector3(origin.x + dx, 0f, origin.z + dz);
                     Terrain? terrain = TerrainAt(candidate);
-                    if (terrain == null || !OnBareTerrain(candidate))
+                    if (terrain == null || !OnBareTerrain(candidate, clearance))
                         continue;
                     float slope = Steepness(terrain, candidate);
                     if (slope <= maxSlope)
@@ -207,26 +208,34 @@ Each call ADDS props -- not idempotent; on an occupied point GeNa STACKS the new
         }
 
         /// <summary>
-        /// True when a downward ray at the point AND at 4 points 1.5 m around it all hit a TerrainCollider first --
-        /// i.e. no road mesh, prop or other collider covers that ground.
+        /// True when a downward ray at the point AND at 8 points on a ring of radius 'clearance' (plus 4 at half of it)
+        /// all hit a TerrainCollider first -- no road mesh, prop or other collider covers that ground or sits too close.
         /// </summary>
-        static bool OnBareTerrain(Vector3 position)
+        /// <remarks>Clearance default 4 m: at the first version's fixed 1.5 m, a re-dressed area got two lamps ~2 m apart (SetDesign 2026-10-10).</remarks>
+        static bool OnBareTerrain(Vector3 position, float clearance)
         {
-            const float margin = 1.5f;
-            Vector3[] offsets = { Vector3.zero, new Vector3(margin, 0f, 0f), new Vector3(-margin, 0f, 0f), new Vector3(0f, 0f, margin), new Vector3(0f, 0f, -margin) };
-            foreach (Vector3 offset in offsets)
-            {
-                Vector3 p = position + offset;
-                Terrain? terrain = TerrainAt(p);
-                if (terrain == null)
-                    return false;
-                float top = terrain.GetPosition().y + terrain.terrainData.size.y + 100f;
-                if (!Physics.Raycast(new Vector3(p.x, top, p.z), Vector3.down, out RaycastHit hit, top + 1000f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
-                    return false;
-                if (!(hit.collider is TerrainCollider))
-                    return false;
-            }
-            return true;
+            if (!ProbeIsTerrain(position))
+                return false;
+            float diagonal = clearance * 0.7071f;
+            float half = clearance * 0.5f;
+            return ProbeIsTerrain(position + new Vector3(clearance, 0f, 0f)) && ProbeIsTerrain(position + new Vector3(-clearance, 0f, 0f))
+                && ProbeIsTerrain(position + new Vector3(0f, 0f, clearance)) && ProbeIsTerrain(position + new Vector3(0f, 0f, -clearance))
+                && ProbeIsTerrain(position + new Vector3(diagonal, 0f, diagonal)) && ProbeIsTerrain(position + new Vector3(-diagonal, 0f, diagonal))
+                && ProbeIsTerrain(position + new Vector3(diagonal, 0f, -diagonal)) && ProbeIsTerrain(position + new Vector3(-diagonal, 0f, -diagonal))
+                && ProbeIsTerrain(position + new Vector3(half, 0f, 0f)) && ProbeIsTerrain(position + new Vector3(-half, 0f, 0f))
+                && ProbeIsTerrain(position + new Vector3(0f, 0f, half)) && ProbeIsTerrain(position + new Vector3(0f, 0f, -half));
+        }
+
+        /// <summary>True when the first collider straight down at this XZ is a terrain.</summary>
+        static bool ProbeIsTerrain(Vector3 p)
+        {
+            Terrain? terrain = TerrainAt(p);
+            if (terrain == null)
+                return false;
+            float top = terrain.GetPosition().y + terrain.terrainData.size.y + 100f;
+            if (!Physics.Raycast(new Vector3(p.x, top, p.z), Vector3.down, out RaycastHit hit, top + 1000f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                return false;
+            return hit.collider is TerrainCollider;
         }
 
         static float Steepness(Terrain terrain, Vector3 position)
