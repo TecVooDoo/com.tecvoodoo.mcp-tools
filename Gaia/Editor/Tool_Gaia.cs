@@ -92,7 +92,7 @@ namespace MCPTools.Gaia.Editor
                 float min = WorldMinHeight(terrain);
                 float max = WorldMaxHeight(terrain);
                 string flag = max < seaLevel ? "  ** ENTIRELY BELOW SEA LEVEL -- spawns will place nothing **"
-                    : min < seaLevel ? "  (partly below sea level)" : "";
+                    : min < seaLevel ? $"  ({PercentBelow(terrain, seaLevel):F0}% of the area below sea level -- spawns skip it)" : "";
                 sb.AppendLine($"  '{terrain.name}' size=({data.size.x:F0}, {data.size.y:F0}, {data.size.z:F0}) height {min:F1}..{max:F1} m, " +
                               $"trees={data.treeInstanceCount}, treeProtos={data.treePrototypes.Length}, detailProtos={data.detailPrototypes.Length}, layers={data.terrainLayers.Length}{flag}");
                 if (includeDetailDensity && data.detailPrototypes.Length > 0)
@@ -100,6 +100,28 @@ namespace MCPTools.Gaia.Editor
                 if (!terrain.drawHeightmap)
                     sb.AppendLine("    ** drawHeightmap = false: the ground is INVISIBLE (a scripted spawn did this in ENTRY-431). Set Terrain.drawHeightmap back to true. **");
             }
+        }
+
+        /// <summary>
+        /// Share of the terrain's area whose ground is below sea level, from a 64 x 64 sample grid.
+        /// "Partly below" alone did not tell a SetDesign trial how far to lower the sea level (2026-10-10).
+        /// </summary>
+        static float PercentBelow(Terrain terrain, float seaLevel)
+        {
+            const int grid = 64;
+            TerrainData data = terrain.terrainData;
+            float originY = terrain.GetPosition().y;
+            int below = 0;
+            for (int z = 0; z < grid; z++)
+            {
+                for (int x = 0; x < grid; x++)
+                {
+                    float height = data.GetInterpolatedHeight((x + 0.5f) / grid, (z + 0.5f) / grid) + originY;
+                    if (height < seaLevel)
+                        below++;
+                }
+            }
+            return 100f * below / (grid * grid);
         }
 
         /// <summary>Per-prototype detail density sums, so a grass/detail spawn can be verified (reads every detail layer once).</summary>

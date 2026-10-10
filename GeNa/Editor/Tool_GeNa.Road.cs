@@ -134,6 +134,7 @@ Leaves GeNa scaffolding (a 'GeNa' root, 'Baked_RoadMeshes'). Props on the terrai
                 sb.AppendLine($"Terrain trees {treesBefore} -> {treesAfter} ({treesBefore - treesAfter} cleared). New meshes: {newMeshes} ({triangles} triangles).");
                 if (newMeshes == 0)
                     sb.AppendLine("** No road mesh appeared -- the terrain WAS carved. Check the spline's 'Road' extension. **");
+                sb.AppendLine(VergeReport(positions));
                 sb.AppendLine("The spline is now inactive (baked). Props already on the terrain were not moved by the carve.");
                 string summary = sb.ToString();
 
@@ -142,6 +143,50 @@ Leaves GeNa scaffolding (a 'GeNa' root, 'Baked_RoadMeshes'). Props on the terrai
                 Debug.Log("[TMCP gena-road] " + summary);
                 return summary;
             });
+        }
+
+        /// <summary>
+        /// Slope of the ground beside the new road (both sides, every ~10 m), so prop placement can be planned:
+        /// a carve leaves steep verges (SetDesign trial: 16-25 deg along the route, 30-68 at a summit), and GeNa
+        /// spawners reject steep ground silently.
+        /// </summary>
+        static string VergeReport(Vector3[] nodes)
+        {
+            List<float> slopes = new List<float>();
+            foreach (float offset in new[] { 6f, 12f })
+            {
+                for (int n = 0; n < nodes.Length - 1; n++)
+                {
+                    Vector3 a = nodes[n], b = nodes[n + 1];
+                    Vector3 along = new Vector3(b.x - a.x, 0f, b.z - a.z);
+                    float length = along.magnitude;
+                    if (length < 0.01f)
+                        continue;
+                    Vector3 side = new Vector3(-along.z, 0f, along.x) / length;
+                    for (float d = 0f; d < length; d += 10f)
+                    {
+                        Vector3 centre = a + along * (d / length);
+                        foreach (float sign in new[] { -1f, 1f })
+                        {
+                            Vector3 p = centre + side * (offset * sign);
+                            Terrain? terrain = TerrainAt(p);
+                            if (terrain != null)
+                                slopes.Add(Steepness(terrain, p));
+                        }
+                    }
+                }
+            }
+            if (slopes.Count == 0)
+                return "Verges: no terrain sampled.";
+            slopes.Sort();
+            int flat = 0;
+            foreach (float slope in slopes)
+            {
+                if (slope <= 11f)
+                    flat++;
+            }
+            return $"Verges (6 and 12 m out, both sides, every 10 m; {slopes.Count} samples): median {slopes[slopes.Count / 2]:F1} deg, max {slopes[slopes.Count - 1]:F1} deg, " +
+                   $"{flat} at <= 11 deg (street-lamp limit). For props beside the road use gena-spawn with searchRadius.";
         }
     }
 }

@@ -2266,7 +2266,7 @@ The shared-scene scan is budgeted (8 s) and resumable -- a big project may answe
 Runs a GeNa spawner prefab (`GeNaSpawner.Spawn(Vector3)`, synchronous) at each point; reuses its scene instance. Reports per point PLACED / NOTHING (criteria rejection, with slope) and flags props that landed off the terrain (GeNa stacks onto existing colliders). Additive -- not idempotent. Sample props are magenta on URP until the Render Pipeline Converter runs.
 
 ```csharp
-string Spawn(string spawner, string[] points)
+string Spawn(string spawner, string[] points, float searchRadius = 0f, float maxSlope = 11f)
 ```
 
 ---
