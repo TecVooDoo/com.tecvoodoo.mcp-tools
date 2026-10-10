@@ -14,12 +14,14 @@ namespace MCPTools.Gaia.Editor
     {
         [AiTool("gaia-query", Title = "Gaia / Query", ReadOnlyHint = true)]
         [Description(@"Reports the Gaia world in the open scene (read-only): sea level, every terrain's size, world height range, tree count and prototype counts,
-plus warnings for terrain below sea level and for invisible ground (drawHeightmap=false).
+plus warnings for terrain below sea level, for invisible ground (drawHeightmap=false) and for a gaia-create-world sea level that was not applied.
+With includeDetailDensity (default true) it sums each detail prototype's density, so a grass/detail spawn can be verified -- this reads every detail layer once.
 Also lists the scene's Spawners and, with includeBiomePresets, every BiomePreset asset in the project.
 Gaia finishes world creation and tree/detail spawning on LATER editor ticks: call this on a separate call after gaia-create-world / gaia-spawn to read the result.")]
         public string Query(
             [Description("List the scene's Spawner GameObjects. Default true.")] bool includeSpawners = true,
-            [Description("List BiomePreset assets in the project (an AssetDatabase search). Default false.")] bool includeBiomePresets = false
+            [Description("List BiomePreset assets in the project (an AssetDatabase search). Default false.")] bool includeBiomePresets = false,
+            [Description("Sum detail (grass) density per prototype. Default true; set false on very large terrains.")] bool includeDetailDensity = true
         )
         {
             return MainThread.Instance.Run(() =>
@@ -27,7 +29,7 @@ Gaia finishes world creation and tree/detail spawning on LATER editor ticks: cal
                 StringBuilder sb = new StringBuilder();
                 GaiaSessionManager? session = GaiaSessionManager.GetSessionManager(false, false);
                 sb.AppendLine(session == null ? "Session manager: none in scene" : $"Session manager: '{session.name}', world creation running: {session.m_worldCreationRunning}");
-                AppendTerrainReport(sb, GaiaAPI.GetSeaLevel());
+                AppendTerrainReport(sb, GaiaAPI.GetSeaLevel(), includeDetailDensity);
 
                 if (includeSpawners)
                 {

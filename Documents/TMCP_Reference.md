@@ -2240,7 +2240,7 @@ string BakeColliders(string? action = null, string[]? targets = null, string? st
 
 ## Gaia Pro VS (Procedural Worlds) (5 Tools)
 
-**Define:** `HAS_GAIA` (type probe `Gaia.GaiaAPI, GaiaCore`) | **Asmdef:** `MCPTools.Gaia.Editor` (editor-only, refs `GaiaCore`) | **Added:** 2026-10-10 (TVD S52), ENTRY-431. **Compile-verified; live test owed in SetDesign.**
+**Define:** `HAS_GAIA` (type probe `Gaia.GaiaAPI, GaiaCore`) | **Asmdef:** `MCPTools.Gaia.Editor` (editor-only, refs `GaiaCore`) | **Added:** 2026-10-10 (TVD S52), ENTRY-431. **Live-tested in SetDesign 2026-10-10; v1.15.1 fixes re-run pending.**
 All edit-mode only. **Gaia finishes world creation and tree/detail spawning on later editor ticks -- read results with `gaia-query` on a SEPARATE call.** Stamping is synchronous.
 
 ### gaia-query -- Query (read-only)
@@ -2248,12 +2248,12 @@ All edit-mode only. **Gaia finishes world creation and tree/detail spawning on l
 Session manager, sea level, per-terrain size / world height range / tree count / prototype counts; warns on terrain below sea level and on `drawHeightmap = false`. Lists spawners; `includeBiomePresets` adds every BiomePreset asset.
 
 ```csharp
-string Query(bool includeSpawners = true, bool includeBiomePresets = false)
+string Query(bool includeSpawners = true, bool includeBiomePresets = false, bool includeDetailDensity = true)
 ```
 
 ### gaia-create-world -- Create World
 
-`GaiaAPI.CreateGaiaWorld`. Refuses when terrains exist (unless `replaceExisting`) or a creation is running -- guards against the MCP client re-sending a slow call. Adds the active scene to EditorBuildSettings (Gaia's side effect).
+`GaiaAPI.CreateGaiaWorld`. Refuses when terrains exist (unless `replaceExisting`) or a creation is running -- guards against the MCP client re-sending a slow call. Adds the active scene to EditorBuildSettings (Gaia's side effect). Gaia ignores the requested sea level, so the tool re-applies it on Gaia's `OnWorldCreated`.
 
 ```csharp
 string CreateWorld(int tileSize = 1024, float tileHeight = 1000f, int xTiles = 1, int zTiles = 1, int seaLevel = 50, bool replaceExisting = false)
@@ -2277,10 +2277,10 @@ string Stamp(string stampPath, string? operation = null, float? x = null, float?
 
 ### gaia-spawn -- Spawn
 
-`create-biome` instantiates a BiomePreset by asset name and lists its spawners. `spawn` runs ONE spawner by exact GameObject name and **refuses when every terrain is below sea level**. One spawner per call (a loop places no trees/details); texture spawners first; a first tree spawn on a fresh API world can place 0, so spawn it again. Re-spawning replaces.
+`create-biome` instantiates a BiomePreset by asset name and lists its spawners; it is IDEMPOTENT (an existing `<preset> Biome` is listed, not duplicated; `replaceExisting` rebuilds). `spawn` runs ONE spawner by exact GameObject name and **refuses when every terrain is below sea level**. One spawner per call (a loop places no trees/details); texture spawners first; a first tree spawn on a fresh API world can place 0, so spawn it again. Re-spawning replaces.
 
 ```csharp
-string Spawn(string action, string name, bool allTerrains = true)
+string Spawn(string action, string name, bool allTerrains = true, bool replaceExisting = false)
 ```
 
 ---

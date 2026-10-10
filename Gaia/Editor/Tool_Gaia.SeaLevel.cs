@@ -29,6 +29,8 @@ Omit 'value' to read. In edit mode the value is written to the scene's Gaia sess
                         throw new Exception("No Gaia session manager in the scene, so there is nowhere to store a sea level. Create a world first.");
                     float before = GaiaAPI.GetSeaLevel();
                     GaiaAPI.SetSeaLevel(value.Value);
+                    // An explicit value supersedes any pending gaia-create-world request.
+                    UnityEditor.SessionState.EraseFloat(PendingSeaLevelKey);
                     sb.AppendLine($"Sea level {before:F1} -> {GaiaAPI.GetSeaLevel():F1} m");
                 }
                 AppendTerrainReport(sb, GaiaAPI.GetSeaLevel());

@@ -77,10 +77,15 @@ namespace MCPTools.Gaia.Editor
             throw new Exception($"No BiomePreset asset named '{name}'. Use gaia-query to list biome presets.");
         }
 
-        static void AppendTerrainReport(StringBuilder sb, float seaLevel)
+        static void AppendTerrainReport(StringBuilder sb, float seaLevel, bool includeDetailDensity = false)
         {
             List<Terrain> terrains = GetTerrains();
             sb.AppendLine($"Terrains: {terrains.Count} | Sea level: {seaLevel:F1} m");
+
+            float requested = UnityEditor.SessionState.GetFloat(PendingSeaLevelKey, float.NaN);
+            if (!float.IsNaN(requested) && Mathf.Abs(requested - seaLevel) > 0.01f)
+                sb.AppendLine($"  ** gaia-create-world requested sea level {requested:F1} m but it is {seaLevel:F1} m -- not applied yet (creation still running, or a domain reload dropped the hook). If creation is done, run gaia-sea-level value={requested:F1}. **");
+
             foreach (Terrain terrain in terrains)
             {
                 TerrainData data = terrain.terrainData;
@@ -90,9 +95,30 @@ namespace MCPTools.Gaia.Editor
                     : min < seaLevel ? "  (partly below sea level)" : "";
                 sb.AppendLine($"  '{terrain.name}' size=({data.size.x:F0}, {data.size.y:F0}, {data.size.z:F0}) height {min:F1}..{max:F1} m, " +
                               $"trees={data.treeInstanceCount}, treeProtos={data.treePrototypes.Length}, detailProtos={data.detailPrototypes.Length}, layers={data.terrainLayers.Length}{flag}");
+                if (includeDetailDensity && data.detailPrototypes.Length > 0)
+                    AppendDetailDensity(sb, data);
                 if (!terrain.drawHeightmap)
                     sb.AppendLine("    ** drawHeightmap = false: the ground is INVISIBLE (a scripted spawn did this in ENTRY-431). Set Terrain.drawHeightmap back to true. **");
             }
+        }
+
+        /// <summary>Per-prototype detail density sums, so a grass/detail spawn can be verified (reads every detail layer once).</summary>
+        static void AppendDetailDensity(StringBuilder sb, TerrainData data)
+        {
+            int res = data.detailResolution;
+            long total = 0;
+            StringBuilder perProto = new StringBuilder();
+            for (int layer = 0; layer < data.detailPrototypes.Length; layer++)
+            {
+                int[,] cells = data.GetDetailLayer(0, 0, res, res, layer);
+                long sum = 0;
+                foreach (int density in cells)
+                    sum += density;
+                total += sum;
+                if (sum > 0)
+                    perProto.Append($" [{layer}]={sum}");
+            }
+            sb.AppendLine($"    detail density sum={total} (resolution {res}){(perProto.Length > 0 ? " per prototype:" + perProto : "")}");
         }
     }
 }

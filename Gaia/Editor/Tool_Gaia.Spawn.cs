@@ -16,6 +16,7 @@ namespace MCPTools.Gaia.Editor
         [AiTool("gaia-spawn", Title = "Gaia / Spawn")]
         [Description(@"Gaia biome spawning, ONE step per call.
 action='create-biome': instantiate the BiomePreset named 'name' (BiomePreset.CreateBiome, prototypes auto-assigned to all terrains); returns its spawner names.
+IDEMPOTENT: if '<name> Biome' already exists it is NOT created again -- its spawners are listed instead (the MCP client re-sends slow calls; one call once made three copies). replaceExisting=true deletes the existing biome root(s) first.
 action='spawn': run the ONE Spawner GameObject named exactly 'name' (Spawner.Spawn). REFUSES when every terrain is below sea level -- Gaia would place nothing and report success.
 RULES (measured, ENTRY-431/436/446): spawn ONE spawner per call -- looping several in one call placed 0 trees and 0 details. Run TEXTURE spawners before tree and detail spawners (their rules mask on terrain textures).
 Trees and details land on LATER editor ticks: read the result with gaia-query on a separate call. On a freshly API-created world the first tree spawn can place 0 -- spawn that spawner again.
@@ -23,7 +24,8 @@ Re-spawning a spawner replaces its output rather than duplicating it. Spawning w
         public string Spawn(
             [Description("'create-biome' or 'spawn'.")] string action,
             [Description("BiomePreset asset name (create-biome) or exact Spawner GameObject name (spawn).")] string name,
-            [Description("spawn only: true = whole world (default), false = the spawner's local range around its position.")] bool allTerrains = true
+            [Description("spawn only: true = whole world (default), false = the spawner's local range around its position.")] bool allTerrains = true,
+            [Description("create-biome only: delete an existing '<name> Biome' root and create it again. Default false.")] bool replaceExisting = false
         )
         {
             return MainThread.Instance.Run(() =>
@@ -35,29 +37,58 @@ Re-spawning a spawner replaces its output rather than duplicating it. Spawning w
 
                 string a = string.IsNullOrWhiteSpace(action) ? "" : action.Trim().ToLowerInvariant();
                 if (a == "create-biome")
-                    return CreateBiome(name.Trim());
+                    return CreateBiome(name.Trim(), replaceExisting);
                 if (a == "spawn")
                     return RunSpawner(name.Trim(), allTerrains);
                 throw new Exception($"Unknown action '{action}'. Use: create-biome, spawn.");
             });
         }
 
-        static string CreateBiome(string presetName)
+        static string CreateBiome(string presetName, bool replaceExisting)
         {
             BiomePreset preset = FindBiomePreset(presetName);
+
+            // BiomePreset.CreateBiome names its root "<preset> Biome" (BiomePreset.cs ~L173).
+            string rootName = preset.name + " Biome";
+            List<BiomeController> existing = new List<BiomeController>();
+            foreach (BiomeController candidate in UnityEngine.Object.FindObjectsByType<BiomeController>(FindObjectsInactive.Include))
+            {
+                if (candidate.name == rootName)
+                    existing.Add(candidate);
+            }
+
+            if (existing.Count > 0 && !replaceExisting)
+            {
+                StringBuilder already = new StringBuilder();
+                already.AppendLine($"Biome '{rootName}' already exists ({existing.Count} root(s)) -- NOT created again (a re-sent call would otherwise duplicate every spawner). Pass replaceExisting=true to rebuild it.");
+                if (existing.Count > 1)
+                    already.AppendLine("** More than one root: spawning by name will refuse until the extras are deleted, or rebuild with replaceExisting=true. **");
+                AppendSpawnerList(already, existing[0]);
+                return already.ToString();
+            }
+
+            foreach (BiomeController old in existing)
+                UnityEditor.Undo.DestroyObjectImmediate(old.gameObject);
+
             BiomeController controller = preset.CreateBiome(true);
             if (controller == null)
                 throw new Exception($"BiomePreset '{presetName}' returned no BiomeController.");
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"Created biome '{controller.name}' from '{presetName}' with {controller.m_autoSpawners.Count} spawner(s). Nothing is spawned yet.");
+            string replaced = existing.Count > 0 ? $" (replaced {existing.Count} existing root(s))" : "";
+            sb.AppendLine($"Created biome '{controller.name}' from '{presetName}'{replaced} with {controller.m_autoSpawners.Count} spawner(s). Nothing is spawned yet.");
+            AppendSpawnerList(sb, controller);
+            return sb.ToString();
+        }
+
+        static void AppendSpawnerList(StringBuilder sb, BiomeController controller)
+        {
             sb.AppendLine("Spawn each with gaia-spawn action='spawn', ONE per call, texture spawners first:");
             foreach (AutoSpawner autoSpawner in controller.m_autoSpawners)
             {
                 if (autoSpawner.spawner != null)
                     sb.AppendLine($"  '{autoSpawner.spawner.name}'");
             }
-            return sb.ToString();
         }
 
         static string RunSpawner(string spawnerName, bool allTerrains)
