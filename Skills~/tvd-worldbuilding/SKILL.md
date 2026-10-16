@@ -4,7 +4,7 @@ description: "Use this skill whenever the user wants to build or dress an outdoo
 metadata:
   author: TecVooDoo (TMCP)
   tools: "gaia-query, gaia-create-world, gaia-sea-level, gaia-stamp, gaia-spawn, gena-query, gena-road, gena-spawn, pegasus-query, pegasus-create, pegasus-control, screenshot-camera, rql-mutate"
-  verified: "SetDesign, Unity 6000.6.3f1, TMCP 1.18.3, 2026-10-10 (valley trial); step 1 + step 6 moved to MCP 1.0 RQL forms 2026-10-16, not yet re-run"
+  verified: "SetDesign, Unity 6000.6.3f1, TMCP 1.18.3, 2026-10-10 (valley trial); step 1 + step 6 RQL forms verified in SetDesign on MCP 1.0.1, 2026-10-16 (TMCP 1.18.5)"
 ---
 
 # World building: Gaia -> GeNa -> Pegasus
@@ -22,7 +22,7 @@ Run `unity-tool-list` with regex `^(gaia|gena|pegasus)-`. Each group appears onl
 
 ## The workflow
 
-1. **Scene.** `rql-mutate` `editor | call CreateFolder("Assets/<Folder>")` FIRST (it creates missing parents), then `editor | call NewScene("Assets/<Folder>/<Name>.unity")`, which creates the scene and saves it at that path. (Before MCP 1.0 these were `assets-create-folder` + `scene-create`, and `scene-create` failed on a missing folder while leaving an unsaved scene that claimed the path. Keep the folder-first order.) Save explicitly at the end with `editor | call SaveScenes()`. `gaia-create-world` adds the scene to EditorBuildSettings, so remove that entry afterwards for a scratch scene.
+1. **Scene.** **Save the open scene first** (`rql-query` `scenes | select name path isDirty`; if dirty, `rql-mutate` `editor | call SaveScenes()`). Then `editor | call CreateFolder("Assets/<Folder>")` (it creates missing parents), then `editor | call NewScene("Assets/<Folder>/<Name>.unity")`. That creates the scene with a camera + light and saves it at that path. **`NewScene` does NOT create folders, and a FAILED `NewScene` still replaces the open scene with an untitled one, without rollback** -- unsaved work in the old scene is lost. So save first, then the folder, then the scene. `rql-mutate` edits auto-save the scene; a closing `editor | call SaveScenes()` is a harmless safety net. `gaia-create-world` adds the scene to EditorBuildSettings, so remove that entry afterwards for a scratch scene.
 2. **Terrain.** `gaia-create-world` (tileSize, tileHeight, seaLevel), then `gaia-query` next call: expect the terrain and your sea level. A new world is flat at 0 m, so it reads "entirely below sea level" until you stamp. That's expected.
 3. **Landform.** `gaia-stamp` with a stamp texture (Gaia ships many under `Procedural Worlds/.../Stamps`). It reports max height before -> after, so stamp, read, adjust. **Starting values:** `2k Mountain 1` at tileHeight 600 gives about 12 m per `height` unit (5 -> 60 m, 8 -> 96 m). For a hill a road will cross, stay near 60 m (see step 6). **A single mountain stamp leaves the tile edges at 0 m**, so set the sea level to about 0-5 m with `gaia-sea-level`, or the edges go bare. Read the "% below" figure.
 4. **Biome.** `gaia-query includeBiomePresets=true`, then `gaia-spawn action=create-biome name=<preset>`. It lists the spawners. **The listing order is NOT the run order.**
