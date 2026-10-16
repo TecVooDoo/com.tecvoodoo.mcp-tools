@@ -2302,10 +2302,10 @@ string Control(string action, string? manager = null, float percent = 0f, int sa
 
 ---
 
-## Gaia Pro VS (Procedural Worlds) (5 Tools)
+## Gaia Pro VS (Procedural Worlds) (8 Tools)
 
 **Define:** `HAS_GAIA` (type probe `Gaia.GaiaAPI, GaiaCore`) | **Asmdef:** `MCPTools.Gaia.Editor` (editor-only, refs `GaiaCore`) | **Added:** 2026-10-10 (TVD S52), ENTRY-431. **Live-verified in SetDesign 2026-10-10 (v1.15.1, all steps PASS).**
-All edit-mode only. **Gaia finishes world creation and tree/detail spawning on later editor ticks -- read results with `gaia-query` on a SEPARATE call.** Stamping is synchronous.
+The 5 world tools are edit-mode only. **Gaia finishes world creation and tree/detail spawning on later editor ticks -- read results with `gaia-query` on a SEPARATE call.** Stamping is synchronous.
 
 ### gaia-query -- Query (read-only)
 
@@ -2345,6 +2345,30 @@ string Stamp(string stampPath, string? operation = null, float? x = null, float?
 
 ```csharp
 string Spawn(string action, string name, bool allTerrains = true, bool replaceExisting = false)
+```
+
+### gaia-sky -- PW Sky (status / add / remove)
+
+Procedural Worlds Sky ([ENTRY-433]). **Needs `GAIA_2023_PRO`** (Standalone-only define), as do the next two tools. `add` = `GRC_PWSky.AddToScene`, which disables every directional light and swaps skybox + fog; the tool records them first (EditorPrefs, keyed by scene path) and ticks the atmosphere. `remove` = `RemoveFromScene` (deletes the whole Gaia `Lighting` object, restores nothing) + the tool's restore of lights / skybox / fog / ambient + `MarkSceneDirty`. `add` refuses when PW Sky exists or a populated `Lighting` object exists; `remove` refuses when `Lighting` holds non-PW children; `force` overrides. Edit mode only. Not on HDRP.
+
+```csharp
+string Sky(string action = "status", bool force = false)
+```
+
+### gaia-time-of-day -- Time of Day
+
+Get (no args) or set hour / minute / cycle running / time scale / sun Y rotation through `GaiaAPI`. In edit mode it ticks `PW_VFX_Atmosphere.LateUpdate` by reflection after a change, so the sun angle and fog/ambient render. PW day is 06:00-18:00 (19:00 is already night).
+
+```csharp
+string TimeOfDay(int? hour = null, float? minute = null, bool? cycleRunning = null, float? timeScale = null, float? sunRotation = null)
+```
+
+### gaia-weather -- Weather
+
+`status` / `rain` / `snow` / `clear`, optional `instant`. Play mode only unless the weather object's `RunInEditor` is on. A rain<->snow switch stops the old weather now and starts the new one on a later frame (once `IsRainingFinished` / `IsSnowingFinished`, 10 s timeout) -- the call returns before the switch; confirm with `status`, which flags a STRANDED emitter (emitting while its weather is off).
+
+```csharp
+string Weather(string action = "status", bool? instant = null)
 ```
 
 ---
