@@ -1,6 +1,6 @@
 # TecVooDoo MCP Tools -- Status
 
-**Package:** `com.tecvoodoo.mcp-tools` v1.14.2
+**Package:** `com.tecvoodoo.mcp-tools` v1.18.4 (header read v1.14.2 until 2026-10-16 -- stale since S50)
 **Source (edit here):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\` (edit directly in package)
 **Package (UPM):** `E:\Unity\DefaultUnityPackages\com.tecvoodoo.mcp-tools\`
 **Unity Requirement:** 6000.0+
@@ -20,6 +20,7 @@
 
 **263 tools across 61 asset groups.** All compiling. (Re-derived from source 2026-10-10, TVD S52: `[AiTool(` = 263, `[AiToolType]` = 61.)
 
+- **2026-10-16 (TVD S53) -- v1.18.4: MCP 1.0.1 crossing. TMCP compiled clean with NO source change** (TVD + Sandbox both measured; TVD 20 tools, Sandbox 38). Offline audit vs the 1.0.1 tarball: every core symbol TMCP uses survives (`MainThread`, `GameObjectRef` + `FindGameObject` in `AIGD`, `Editor.Utils`); McpPlugin 8.8.0 is additive; TMCP gates on `UNITY_MCP_READY` only, so `DEPS_11` does not bite; `MCP_HAS_AIGD` (`>=0.69.0`) stays on. Only change: `Skills~/tvd-worldbuilding` named 3 core tools that 1.0 REMOVED (`assets-create-folder`, `scene-create`, `gameobject-modify`), now `rql-mutate` `editor | call CreateFolder/NewScene/SaveScenes` + `set transform.position`. The RQL forms are not yet re-run in a world-building trial. **Under `toolFormat: Rql` (1.0 default), structured TMCP returns render in RQL compact notation (`{profileCount:0,details:""}`), not JSON**; plain-string returns are unchanged.
 - **2026-10-10 (TVD S52) -- `Skills~/` ships to projects:** package skills (today: `tvd-worldbuilding`) are mirrored into every tree that resolves TMCP by Sandbox's `Documents/Canonical/Tools/sync_vendor_skills.py` (Sandbox `aa2ad7b`; `.tmcp-skill-source` marker, pruned on removal). **After editing anything under `Skills~/`, re-run it** -- the trees do not pick it up on their own.
 - **2026-10-10 (TVD S52) -- v1.18.3: 1.18.2's clearance DID NOT HOLD** -- a new lamp landed 2.83 m from an existing one with clearance 4. The lamp's only collider is a 0.51 x 0.50 m BoxCollider post, and the ring of downward rays left ~3 m gaps it slipped through. **Lesson: ray sampling cannot guarantee a clearance wider than the thinnest obstacle.** Fix (SetDesign's, primitive verified there): keep the centre ray for "bare terrain", and test clearance with `Physics.OverlapCapsule` (ground -2 m to +3 m, radius = clearance), rejecting any non-`TerrainCollider` -- which also keeps props off road MeshColliders. **VERIFIED in SetDesign:** default clearance placed the next lamp 4.47 m from the nearest of 4 surrounding posts (all >= 4 m); `clearance=1` still allows 2.00 m.
 - **2026-10-10 (TVD S52) -- v1.18.2:** 1.18.1 verified (summit point now lands on the grass bank 14 m off the road; a second call moved further because the first lamp is non-bare; normal case unchanged). SetDesign's idea adopted: **`clearance`** (default 4 m) -- the bare-terrain probe is now a ring of 8 points at `clearance` + 4 at half, so re-dressing an area no longer puts two lamps ~2 m apart (the fixed 1.5 m ring allowed it).
