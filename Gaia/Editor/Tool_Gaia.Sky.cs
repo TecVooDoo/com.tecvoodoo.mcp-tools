@@ -52,6 +52,7 @@ namespace MCPTools.Gaia.Editor
 action='status' (default) -- read-only report: sky present, time of day, sun/moon, skybox, fog, weather flags.
 action='add' -- GRC_PWSky.AddToScene. The vendor call DISABLES EVERY DIRECTIONAL LIGHT in the scene and swaps the skybox and fog (ENTRY-433); this tool first records the lights it is about to switch off, the skybox and the fog/ambient settings (EditorPrefs, per scene path) so 'remove' can put them back, then ticks the atmosphere so the first frame is not drowned in fog. REFUSES when PW Sky is already present (a re-sent call would otherwise wipe the record), and when a Gaia 'Lighting' object holding other children exists, unless force=true -- AddToScene deletes that object first.
 action='remove' -- GRC_PWSky.RemoveFromScene, which deletes the whole Gaia 'Lighting' object and restores NOTHING (measured: zero active lights, terrain trees stop rendering, PW skybox and fog left behind, scene not dirtied). This tool re-enables the recorded lights, restores skybox/fog/ambient, deletes the 'PW Wind Zone' the add created, and marks the scene dirty. REFUSES when 'Lighting' holds children that PW Sky did not create, unless force=true. A Gaia 'Lighting' object that existed (even empty) before the add is gone afterwards -- the vendor add replaces it. Gaia logs ONE MissingReferenceException from PW_VFX_Clouds.EditorUpdateCloudPosition right after a remove (vendor, one-shot, harmless).
+After 'add', make one gaia-time-of-day call on a separate call: until then the sun keeps the prefab intensity (measured 2.49 vs the 16:00 curve's 1.60).
 Not available on HDRP (the vendor add returns early). Edit mode only for add/remove. Save the scene afterwards.")]
         public string Sky(
             [Description("'status' (default), 'add' or 'remove'.")] string action = "status",
@@ -111,16 +112,15 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             if (!GaiaUtils.CheckIfPWSkyExists())
                 throw new Exception("AddToScene returned but no PW Sky exists. The vendor add is a no-op on HDRP, and needs its 'PW Sky Prefabs.asset'.");
 
-            // Re-apply the add's 16:00 through the GaiaAPI setters, as gaia-time-of-day does. SetDesign S46 measured that the
-            // atmosphere tick never writes the sun intensity (2.49 survived two LateUpdates and later frames); only a
-            // time set brought it to the 16:00 curve's 1.60, even with the time unchanged.
-            GaiaAPI.SetTimeOfDayHour(GaiaAPI.GetTimeOfDayHour());
-            GaiaAPI.SetTimeOfDayMinute(GaiaAPI.GetTimeOfDayMinute());
             EditorSceneManager.MarkSceneDirty(scene);
             sb.AppendLine($"PW Sky added. Recorded for restore: {record.disabledLightPaths.Count} directional light(s) the add switched off" +
                           (record.disabledLightPaths.Count > 0 ? $" ({string.Join(", ", record.disabledLightPaths)})" : "") +
                           $", skybox '{(record.skyboxWasNull ? "<none>" : record.skyboxPath.Length > 0 ? $"{record.skyboxName} ({record.skyboxPath})" : "<scene material, NOT restorable>")}', fog {(record.fog ? "on" : "off")}.");
             sb.AppendLine(TickAtmosphere());
+            // SetDesign S46 (1.19.2 + 1.19.3, both failed): in the add's own call the sun keeps the prefab intensity (2.49);
+            // neither extra LateUpdates nor a same-call GaiaAPI re-set fix it. A gaia-time-of-day call made LATER does
+            // (1.60 at 16:00), so the vendor needs editor frames to initialise first.
+            sb.AppendLine("Note: the sun intensity starts at the prefab value. Call gaia-time-of-day (any time, e.g. hour=16) on a SEPARATE call before judging light levels or taking a screenshot.");
         }
 
         static void RemoveSky(StringBuilder sb, bool force)
