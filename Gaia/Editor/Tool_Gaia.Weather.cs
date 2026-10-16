@@ -53,7 +53,7 @@ Needs PW Sky in the scene (gaia-sky action='add').")]
                             weather.StopRain();
                         if (weather.IsSnowing)
                             weather.StopSnow();
-                        sb.AppendLine("Weather cleared (rain and snow stopped). Emitters wind down over the next frames; confirm with action='status'.");
+                        sb.AppendLine("Weather cleared (rain and snow stopped). Emitters wind down over the next frames (Finished flags go true when done); confirm with action='status'.");
                         break;
                     case "rain":
                     case "snow":
@@ -163,15 +163,17 @@ Needs PW Sky in the scene (gaia-sky action='add').")]
         {
             sb.AppendLine($"Finished flags: rain={weather.IsRainingFinished} snow={weather.IsSnowingFinished}");
             // The emitters are referenced by field: the rain VFX follows the camera, so it need not sit under the weather object.
-            bool rainStranded = AppendEmitter(sb, "rain", weather.m_rainVFX, weather.IsRaining);
-            bool snowStranded = AppendEmitter(sb, "snow", weather.m_snowParticles, weather.IsSnowing);
-            snowStranded |= AppendEmitter(sb, "snow VFX", weather.m_snowVFX, weather.IsSnowing);
+            // A weather whose Finished flag is still false is winding down after a stop, not stranded (SetDesign S46:
+            // a clear's own report flagged that state). The flag is also true WHILE that weather runs.
+            bool rainStranded = AppendEmitter(sb, "rain", weather.m_rainVFX, weather.IsRaining || !weather.IsRainingFinished);
+            bool snowStranded = AppendEmitter(sb, "snow", weather.m_snowParticles, weather.IsSnowing || !weather.IsSnowingFinished);
+            snowStranded |= AppendEmitter(sb, "snow VFX", weather.m_snowVFX, weather.IsSnowing || !weather.IsSnowingFinished);
             if ((rainStranded || snowStranded) && s_pendingWeather == null)
                 sb.AppendLine($"  ** STRANDED EMITTER: {(rainStranded ? "rain" : "snow")} is emitting although that weather is not active (ENTRY-433's same-frame switch bug). Run action='clear' and check again a moment later; if it persists, stop and restart play mode. **");
         }
 
-        /// <summary>Reports one weather emitter; returns true when it emits while its weather is off.</summary>
-        static bool AppendEmitter(StringBuilder sb, string label, ParticleSystem? system, bool weatherActive)
+        /// <summary>Reports one weather emitter; returns true when it emits while its weather is off and finished.</summary>
+        static bool AppendEmitter(StringBuilder sb, string label, ParticleSystem? system, bool weatherActiveOrFinishing)
         {
             if (system == null)
             {
@@ -179,7 +181,7 @@ Needs PW Sky in the scene (gaia-sky action='add').")]
                 return false;
             }
             sb.AppendLine($"  {label} emitter '{HierarchyPath(system.transform)}' emitting={system.isEmitting} particles={system.particleCount}");
-            return system.isEmitting && !weatherActive;
+            return system.isEmitting && !weatherActiveOrFinishing;
         }
     }
 }

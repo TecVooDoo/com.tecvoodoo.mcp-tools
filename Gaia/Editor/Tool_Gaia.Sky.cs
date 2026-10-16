@@ -31,7 +31,9 @@ namespace MCPTools.Gaia.Editor
         {
             public List<string> disabledLightPaths = new List<string>();
             public string skyboxPath = "";
+            public string skyboxName = "";
             public bool skyboxWasNull;
+            public List<string> windZonePaths = new List<string>();
             public bool fog;
             public FogMode fogMode;
             public float fogDensity;
@@ -49,7 +51,7 @@ namespace MCPTools.Gaia.Editor
         [Description(@"Adds, removes or reports Procedural Worlds Sky (the Gaia Pro sky: time of day, clouds, rain/snow).
 action='status' (default) -- read-only report: sky present, time of day, sun/moon, skybox, fog, weather flags.
 action='add' -- GRC_PWSky.AddToScene. The vendor call DISABLES EVERY DIRECTIONAL LIGHT in the scene and swaps the skybox and fog (ENTRY-433); this tool first records the lights it is about to switch off, the skybox and the fog/ambient settings (EditorPrefs, per scene path) so 'remove' can put them back, then ticks the atmosphere so the first frame is not drowned in fog. REFUSES when PW Sky is already present (a re-sent call would otherwise wipe the record), and when a Gaia 'Lighting' object holding other children exists, unless force=true -- AddToScene deletes that object first.
-action='remove' -- GRC_PWSky.RemoveFromScene, which deletes the whole Gaia 'Lighting' object and restores NOTHING (measured: zero active lights, terrain trees stop rendering, PW skybox and fog left behind, scene not dirtied). This tool re-enables the recorded lights, restores skybox/fog/ambient and marks the scene dirty. REFUSES when 'Lighting' holds children that PW Sky did not create, unless force=true.
+action='remove' -- GRC_PWSky.RemoveFromScene, which deletes the whole Gaia 'Lighting' object and restores NOTHING (measured: zero active lights, terrain trees stop rendering, PW skybox and fog left behind, scene not dirtied). This tool re-enables the recorded lights, restores skybox/fog/ambient, deletes the 'PW Wind Zone' the add created, and marks the scene dirty. REFUSES when 'Lighting' holds children that PW Sky did not create, unless force=true. A Gaia 'Lighting' object that existed (even empty) before the add is gone afterwards -- the vendor add replaces it. Gaia logs ONE MissingReferenceException from PW_VFX_Clouds.EditorUpdateCloudPosition right after a remove (vendor, one-shot, harmless).
 Not available on HDRP (the vendor add returns early). Edit mode only for add/remove. Save the scene afterwards.")]
         public string Sky(
             [Description("'status' (default), 'add' or 'remove'.")] string action = "status",
@@ -109,10 +111,12 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             if (!GaiaUtils.CheckIfPWSkyExists())
                 throw new Exception("AddToScene returned but no PW Sky exists. The vendor add is a no-op on HDRP, and needs its 'PW Sky Prefabs.asset'.");
 
+            // Same path as a gaia-time-of-day set (SetDesign S46: without it the first sun intensity read 2.49, not the 16:00 curve's 1.60).
+            PWSkyStandalone.Instance.UpdateGaiaTimeOfDay(false);
             EditorSceneManager.MarkSceneDirty(scene);
             sb.AppendLine($"PW Sky added. Recorded for restore: {record.disabledLightPaths.Count} directional light(s) the add switched off" +
                           (record.disabledLightPaths.Count > 0 ? $" ({string.Join(", ", record.disabledLightPaths)})" : "") +
-                          $", skybox '{(record.skyboxWasNull ? "<none>" : record.skyboxPath.Length > 0 ? record.skyboxPath : "<scene material, NOT restorable>")}', fog {(record.fog ? "on" : "off")}.");
+                          $", skybox '{(record.skyboxWasNull ? "<none>" : record.skyboxPath.Length > 0 ? $"{record.skyboxName} ({record.skyboxPath})" : "<scene material, NOT restorable>")}', fog {(record.fog ? "on" : "off")}.");
             sb.AppendLine(TickAtmosphere());
         }
 
@@ -175,6 +179,9 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             Material? skybox = RenderSettings.skybox;
             record.skyboxWasNull = skybox == null;
             record.skyboxPath = skybox != null ? AssetDatabase.GetAssetPath(skybox) : "";
+            record.skyboxName = skybox != null ? skybox.name : "";
+            foreach (WindZone zone in UnityEngine.Object.FindObjectsByType<WindZone>(FindObjectsInactive.Include))
+                record.windZonePaths.Add(HierarchyPath(zone.transform));
             record.fog = RenderSettings.fog;
             record.fogMode = RenderSettings.fogMode;
             record.fogDensity = RenderSettings.fogDensity;
@@ -191,6 +198,7 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
 
         static void ApplySkyRestoreRecord(StringBuilder sb, Scene scene, SkyRestoreRecord record)
         {
+            bool skyboxRestored = true;
             int restored = 0;
             foreach (string path in record.disabledLightPaths)
             {
@@ -211,15 +219,17 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             }
             else if (record.skyboxPath.Length > 0)
             {
-                Material? original = AssetDatabase.LoadAssetAtPath<Material>(record.skyboxPath);
+                Material? original = LoadSkybox(record.skyboxPath, record.skyboxName);
                 if (original != null)
                     RenderSettings.skybox = original;
                 else
-                    sb.AppendLine($"  ** Original skybox '{record.skyboxPath}' no longer loads; the PW skybox instance is still assigned. **");
+                    sb.AppendLine($"  ** Original skybox '{record.skyboxName}' ({record.skyboxPath}) no longer loads; the PW skybox instance is still assigned. **");
+                skyboxRestored = original != null;
             }
             else
             {
                 sb.AppendLine("  ** The original skybox was a scene-only material (no asset path) and cannot be restored; the PW skybox instance is still assigned. **");
+                skyboxRestored = false;
             }
 
             RenderSettings.fog = record.fog;
@@ -233,7 +243,34 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             RenderSettings.ambientEquatorColor = record.ambientEquator;
             RenderSettings.ambientGroundColor = record.ambientGround;
             RenderSettings.ambientIntensity = record.ambientIntensity;
-            sb.AppendLine("Restored skybox, fog and ambient to their pre-add values.");
+            sb.AppendLine(skyboxRestored ? "Restored skybox, fog and ambient to their pre-add values." : "Restored fog and ambient to their pre-add values (NOT the skybox -- see above).");
+
+            // The add leaves a 'PW Wind Zone' that RemoveFromScene does not delete (SetDesign S46).
+            foreach (WindZone zone in UnityEngine.Object.FindObjectsByType<WindZone>(FindObjectsInactive.Include))
+            {
+                string path = HierarchyPath(zone.transform);
+                if (zone.name.StartsWith("PW Wind Zone") && !record.windZonePaths.Contains(path))
+                {
+                    UnityEngine.Object.DestroyImmediate(zone.gameObject);
+                    sb.AppendLine($"Deleted '{path}' (created by the add).");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads a recorded skybox. Built-in materials share the pseudo-path 'Resources/unity_builtin_extra', which
+        /// LoadAssetAtPath cannot load (SetDesign S46: Default-Skybox was never restored), so those go by name.
+        /// </summary>
+        static Material? LoadSkybox(string path, string name)
+        {
+            if (path == "Resources/unity_builtin_extra")
+                return name.Length > 0 ? AssetDatabase.GetBuiltinExtraResource<Material>(name + ".mat") : null;
+            foreach (UnityEngine.Object asset in AssetDatabase.LoadAllAssetsAtPath(path))
+            {
+                if (asset is Material material && (name.Length == 0 || material.name == name))
+                    return material;
+            }
+            return null;
         }
 
         /// <summary>GRC_PWSky lives in Assembly-CSharp (no asmdef), so it is found through its GaiaCore base type.</summary>
@@ -269,7 +306,9 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             List<string> foreign = new List<string>();
             foreach (Transform child in lighting.transform)
             {
-                if (!expected.Contains(child.name))
+                // AddToScene strips "(Clone)" from most children but not the URP post-processing one (SetDesign S46).
+                string name = child.name.EndsWith("(Clone)") ? child.name.Substring(0, child.name.Length - "(Clone)".Length).TrimEnd() : child.name;
+                if (!expected.Contains(name))
                     foreign.Add(child.name);
             }
             return foreign;

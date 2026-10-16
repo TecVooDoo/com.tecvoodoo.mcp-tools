@@ -2349,7 +2349,7 @@ string Spawn(string action, string name, bool allTerrains = true, bool replaceEx
 
 ### gaia-sky -- PW Sky (status / add / remove)
 
-Procedural Worlds Sky ([ENTRY-433]). **Needs `GAIA_2023_PRO`** (Standalone-only define), as do the next two tools. `add` = `GRC_PWSky.AddToScene`, which disables every directional light and swaps skybox + fog; the tool records them first (EditorPrefs, keyed by scene path) and ticks the atmosphere. `remove` = `RemoveFromScene` (deletes the whole Gaia `Lighting` object, restores nothing) + the tool's restore of lights / skybox / fog / ambient + `MarkSceneDirty`. `add` refuses when PW Sky exists or a populated `Lighting` object exists; `remove` refuses when `Lighting` holds non-PW children; `force` overrides. Edit mode only. Not on HDRP.
+Procedural Worlds Sky ([ENTRY-433]). **Needs `GAIA_2023_PRO`** (Standalone-only define), as do the next two tools. `add` = `GRC_PWSky.AddToScene`, which disables every directional light and swaps skybox + fog; the tool records them first (EditorPrefs, keyed by scene path) and ticks the atmosphere. `remove` = `RemoveFromScene` (deletes the whole Gaia `Lighting` object, restores nothing) + the tool's restore of lights / skybox / fog / ambient + `MarkSceneDirty`. `add` refuses when PW Sky exists or a populated `Lighting` object exists; `remove` refuses when `Lighting` holds non-PW children (`(Clone)` suffix ignored); `force` overrides. `remove` also deletes the `PW Wind Zone` the add created; built-in skyboxes (`unity_builtin_extra`) restore by name. Live-tested SetDesign S46 (1.19.1, 11/13 PASS; 1.19.2 fixes the rest). Edit mode only. Not on HDRP.
 
 ```csharp
 string Sky(string action = "status", bool force = false)
