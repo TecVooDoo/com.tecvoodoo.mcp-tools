@@ -13,7 +13,7 @@ namespace MCPTools.AnimationRigging.Editor
     {
         [AiTool("rig-configure-twoboneik", Title = "Animation Rigging / Configure Two Bone IK")]
         [Description(@"Configures a TwoBoneIKConstraint component.
-Requires a TwoBoneIKConstraint already on the named object (add via GameObject menu or gameobject-component-add first).
+Requires a TwoBoneIKConstraint already on the named object (add via the GameObject menu, or rql-mutate: objects | where name == ""X"" | call AddComponent(""TwoBoneIKConstraint"")).
 rootBoneName / midBoneName / tipBoneName: the three bones in the IK chain (e.g. UpperArm, Forearm, Hand).
 targetName: the IK target transform the tip bone tries to reach.
 hintName: optional pole vector hint for elbow/knee direction.
@@ -39,7 +39,7 @@ hintWeight [0-1]: how strongly the pole vector hint influences the mid-joint dir
             {
                 var go = FindGO(gameObjectName);
                 var c = go.GetComponent<TwoBoneIKConstraint>();
-                if (c == null) throw new System.Exception($"'{gameObjectName}' has no TwoBoneIKConstraint. Add it first with gameobject-component-add.");
+                if (c == null) throw new System.Exception($"'{gameObjectName}' has no TwoBoneIKConstraint. Add it first: rql-mutate objects | where name == \"{gameObjectName}\" | call AddComponent(\"TwoBoneIKConstraint\")");
 
                 TwoBoneIKConstraintData data = c.data;
                 if (rootBoneName != null) data.root = FindTransform(rootBoneName);
@@ -80,7 +80,7 @@ If sources already exist, existing entries are preserved and new ones are append
             {
                 var go = FindGO(gameObjectName);
                 var c = go.GetComponent<MultiAimConstraint>();
-                if (c == null) throw new System.Exception($"'{gameObjectName}' has no MultiAimConstraint. Add it first with gameobject-component-add.");
+                if (c == null) throw new System.Exception($"'{gameObjectName}' has no MultiAimConstraint. Add it first: rql-mutate objects | where name == \"{gameObjectName}\" | call AddComponent(\"MultiAimConstraint\")");
 
                 MultiAimConstraintData data = c.data;
                 if (constrainedObjectName != null) data.constrainedObject = FindTransform(constrainedObjectName);
