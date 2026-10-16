@@ -111,8 +111,11 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             if (!GaiaUtils.CheckIfPWSkyExists())
                 throw new Exception("AddToScene returned but no PW Sky exists. The vendor add is a no-op on HDRP, and needs its 'PW Sky Prefabs.asset'.");
 
-            // Same path as a gaia-time-of-day set (SetDesign S46: without it the first sun intensity read 2.49, not the 16:00 curve's 1.60).
-            PWSkyStandalone.Instance.UpdateGaiaTimeOfDay(false);
+            // Re-apply the add's 16:00 through the GaiaAPI setters, as gaia-time-of-day does. SetDesign S46 measured that the
+            // atmosphere tick never writes the sun intensity (2.49 survived two LateUpdates and later frames); only a
+            // time set brought it to the 16:00 curve's 1.60, even with the time unchanged.
+            GaiaAPI.SetTimeOfDayHour(GaiaAPI.GetTimeOfDayHour());
+            GaiaAPI.SetTimeOfDayMinute(GaiaAPI.GetTimeOfDayMinute());
             EditorSceneManager.MarkSceneDirty(scene);
             sb.AppendLine($"PW Sky added. Recorded for restore: {record.disabledLightPaths.Count} directional light(s) the add switched off" +
                           (record.disabledLightPaths.Count > 0 ? $" ({string.Join(", ", record.disabledLightPaths)})" : "") +
@@ -154,7 +157,9 @@ Not available on HDRP (the vendor add returns early). Edit mode only for add/rem
             }
             else
             {
-                sb.AppendLine("No restore record for this scene (PW Sky was not added by gaia-sky, or the scene was renamed). Lights, skybox and fog were NOT restored -- see the report below and fix them by hand.");
+                sb.AppendLine(hadSky
+                    ? "No restore record for this scene (PW Sky was not added by gaia-sky, or the scene was renamed). Lights, skybox and fog were NOT restored -- see the report below and fix them by hand."
+                    : "No restore record and no PW Sky: nothing to do. If you just removed it, this is likely a RE-SENT call and the first run already restored the scene -- check the report below.");
             }
 
             EditorSceneManager.MarkSceneDirty(scene);
